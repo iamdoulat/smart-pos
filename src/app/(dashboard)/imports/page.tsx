@@ -260,7 +260,7 @@ function ShipmentDialog({ open, onClose, onSuccess, companyId, shipment }: { ope
     const loadVendors = async () => {
         try {
             const data = await ContactService.getAll(companyId);
-            setVendors(data.filter((c: Contact) => c.type === 'vendor' || c.type === 'supplier' || c.type === 'both'));
+            setVendors(data.filter((c: Contact) => c.type === 'vendor'));
         } catch (error) {
             console.error("Failed to load vendors", error);
         }

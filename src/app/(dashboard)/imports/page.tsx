@@ -21,8 +21,15 @@ import {
     DollarSign,
     Trash2,
     ArrowUpRight,
+    Pencil,
+    User,
+    Calendar,
+    Hash,
+    Layers,
+    Receipt,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ContactService, Contact } from "@/lib/contact-service";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -84,7 +91,7 @@ const STATUS_CONFIG: Record<string, {
 const ALL_STATUSES = ["pending", "shipped", "arrived", "cleared", "cancelled"] as const;
 
 // ── ShipmentCard ──────────────────────────────────────────────
-function ShipmentCard({ shipment, index, onDelete }: { shipment: any; index: number; onDelete: (id: number) => void }) {
+function ShipmentCard({ shipment, index, onDelete, onEdit }: { shipment: any; index: number; onDelete: (id: number) => void; onEdit: (s: any) => void }) {
     const cfg = STATUS_CONFIG[shipment.status] ?? STATUS_CONFIG.pending;
     const Icon = cfg.icon;
     const shippingCost = parseFloat(shipment.total_shipping_cost ?? 0);
@@ -150,8 +157,13 @@ function ShipmentCard({ shipment, index, onDelete }: { shipment: any; index: num
 
                 {/* Actions */}
                 <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <Button variant="ghost" size="sm" className="flex-1 rounded-2xl h-10 bg-zinc-50 dark:bg-zinc-800 text-zinc-500 hover:text-indigo-600 border border-zinc-100 dark:border-zinc-700 text-xs font-black uppercase tracking-widest gap-2">
-                        View Details <ArrowUpRight size={14} />
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEdit(shipment)}
+                        className="flex-1 rounded-2xl h-10 bg-zinc-50 dark:bg-zinc-800 text-zinc-500 hover:text-indigo-600 border border-zinc-100 dark:border-zinc-700 text-xs font-black uppercase tracking-widest gap-2"
+                    >
+                        Edit Details <Pencil size={14} />
                     </Button>
                     <Button
                         variant="ghost"
@@ -189,33 +201,97 @@ function StatCard({ label, value, icon: Icon, iconBg, iconText, gradientFrom, gr
     );
 }
 
-// ── New Shipment Dialog ───────────────────────────────────────
-function NewShipmentDialog({ open, onClose, onCreated, companyId }: { open: boolean; onClose: () => void; onCreated: () => void; companyId: number }) {
+// ── Shipment Dialog ───────────────────────────────────────────
+function ShipmentDialog({ open, onClose, onSuccess, companyId, shipment }: { open: boolean; onClose: () => void; onSuccess: () => void; companyId: number; shipment?: any }) {
     const [loading, setLoading] = useState(false);
+    const [vendors, setVendors] = useState<Contact[]>([]);
     const [form, setForm] = useState({
+        supplier_id: "",
         container_number: "",
         status: "pending",
         distribution_method: "value",
         total_shipping_cost: "",
         total_duty_cost: "",
+        bill_date: "",
+        way_bill_no: "",
+        quantity: "",
+        cad_amount: "",
+        gst_amount: "",
+        remarks: "",
     });
+
+    useEffect(() => {
+        if (open) {
+            loadVendors();
+            if (shipment) {
+                setForm({
+                    supplier_id: shipment.supplier_id?.toString() || "",
+                    container_number: shipment.container_number || "",
+                    status: shipment.status || "pending",
+                    distribution_method: shipment.distribution_method || "value",
+                    total_shipping_cost: shipment.total_shipping_cost?.toString() || "",
+                    total_duty_cost: shipment.total_duty_cost?.toString() || "",
+                    bill_date: shipment.bill_date || "",
+                    way_bill_no: shipment.way_bill_no || "",
+                    quantity: shipment.quantity?.toString() || "",
+                    cad_amount: shipment.cad_amount?.toString() || "",
+                    gst_amount: shipment.gst_amount?.toString() || "",
+                    remarks: shipment.remarks || "",
+                });
+            } else {
+                setForm({
+                    supplier_id: "",
+                    container_number: "",
+                    status: "pending",
+                    distribution_method: "value",
+                    total_shipping_cost: "",
+                    total_duty_cost: "",
+                    bill_date: new Date().toISOString().split('T')[0],
+                    way_bill_no: "",
+                    quantity: "",
+                    cad_amount: "",
+                    gst_amount: "",
+                    remarks: "",
+                });
+            }
+        }
+    }, [open, shipment]);
+
+    const loadVendors = async () => {
+        try {
+            const data = await ContactService.getAll(companyId);
+            setVendors(data.filter((c: Contact) => c.type === 'vendor' || c.type === 'supplier' || c.type === 'both'));
+        } catch (error) {
+            console.error("Failed to load vendors", error);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         try {
-            await ImportShipmentService.create({
+            const payload = {
                 ...form,
                 company_id: companyId,
                 total_shipping_cost: parseFloat(form.total_shipping_cost) || 0,
                 total_duty_cost: parseFloat(form.total_duty_cost) || 0,
-            });
-            toast.success("Shipment created successfully");
-            onCreated();
+                cad_amount: parseFloat(form.cad_amount) || 0,
+                gst_amount: parseFloat(form.gst_amount) || 0,
+                quantity: parseInt(form.quantity) || 0,
+                supplier_id: form.supplier_id ? parseInt(form.supplier_id) : null,
+            };
+
+            if (shipment) {
+                await ImportShipmentService.update(shipment.id, payload);
+                toast.success("Shipment updated successfully");
+            } else {
+                await ImportShipmentService.create(payload);
+                toast.success("Shipment created successfully");
+            }
+            onSuccess();
             onClose();
-            setForm({ container_number: "", status: "pending", distribution_method: "value", total_shipping_cost: "", total_duty_cost: "" });
         } catch (error: any) {
-            toast.error(error?.response?.data?.message || "Failed to create shipment");
+            toast.error(error?.response?.data?.message || "Operation failed");
         } finally {
             setLoading(false);
         }
@@ -223,28 +299,113 @@ function NewShipmentDialog({ open, onClose, onCreated, companyId }: { open: bool
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-[2rem] p-0 overflow-hidden max-w-lg">
+            <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-[2.5rem] p-0 overflow-hidden max-w-2xl">
                 <div className="h-1.5 bg-gradient-to-r from-indigo-500 via-blue-600 to-violet-500" />
-                <div className="p-8 space-y-8">
+                <div className="p-8 md:p-10 space-y-8 max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle className="text-2xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tighter uppercase">New Shipment</DialogTitle>
+                        <DialogTitle className="text-3xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tighter uppercase leading-none">
+                            {shipment ? "Edit Shipment" : "New Shipment"}
+                        </DialogTitle>
                     </DialogHeader>
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="space-y-3">
-                            <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Container Number</Label>
-                            <Input
-                                value={form.container_number}
-                                onChange={e => setForm({ ...form, container_number: e.target.value })}
-                                placeholder="e.g. MSCU7654321"
-                                required
-                                className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono tracking-widest"
-                            />
+
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                        {/* ── Primary Details ── */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-3">
+                                <Label className="flex items-center gap-2 text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em] mb-1">
+                                    <Container size={12} /> Container Number
+                                </Label>
+                                <Input
+                                    value={form.container_number}
+                                    onChange={e => setForm({ ...form, container_number: e.target.value })}
+                                    placeholder="e.g. MSCU7654321"
+                                    required
+                                    className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono tracking-widest text-lg"
+                                />
+                            </div>
+                            <div className="space-y-3">
+                                <Label className="flex items-center gap-2 text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em] mb-1">
+                                    <User size={12} /> Supplier
+                                </Label>
+                                <Select value={form.supplier_id} onValueChange={v => setForm({ ...form, supplier_id: v })}>
+                                    <SelectTrigger className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
+                                        <SelectValue placeholder="Select Supplier" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2">
+                                        {vendors.map(v => (
+                                            <SelectItem key={v.id} value={v.id.toString()} className="rounded-xl h-10 font-bold focus:bg-indigo-600 focus:text-white">
+                                                {v.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
+
+                        {/* ── Logistics ── */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="space-y-3 md:col-span-1">
+                                <Label className="flex items-center gap-2 text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em] mb-1">
+                                    <Calendar size={12} /> Bill Date
+                                </Label>
+                                <Input
+                                    type="date"
+                                    value={form.bill_date}
+                                    onChange={e => setForm({ ...form, bill_date: e.target.value })}
+                                    className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold"
+                                />
+                            </div>
+                            <div className="space-y-3 md:col-span-1">
+                                <Label className="flex items-center gap-2 text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em] mb-1">
+                                    <Hash size={12} /> Waybill No.
+                                </Label>
+                                <Input
+                                    value={form.way_bill_no}
+                                    onChange={e => setForm({ ...form, way_bill_no: e.target.value })}
+                                    placeholder="WBN-99228"
+                                    className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold"
+                                />
+                            </div>
+                            <div className="space-y-3 md:col-span-1">
+                                <Label className="flex items-center gap-2 text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em] mb-1">
+                                    <Layers size={12} /> Quantity
+                                </Label>
+                                <Input
+                                    type="number"
+                                    value={form.quantity}
+                                    onChange={e => setForm({ ...form, quantity: e.target.value })}
+                                    placeholder="0"
+                                    className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold"
+                                />
+                            </div>
+                        </div>
+
+                        {/* ── Financials ── */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="space-y-3">
+                                <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">CAD Amount</Label>
+                                <Input type="number" step="0.01" value={form.cad_amount} onChange={e => setForm({ ...form, cad_amount: e.target.value })} placeholder="0.00" className="h-12 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-black" />
+                            </div>
+                            <div className="space-y-3">
+                                <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">GST</Label>
+                                <Input type="number" step="0.01" value={form.gst_amount} onChange={e => setForm({ ...form, gst_amount: e.target.value })} placeholder="0.00" className="h-12 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-100 dark:text-zinc-100 font-black" />
+                            </div>
+                            <div className="space-y-3">
+                                <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Shipping ($)</Label>
+                                <Input type="number" step="0.01" value={form.total_shipping_cost} onChange={e => setForm({ ...form, total_shipping_cost: e.target.value })} placeholder="0.00" className="h-12 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-indigo-600 dark:text-indigo-400 font-black" />
+                            </div>
+                            <div className="space-y-3">
+                                <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Duty ($)</Label>
+                                <Input type="number" step="0.01" value={form.total_duty_cost} onChange={e => setForm({ ...form, total_duty_cost: e.target.value })} placeholder="0.00" className="h-12 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-amber-600 dark:text-amber-400 font-black" />
+                            </div>
+                        </div>
+
+                        {/* ── Status & Distribution ── */}
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-3">
                                 <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Status</Label>
                                 <Select value={form.status} onValueChange={v => setForm({ ...form, status: v })}>
-                                    <SelectTrigger className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
+                                    <SelectTrigger className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 font-bold">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2">
@@ -255,9 +416,9 @@ function NewShipmentDialog({ open, onClose, onCreated, companyId }: { open: bool
                                 </Select>
                             </div>
                             <div className="space-y-3">
-                                <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Distribution Method</Label>
+                                <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Distribution</Label>
                                 <Select value={form.distribution_method} onValueChange={v => setForm({ ...form, distribution_method: v })}>
-                                    <SelectTrigger className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
+                                    <SelectTrigger className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 font-bold">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2">
@@ -268,21 +429,24 @@ function NewShipmentDialog({ open, onClose, onCreated, companyId }: { open: bool
                                 </Select>
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-6">
-                            <div className="space-y-3">
-                                <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Shipping Cost ($)</Label>
-                                <Input type="number" step="0.01" value={form.total_shipping_cost} onChange={e => setForm({ ...form, total_shipping_cost: e.target.value })} placeholder="0.00" className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-black" />
-                            </div>
-                            <div className="space-y-3">
-                                <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Duty Cost ($)</Label>
-                                <Input type="number" step="0.01" value={form.total_duty_cost} onChange={e => setForm({ ...form, total_duty_cost: e.target.value })} placeholder="0.00" className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-black" />
-                            </div>
+
+                        <div className="space-y-3">
+                            <Label className="flex items-center gap-2 text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">
+                                <Receipt size={12} /> Remarks
+                            </Label>
+                            <Input
+                                value={form.remarks}
+                                onChange={e => setForm({ ...form, remarks: e.target.value })}
+                                placeholder="Additional details..."
+                                className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium"
+                            />
                         </div>
-                        <DialogFooter className="gap-4 pt-2">
-                            <Button type="button" variant="ghost" onClick={onClose} className="rounded-2xl h-12 px-8 font-black text-xs uppercase tracking-[0.15em] text-zinc-500">Cancel</Button>
-                            <Button type="submit" disabled={loading} className="bg-gradient-to-r from-indigo-500 via-blue-600 to-violet-500 text-white rounded-full h-12 px-8 font-black uppercase italic tracking-tight shadow-lg shadow-indigo-500/20 flex items-center gap-2">
-                                {loading ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} strokeWidth={3} />}
-                                {loading ? "Creating..." : "Create Shipment"}
+
+                        <DialogFooter className="gap-4 pt-4">
+                            <Button type="button" variant="ghost" onClick={onClose} className="rounded-2xl h-14 px-8 font-black text-xs uppercase tracking-[0.15em] text-zinc-500">Cancel</Button>
+                            <Button type="submit" disabled={loading} className="flex-1 bg-gradient-to-r from-indigo-500 via-blue-600 to-violet-500 text-white rounded-full h-14 px-8 font-black uppercase italic tracking-tight shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-3">
+                                {loading ? <Loader2 size={20} className="animate-spin" /> : shipment ? <Pencil size={18} strokeWidth={3} /> : <Plus size={20} strokeWidth={3} />}
+                                {loading ? "Saving..." : shipment ? "Update Shipment" : "Create Shipment"}
                             </Button>
                         </DialogFooter>
                     </form>
@@ -299,6 +463,7 @@ export default function ImportsPage() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [showNewDialog, setShowNewDialog] = useState(false);
+    const [selectedShipment, setSelectedShipment] = useState<any>(null);
     const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
     const loadShipments = useCallback(async () => {
@@ -451,7 +616,16 @@ export default function ImportsPage() {
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     <AnimatePresence mode="popLayout">
                         {filtered.map((shipment, index) => (
-                            <ShipmentCard key={shipment.id} shipment={shipment} index={index} onDelete={handleDelete} />
+                            <ShipmentCard
+                                key={shipment.id}
+                                shipment={shipment}
+                                index={index}
+                                onDelete={handleDelete}
+                                onEdit={(s) => {
+                                    setSelectedShipment(s);
+                                    setShowNewDialog(true);
+                                }}
+                            />
                         ))}
                     </AnimatePresence>
                 </div>
@@ -498,10 +672,14 @@ export default function ImportsPage() {
 
             {/* ── Dialog ── */}
             {currentCompany && (
-                <NewShipmentDialog
+                <ShipmentDialog
                     open={showNewDialog}
-                    onClose={() => setShowNewDialog(false)}
-                    onCreated={loadShipments}
+                    shipment={selectedShipment}
+                    onClose={() => {
+                        setShowNewDialog(false);
+                        setSelectedShipment(null);
+                    }}
+                    onSuccess={loadShipments}
                     companyId={currentCompany.id}
                 />
             )}

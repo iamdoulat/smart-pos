@@ -36,5 +36,9 @@ export const ImportShipmentService = {
     async create(data: any) {
         const response = await api.post('/import-shipments', data);
         return response.data;
+    },
+    async update(id: number, data: any) {
+        const response = await api.put(`/import-shipments/${id}`, data);
+        return response.data;
     }
 };

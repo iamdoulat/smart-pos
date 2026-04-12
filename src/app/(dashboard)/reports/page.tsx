@@ -21,7 +21,19 @@ import {
     FileSpreadsheet,
     FilePieChart,
     Layers,
+    Users,
+    ChevronDown,
+    Wallet,
+    Building2,
 } from "lucide-react";
+import { ContactService, Contact } from "@/lib/contact-service";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
@@ -179,6 +191,10 @@ export default function ReportsPage() {
     const { currentCompany } = useAuthStore();
     const [summary, setSummary] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [vendors, setVendors] = useState<Contact[]>([]);
+    const [selectedVendorId, setSelectedVendorId] = useState<string>("");
+    const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
+    const [exporting, setExporting] = useState(false);
     const companyId = currentCompany?.id || 1;
 
     const loadSummary = useCallback(async () => {
@@ -194,9 +210,20 @@ export default function ReportsPage() {
         }
     }, [currentCompany]);
 
+    const loadVendors = useCallback(async () => {
+        if (!currentCompany) return;
+        try {
+            const data = await ContactService.getAll(currentCompany.id, 'vendor');
+            setVendors(data);
+        } catch (error) {
+            console.error("Failed to load vendors", error);
+        }
+    }, [currentCompany]);
+
     useEffect(() => {
         loadSummary();
-    }, [loadSummary]);
+        loadVendors();
+    }, [loadSummary, loadVendors]);
 
     if (loading) {
         return (
@@ -304,6 +331,207 @@ export default function ReportsPage() {
                     gradient="from-rose-500 to-red-400"
                 />
             </div>
+
+            {/* ── Supplier Wise Report ── */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.6 }}
+            >
+                <Card className="bg-white dark:bg-zinc-900/60 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-lg p-8 group hover:shadow-2xl transition-all relative overflow-hidden">
+                    <div className="h-full w-2 absolute left-0 top-0 bg-gradient-to-b from-indigo-500 to-purple-600" />
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                        <div className="flex gap-5 items-center">
+                            <div className="h-16 w-16 rounded-[1.5rem] bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg text-white">
+                                <Users size={32} strokeWidth={1.5} />
+                            </div>
+                            <div className="space-y-1">
+                                <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tight uppercase leading-none">Supplier Wise Report</h4>
+                                <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-[350px]">
+                                    Detailed purchase analysis including CAD, GST, Duties and Shipping charges for specific suppliers.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                            <div className="w-full sm:w-64">
+                                <Select value={selectedVendorId} onValueChange={setSelectedVendorId}>
+                                    <SelectTrigger className="h-12 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
+                                        <SelectValue placeholder="Select Supplier" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2 max-h-64">
+                                        {vendors.map(v => (
+                                            <SelectItem key={v.id} value={v.id.toString()} className="rounded-xl h-10 font-bold focus:bg-indigo-600 focus:text-white">
+                                                {v.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <Button
+                                disabled={!selectedVendorId || exporting}
+                                onClick={() => {
+                                    if (!selectedVendorId) return;
+                                    window.open(ReportService.exportSupplierPdfUrl(companyId, parseInt(selectedVendorId)), '_blank');
+                                }}
+                                className="w-full sm:w-auto h-12 rounded-full px-8 bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase italic tracking-tighter transition-all hover:scale-105 active:scale-95 border-0 gap-2 disabled:opacity-50 disabled:grayscale"
+                            >
+                                <Download size={18} strokeWidth={3} /> Export PDF
+                            </Button>
+                        </div>
+                    </div>
+                </Card>
+            </motion.div>
+
+            {/* ── Yearly Performance Report ── */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.6 }}
+            >
+                <Card className="bg-white dark:bg-zinc-900/60 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-lg p-8 group hover:shadow-2xl transition-all relative overflow-hidden">
+                    <div className="h-full w-2 absolute left-0 top-0 bg-gradient-to-b from-amber-500 to-orange-600" />
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                        <div className="flex gap-5 items-center">
+                            <div className="h-16 w-16 rounded-[1.5rem] bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg text-white">
+                                <BarChart3 size={32} strokeWidth={1.5} />
+                            </div>
+                            <div className="space-y-1">
+                                <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tight uppercase leading-none">Yearly Financial Summary</h4>
+                                <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-[350px]">
+                                    Comprehensive year-end analysis of Purchases, Sales, and Inventory performance. 
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                            <div className="w-full sm:w-48">
+                                <Select value={selectedYear} onValueChange={setSelectedYear}>
+                                    <SelectTrigger className="h-12 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
+                                        <SelectValue placeholder="Select Year" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2">
+                                        {[2023, 2024, 2025, 2026].map(year => (
+                                            <SelectItem key={year} value={year.toString()} className="rounded-xl h-10 font-bold focus:bg-amber-500 focus:text-white">
+                                                Year {year}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <Button
+                                disabled={exporting}
+                                onClick={() => {
+                                    window.open(ReportService.exportYearlyPdfUrl(companyId, parseInt(selectedYear)), '_blank');
+                                }}
+                                className="w-full sm:w-auto h-12 rounded-full px-8 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-black uppercase italic tracking-tighter transition-all hover:scale-105 active:scale-95 border-0 gap-2"
+                            >
+                                <Download size={18} strokeWidth={3} /> Export Yearly PDF
+                            </Button>
+                        </div>
+                    </div>
+                </Card>
+            </motion.div>
+
+            {/* ── Expenses Yearly Report ── */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 0.6 }}
+            >
+                <Card className="bg-white dark:bg-zinc-900/60 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-lg p-8 group hover:shadow-2xl transition-all relative overflow-hidden">
+                    <div className="h-full w-2 absolute left-0 top-0 bg-gradient-to-b from-rose-500 to-pink-600" />
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                        <div className="flex gap-5 items-center">
+                            <div className="h-16 w-16 rounded-[1.5rem] bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg text-white">
+                                <Wallet size={32} strokeWidth={1.5} />
+                            </div>
+                            <div className="space-y-1">
+                                <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tight uppercase leading-none">Yearly Expenses Record</h4>
+                                <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-[350px]">
+                                    Categorized expense analysis with store-wise grouping and total cost consolidation.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                            <div className="w-full sm:w-48">
+                                <Select value={selectedYear} onValueChange={setSelectedYear}>
+                                    <SelectTrigger className="h-12 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
+                                        <SelectValue placeholder="Select Year" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2">
+                                        {[2023, 2024, 2025, 2026].map(year => (
+                                            <SelectItem key={year} value={year.toString()} className="rounded-xl h-10 font-bold focus:bg-rose-500 focus:text-white">
+                                                Year {year}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <Button
+                                disabled={exporting}
+                                onClick={() => {
+                                    window.open(ReportService.exportExpensesPdfUrl(companyId, parseInt(selectedYear)), '_blank');
+                                }}
+                                className="w-full sm:w-auto h-12 rounded-full px-8 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-black uppercase italic tracking-tighter transition-all hover:scale-105 active:scale-95 border-0 gap-2"
+                            >
+                                <Download size={18} strokeWidth={3} /> Export Expenses PDF
+                            </Button>
+                        </div>
+                    </div>
+                </Card>
+            </motion.div>
+
+            {/* ── Bank Statement Summary ── */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.6 }}
+            >
+                <Card className="bg-white dark:bg-zinc-900/60 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-lg p-8 group hover:shadow-2xl transition-all relative overflow-hidden">
+                    <div className="h-full w-2 absolute left-0 top-0 bg-gradient-to-b from-blue-500 to-indigo-600" />
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                        <div className="flex gap-5 items-center">
+                            <div className="h-16 w-16 rounded-[1.5rem] bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg text-white">
+                                <Building2 size={32} strokeWidth={1.5} />
+                            </div>
+                            <div className="space-y-1">
+                                <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tight uppercase leading-none">Bank Statement Summary</h4>
+                                <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-[350px]">
+                                    Year-end snapshot of income, expenses, and net balances across all company accounts.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                            <div className="w-full sm:w-48">
+                                <Select value={selectedYear} onValueChange={setSelectedYear}>
+                                    <SelectTrigger className="h-12 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
+                                        <SelectValue placeholder="Select Year" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2">
+                                        {[2023, 2024, 2025, 2026].map(year => (
+                                            <SelectItem key={year} value={year.toString()} className="rounded-xl h-10 font-bold focus:bg-blue-500 focus:text-white">
+                                                Year {year}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <Button
+                                disabled={exporting}
+                                onClick={() => {
+                                    window.open(ReportService.exportBankPdfUrl(companyId, parseInt(selectedYear)), '_blank');
+                                }}
+                                className="w-full sm:w-auto h-12 rounded-full px-8 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-black uppercase italic tracking-tighter transition-all hover:scale-105 active:scale-95 border-0 gap-2"
+                            >
+                                <Download size={18} strokeWidth={3} /> Export Bank PDF
+                            </Button>
+                        </div>
+                    </div>
+                </Card>
+            </motion.div>
 
             {/* ── AI Insights ── */}
             <AIForecastCard

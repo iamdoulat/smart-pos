@@ -126,9 +126,9 @@ export default function GeneralSettingsPage() {
         }
     };
 
-    const renderFileInput = (id: string, label: string, currentPath: string | undefined, icon: any) => {
+    const renderFileInput = (id: string, label: string, currentUrl: string | undefined, icon: any) => {
         const Icon = icon;
-        const preview = previews[id] || (currentPath ? `${API_BASE_URL}/storage/${currentPath}` : null);
+        const preview = previews[id] || (currentUrl || null);
 
         return (
             <div className="space-y-4">
@@ -400,12 +400,12 @@ export default function GeneralSettingsPage() {
                                         </h3>
                                     </div>
                                     <div className="p-8 space-y-10">
-                                        {renderFileInput("logo_path", "Company Logo", company?.logo_path, Building2)}
+                                        {renderFileInput("logo_path", "Company Logo", company?.logo_url, Building2)}
                                         <div className="border-t border-zinc-100 dark:border-zinc-800 pt-8">
-                                            {renderFileInput("favicon_path", "Application Favicon", company?.favicon_path, Globe)}
+                                            {renderFileInput("favicon_path", "Application Favicon", company?.favicon_url, Globe)}
                                         </div>
                                         <div className="border-t border-zinc-100 dark:border-zinc-800 pt-8">
-                                            {renderFileInput("qr_code_path", "Google Business QR Code", company?.qr_code_path, QrCode)}
+                                            {renderFileInput("qr_code_path", "Google Business QR Code", company?.qr_code_url, QrCode)}
                                         </div>
                                     </div>
                                 </div>
@@ -500,11 +500,11 @@ export default function GeneralSettingsPage() {
                                         PWA Assets
                                     </h4>
                                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
-                                        {renderFileInput("pwa_icon_144", "Icon (144x144)", company?.pwa_icon_144, Smartphone)}
-                                        {renderFileInput("pwa_icon_192", "Icon (192x192)", company?.pwa_icon_192, Smartphone)}
-                                        {renderFileInput("pwa_icon_512", "Icon (512x512)", company?.pwa_icon_512, Smartphone)}
-                                        {renderFileInput("pwa_maskable_icon", "Maskable Icon", company?.pwa_maskable_icon, SmartphoneNfc)}
-                                        {renderFileInput("pwa_screenshot", "Screenshot", company?.pwa_screenshot, Camera)}
+                                        {renderFileInput("pwa_icon_144", "Icon (144x144)", company?.pwa_icon_144_url, Smartphone)}
+                                        {renderFileInput("pwa_icon_192", "Icon (192x192)", company?.pwa_icon_192_url, Smartphone)}
+                                        {renderFileInput("pwa_icon_512", "Icon (512x512)", company?.pwa_icon_512_url, Smartphone)}
+                                        {renderFileInput("pwa_maskable_icon", "Maskable Icon", company?.pwa_maskable_icon_url, SmartphoneNfc)}
+                                        {renderFileInput("pwa_screenshot", "Screenshot", company?.pwa_screenshot_url, Camera)}
                                     </div>
                                 </div>
                             </div>

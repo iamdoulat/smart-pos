@@ -280,14 +280,14 @@ export default function DashboardLayout({
         if (currentCompany) {
             document.title = `${currentCompany.name} | Dashboard`;
 
-            if (currentCompany.favicon_path) {
+            if (currentCompany.favicon_url) {
                 let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
                 if (!link) {
                     link = document.createElement('link');
                     link.rel = 'icon';
                     document.getElementsByTagName('head')[0].appendChild(link);
                 }
-                link.href = `${API_BASE_URL}/storage/${currentCompany.favicon_path}`;
+                link.href = currentCompany.favicon_url;
             }
         }
     }, [currentCompany, API_BASE_URL]);
@@ -324,11 +324,11 @@ export default function DashboardLayout({
             >
                 <div className="h-16 px-4 flex items-center gap-3 sticky top-0 z-10 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                        {currentCompany?.logo_path && (
+                        {currentCompany?.logo_url && (
                             <div className="p-[2px] rounded-xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-pink-500 shadow-lg shadow-orange-500/20 shrink-0">
                                 <div className="h-10 w-10 rounded-[10px] overflow-hidden bg-white dark:bg-zinc-900 border border-white/10 flex items-center justify-center">
                                     <img
-                                        src={`${API_BASE_URL}/storage/${currentCompany.logo_path}`}
+                                        src={currentCompany.logo_url}
                                         alt="Logo"
                                         className="h-full w-full object-contain p-0.5"
                                     />
@@ -580,9 +580,9 @@ export default function DashboardLayout({
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <button className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-600 to-purple-500 flex items-center justify-center text-xs font-bold text-white shadow ring-2 ring-transparent hover:ring-indigo-300 dark:hover:ring-indigo-700 transition-all focus:outline-none overflow-hidden">
-                                    {user?.avatar_path ? (
+                                    {user?.avatar_url ? (
                                         <img
-                                            src={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/storage/${user.avatar_path}`}
+                                            src={user.avatar_url}
                                             alt="Avatar"
                                             className="h-full w-full object-cover"
                                         />

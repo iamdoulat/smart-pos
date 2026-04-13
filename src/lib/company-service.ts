@@ -14,8 +14,11 @@ export interface Company {
     currency: string;
     fiscal_year_start?: string;
     logo_path?: string;
+    logo_url?: string;
     favicon_path?: string;
+    favicon_url?: string;
     qr_code_path?: string;
+    qr_code_url?: string;
     pos_email?: string;
     pos_website?: string;
     pos_mobile?: string;
@@ -25,10 +28,15 @@ export interface Company {
     app_short_name?: string;
     app_description?: string;
     pwa_icon_144?: string;
+    pwa_icon_144_url?: string;
     pwa_icon_192?: string;
+    pwa_icon_192_url?: string;
     pwa_icon_512?: string;
+    pwa_icon_512_url?: string;
     pwa_maskable_icon?: string;
+    pwa_maskable_icon_url?: string;
     pwa_screenshot?: string;
+    pwa_screenshot_url?: string;
 
     created_at?: string;
     updated_at?: string;

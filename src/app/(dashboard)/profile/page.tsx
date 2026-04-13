@@ -138,8 +138,7 @@ function ProfileTab() {
         ? user.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
         : "??";
 
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || "http://localhost:8000";
-    const avatarUrl = preview || (user?.avatar_path ? `${API_BASE_URL}/storage/${user.avatar_path}` : null);
+    const avatarUrl = preview || (user?.avatar_url || null);
 
     return (
         <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm rounded-2xl overflow-hidden">

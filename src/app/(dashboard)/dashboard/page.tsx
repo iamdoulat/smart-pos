@@ -17,6 +17,8 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
+    AreaChart,
+    Area,
     PieChart,
     Pie,
     Cell,

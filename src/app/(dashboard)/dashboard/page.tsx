@@ -268,12 +268,15 @@ export default function DashboardPage() {
                                 </CardTitle>
                                 <p className="text-xs text-zinc-500 font-medium">Sales value distribution</p>
                             </CardHeader>
-                            <CardContent className="flex-1 flex flex-col justify-center min-h-[300px] px-2">
-                                <div className="h-[250px] w-full">
+                            <CardContent className="flex-1 flex flex-col justify-center px-2">
+                                <div className="h-[300px] w-full flex items-center justify-center">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
                                             <Pie
-                                                data={summary?.top_products || []}
+                                                data={(summary?.top_products || []).map((p: any) => ({
+                                                    ...p,
+                                                    total_value: parseFloat(p.total_value || "0")
+                                                }))}
                                                 cx="50%"
                                                 cy="50%"
                                                 innerRadius={60}

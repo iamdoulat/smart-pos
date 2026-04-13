@@ -484,7 +484,7 @@ export default function POSTerminalPage() {
                             </div>
                             <input
                                 type="text"
-                                className="flex-1 bg-transparent border-none focus:outline-none font-bold text-slate-700 text-sm placeholder:text-slate-300 w-full"
+                                className="flex-1 bg-transparent border-none focus:outline-none font-bold text-slate-700 dark:text-zinc-100 text-sm placeholder:text-slate-300 dark:placeholder:text-zinc-500 w-full"
                                 placeholder="Search by name or mobile..."
                                 value={customerName}
                                 onChange={(e) => {
@@ -542,7 +542,7 @@ export default function POSTerminalPage() {
                             <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500 w-16 shrink-0">Mobile</span>
                             <input
                                 type="text"
-                                className="flex-1 bg-transparent border-none focus:outline-none font-medium text-slate-700 text-sm placeholder:text-slate-300 w-full"
+                                className="flex-1 bg-transparent border-none focus:outline-none font-medium text-slate-700 dark:text-zinc-100 text-sm placeholder:text-slate-300 dark:placeholder:text-zinc-500 w-full"
                                 placeholder="Enter mobile"
                                 value={customerMobile}
                                 onChange={(e) => setCustomerMobile(e.target.value)}
@@ -569,7 +569,7 @@ export default function POSTerminalPage() {
                             <span className="text-[10px] font-black uppercase tracking-widest text-purple-500 w-16 shrink-0">Email ID</span>
                             <input
                                 type="email"
-                                className="flex-1 bg-transparent border-none focus:outline-none font-medium text-slate-700 text-sm placeholder:text-slate-300 w-full"
+                                className="flex-1 bg-transparent border-none focus:outline-none font-medium text-slate-700 dark:text-zinc-100 text-sm placeholder:text-slate-300 dark:placeholder:text-zinc-500 w-full"
                                 placeholder="Enter email"
                                 value={customerEmail}
                                 onChange={(e) => setCustomerEmail(e.target.value)}
@@ -599,7 +599,7 @@ export default function POSTerminalPage() {
                             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-indigo-600 transition-colors" size={22} />
                              <Input
                                 placeholder="Scan barcode or search products..."
-                                className="h-13 pl-14 pr-12 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-slate-200 dark:border-zinc-800 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 dark:focus:border-indigo-500/50 font-medium text-lg placeholder:text-zinc-400 dark:placeholder:text-zinc-600 transition-all"
+                                className="h-13 pl-14 pr-12 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-slate-200 dark:border-zinc-800 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 dark:focus:border-indigo-500/50 font-medium text-lg placeholder:text-zinc-400 dark:placeholder:text-zinc-400 transition-all text-slate-900 dark:text-zinc-100"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
@@ -692,7 +692,7 @@ export default function POSTerminalPage() {
                                         <div className="p-4 flex flex-col gap-1.5 text-zinc-900 dark:text-zinc-100">
                                             <div className="flex flex-col">
                                                 <h3 className="font-bold text-sm text-slate-800 dark:text-zinc-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1 leading-tight">{product.name}</h3>
-                                                <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-zinc-500 mt-0.5">
+                                                 <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-zinc-300 mt-0.5">
                                                     {categories.find(c => c.id === product.category_id)?.name || "Apparel"}
                                                 </p>
                                             </div>
@@ -869,9 +869,9 @@ export default function POSTerminalPage() {
                                 </div>
                             ))}
                             {cart.length === 0 && (
-                                <div className="h-80 flex flex-col items-center justify-center text-slate-200 text-slate-300">
+                                 <div className="h-80 flex flex-col items-center justify-center text-slate-300 dark:text-zinc-500">
                                     <ShoppingCart size={80} className="opacity-20 mb-6" />
-                                    <p className="font-bold italic uppercase tracking-widest text-[10px] opacity-40">Cart is empty</p>
+                                    <p className="font-bold italic uppercase tracking-widest text-[10px] opacity-100 dark:text-zinc-200">Cart is empty</p>
                                 </div>
                             )}
                         </div>
@@ -879,21 +879,21 @@ export default function POSTerminalPage() {
 
                      <div className="p-6 bg-white dark:bg-zinc-900 border-t border-slate-200 dark:border-zinc-800 space-y-4 shrink-0 shadow-[0_-8px_30px_rgb(0,0,0,0.04)] dark:shadow-none">
                         <div className="space-y-2">
-                            <h3 className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-zinc-500">Order Summary</h3>
+                             <h3 className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-zinc-400">Order Summary</h3>
                             <div className="space-y-1">
-                                <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-400 tracking-tight">
+                                <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-200 tracking-tight">
                                     <span>Subtotal</span>
                                     <span className="text-slate-900 dark:text-zinc-100 font-black">${totals.subtotal.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-400 tracking-tight">
+                                <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-200 tracking-tight">
                                     <span>GST (5.00%)</span>
                                     <span className="text-slate-900 dark:text-zinc-100 font-black">${totals.gst.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-400 tracking-tight">
+                                <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-200 tracking-tight">
                                     <span>QST (9.975%)</span>
                                     <span className="text-slate-900 dark:text-zinc-100 font-black">${totals.qst.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-400 tracking-tight">
+                                <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-200 tracking-tight">
                                     <div className="flex items-center gap-2">
                                         <span>Discount</span>
                                         <input
@@ -910,7 +910,7 @@ export default function POSTerminalPage() {
                         </div>
 
                         <div className="flex justify-between items-center group/total py-2 text-slate-900 dark:text-zinc-100">
-                             <span className="text-xl font-black italic uppercase tracking-tighter text-slate-400 dark:text-zinc-500 group-hover/total:text-indigo-600 dark:group-hover/total:text-indigo-400 transition-colors">Grand Total</span>
+                              <span className="text-xl font-black italic uppercase tracking-tighter text-slate-400 dark:text-zinc-100 group-hover/total:text-indigo-600 dark:group-hover/total:text-indigo-400 transition-colors">Grand Total</span>
                             <span className="text-2xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent italic tracking-tight transition-all pr-1">
                                 ${totals.total.toFixed(2)}
                             </span>

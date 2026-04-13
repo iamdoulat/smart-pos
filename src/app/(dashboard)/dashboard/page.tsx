@@ -313,9 +313,6 @@ function PaymentStatusBadge({ status }: { status?: string }) {
         </div>
     );
 }
-        </div>
-    );
-}
 
 function StatCard({ title, value, change, trend, icon: Icon, gradient }: any) {
     return (

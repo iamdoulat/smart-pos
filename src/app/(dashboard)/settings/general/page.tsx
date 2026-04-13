@@ -46,7 +46,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { cn } from "@/lib/utils";
+import { cn, getAssetUrl } from "@/lib/utils";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || "http://localhost:8000";
 
@@ -128,7 +128,7 @@ export default function GeneralSettingsPage() {
 
     const renderFileInput = (id: string, label: string, currentUrl: string | undefined, icon: any) => {
         const Icon = icon;
-        const preview = previews[id] || (currentUrl || null);
+        const preview = previews[id] || (currentUrl ? getAssetUrl(currentUrl) : null);
 
         return (
             <div className="space-y-4">

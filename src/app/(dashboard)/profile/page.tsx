@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTheme } from "next-themes";
 import { User, KeyRound, Palette, Save, Eye, EyeOff, Sun, Moon, Monitor, CheckCircle2, Upload, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getAssetUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -138,7 +138,7 @@ function ProfileTab() {
         ? user.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
         : "??";
 
-    const avatarUrl = preview || (user?.avatar_url || null);
+    const avatarUrl = preview || (user?.avatar_url ? getAssetUrl(user.avatar_url) : null);
 
     return (
         <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm rounded-2xl overflow-hidden">

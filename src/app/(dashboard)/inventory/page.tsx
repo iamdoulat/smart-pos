@@ -23,7 +23,7 @@ import {
     ChevronLeft,
     ChevronRight,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getAssetUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import {
     DropdownMenu,
@@ -300,7 +300,7 @@ export default function InventoryPage() {
                                                     <div className="h-10 w-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700">
                                                         {p.image_url ? (
                                                             <img
-                                                                src={p.image_url}
+                                                                src={getAssetUrl(p.image_url)}
                                                                 alt={p.name}
                                                                 className="h-full w-full object-cover transition-transform group-hover:scale-110"
                                                                 onError={(e) => {

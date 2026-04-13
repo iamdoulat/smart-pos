@@ -38,7 +38,7 @@ import {
     Check,
     CalendarDays
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getAssetUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AuthService } from "@/lib/auth-service";
@@ -287,7 +287,7 @@ export default function DashboardLayout({
                     link.rel = 'icon';
                     document.getElementsByTagName('head')[0].appendChild(link);
                 }
-                link.href = currentCompany.favicon_url;
+                link.href = getAssetUrl(currentCompany.favicon_url);
             }
         }
     }, [currentCompany, API_BASE_URL]);
@@ -328,7 +328,7 @@ export default function DashboardLayout({
                             <div className="p-[2px] rounded-xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-pink-500 shadow-lg shadow-orange-500/20 shrink-0">
                                 <div className="h-10 w-10 rounded-[10px] overflow-hidden bg-white dark:bg-zinc-900 border border-white/10 flex items-center justify-center">
                                     <img
-                                        src={currentCompany.logo_url}
+                                        src={getAssetUrl(currentCompany.logo_url)}
                                         alt="Logo"
                                         className="h-full w-full object-contain p-0.5"
                                     />
@@ -582,7 +582,7 @@ export default function DashboardLayout({
                                 <button className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-600 to-purple-500 flex items-center justify-center text-xs font-bold text-white shadow ring-2 ring-transparent hover:ring-indigo-300 dark:hover:ring-indigo-700 transition-all focus:outline-none overflow-hidden">
                                     {user?.avatar_url ? (
                                         <img
-                                            src={user.avatar_url}
+                                            src={getAssetUrl(user.avatar_url)}
                                             alt="Avatar"
                                             className="h-full w-full object-cover"
                                         />

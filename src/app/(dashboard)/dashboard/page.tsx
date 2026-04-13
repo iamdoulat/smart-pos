@@ -96,6 +96,42 @@ export default function DashboardPage() {
 
     return (
         <div className="space-y-6">
+            {/* Stat Cards - Restored */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <StatCard
+                    title="Revenue"
+                    value={`$${parseFloat(summary?.total_income || 0).toFixed(2)}`}
+                    change="+12.5% vs last month"
+                    trend="up"
+                    icon={DollarSign}
+                    gradient="from-blue-500 via-blue-600 to-indigo-700"
+                />
+                <StatCard
+                    title="Expenses"
+                    value={`$${parseFloat(summary?.total_expense || 0).toFixed(2)}`}
+                    change="+4.2% vs last month"
+                    trend="up"
+                    icon={CreditCard}
+                    gradient="from-emerald-400 via-teal-500 to-cyan-600"
+                />
+                <StatCard
+                    title="Net Profit"
+                    value={`$${parseFloat(summary?.net_profit || 0).toFixed(2)}`}
+                    change="+18.3% vs last month"
+                    trend="up"
+                    icon={TrendingUp}
+                    gradient="from-violet-500 via-purple-600 to-indigo-600"
+                />
+                <StatCard
+                    title="Transactions"
+                    value={summary?.transactions_count || 0}
+                    change="Steady this month"
+                    trend="up"
+                    icon={AlertCircle}
+                    gradient="from-orange-400 via-orange-500 to-rose-500"
+                />
+            </div>
+
             {/* Main Upper Row */}
             <div className="grid gap-6 lg:grid-cols-7">
                 {/* Financial Performance - Wide Left */}

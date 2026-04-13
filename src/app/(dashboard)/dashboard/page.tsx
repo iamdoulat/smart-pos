@@ -23,7 +23,7 @@ import {
 import { useAuthStore } from "@/lib/store";
 import { ReportService } from "@/lib/report-service";
 import { SaleService, Sale } from "@/lib/sales-purchase-service";
-import { Loader2, MoreVertical, Calendar, User, Wallet } from "lucide-react";
+import { Loader2, MoreVertical, Calendar, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
     Table,
@@ -39,7 +39,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { format } from "date-fns";
 
 export default function DashboardPage() {
     const { currentCompany } = useAuthStore();
@@ -219,7 +218,7 @@ export default function DashboardPage() {
                                                     <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
                                                         <Calendar size={13} strokeWidth={2.5} />
                                                         <span className="text-xs font-medium">
-                                                            {format(new Date(sale.sales_date), "MMM d, yyyy")}
+                                                            {new Date(sale.sales_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                                                         </span>
                                                     </div>
                                                 </TableCell>

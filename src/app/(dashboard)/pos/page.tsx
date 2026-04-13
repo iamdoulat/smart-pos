@@ -429,7 +429,7 @@ export default function POSTerminalPage() {
     };
 
     return (
-        <div className="flex h-[calc(100vh-64px)] gap-4 overflow-hidden p-4 bg-slate-50 text-zinc-900 font-sans selection:bg-indigo-500/10">
+        <div className="flex h-[calc(100vh-64px)] gap-4 overflow-hidden p-4 bg-slate-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans selection:bg-indigo-500/10">
             <style jsx global>{`
                 .scrollbar-visible::-webkit-scrollbar {
                     width: 6px;
@@ -476,10 +476,10 @@ export default function POSTerminalPage() {
                 {/* Header Rows */}
                 <div className="flex flex-col gap-4 shrink-0">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="relative group px-4 h-12 rounded-xl bg-white border border-slate-200 flex items-center gap-2 shadow-sm focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+                        <div className="relative group px-4 h-12 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center gap-2 shadow-sm focus-within:border-indigo-400 dark:focus-within:border-indigo-500/50 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
                             <div className="flex items-center gap-3 shrink-0">
-                                <div className="h-8 w-8 rounded-full bg-indigo-50 flex items-center justify-center">
-                                    <User size={16} className="text-indigo-600" />
+                                <div className="h-8 w-8 rounded-full bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center">
+                                    <User size={16} className="text-indigo-600 dark:text-indigo-400" />
                                 </div>
                             </div>
                             <input
@@ -501,16 +501,16 @@ export default function POSTerminalPage() {
 
                             {/* Suggestions Dropdown */}
                             {showCustomerSuggestions && (
-                                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl p-2 z-[100] max-h-60 overflow-y-auto cart-scrollbar">
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-2xl p-2 z-[100] max-h-60 overflow-y-auto cart-scrollbar">
                                     {customerSearchResults.slice(0, 10).map(customer => (
                                         <div
                                             key={customer.id}
                                             onClick={() => selectCustomer(customer)}
-                                            className="flex flex-col gap-0.5 p-3 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors group/suggestion border border-transparent hover:border-slate-100"
+                                            className="flex flex-col gap-0.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800 cursor-pointer transition-colors group/suggestion border border-transparent hover:border-slate-100 dark:hover:border-zinc-700"
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="flex flex-col">
-                                                    <span className="font-bold text-slate-700 group-hover/suggestion:text-indigo-600 transition-colors uppercase italic text-xs tracking-tight">
+                                                    <span className="font-bold text-slate-700 dark:text-zinc-200 group-hover/suggestion:text-indigo-600 dark:group-hover/suggestion:text-indigo-400 transition-colors uppercase italic text-xs tracking-tight">
                                                         {customer.name}
                                                     </span>
                                                     <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mt-0.5">
@@ -597,9 +597,9 @@ export default function POSTerminalPage() {
                         <div className="relative group flex-1">
                             <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-3xl blur opacity-0 group-focus-within:opacity-100 transition duration-1000 group-focus-within:duration-200"></div>
                             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-indigo-600 transition-colors" size={22} />
-                            <Input
+                             <Input
                                 placeholder="Scan barcode or search products..."
-                                className="h-13 pl-14 pr-12 bg-white/80 backdrop-blur-xl border-slate-200 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 font-medium text-lg placeholder:text-zinc-400 transition-all"
+                                className="h-13 pl-14 pr-12 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-slate-200 dark:border-zinc-800 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 dark:focus:border-indigo-500/50 font-medium text-lg placeholder:text-zinc-400 dark:placeholder:text-zinc-600 transition-all"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
@@ -610,15 +610,15 @@ export default function POSTerminalPage() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                                <SelectTrigger className="w-[180px] h-13 bg-white/80 backdrop-blur-xl border-slate-200 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 font-medium transition-all text-slate-900">
+                             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                                <SelectTrigger className="w-[180px] h-13 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-slate-200 dark:border-zinc-800 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 dark:focus:border-indigo-500/50 font-medium transition-all text-slate-900 dark:text-zinc-100">
                                     <div className="flex items-center gap-2">
-                                        <Layers size={18} className="text-indigo-600" />
+                                        <Layers size={18} className="text-indigo-600 dark:text-indigo-400" />
                                         <SelectValue placeholder="Categories" />
                                     </div>
                                 </SelectTrigger>
-                                <SelectContent className="rounded-2xl border-slate-200 shadow-xl overflow-hidden p-1 bg-white text-slate-900">
-                                    <SelectItem value="all" className="rounded-xl font-bold uppercase tracking-widest text-[10px] focus:bg-indigo-50 focus:text-indigo-600 py-3">All Categories</SelectItem>
+                                 <SelectContent className="rounded-2xl border-slate-200 dark:border-zinc-800 shadow-xl overflow-hidden p-1 bg-white dark:bg-zinc-900 text-slate-900 dark:text-zinc-100">
+                                    <SelectItem value="all" className="rounded-xl font-bold uppercase tracking-widest text-[10px] focus:bg-indigo-50 dark:focus:bg-indigo-500/10 focus:text-indigo-600 dark:focus:text-indigo-400 py-3">All Categories</SelectItem>
                                     {categories.map(cat => (
                                         <SelectItem key={cat.id} value={cat.id.toString()} className="rounded-xl font-bold uppercase tracking-widest text-[10px] focus:bg-indigo-50 focus:text-indigo-600 py-3">{cat.name}</SelectItem>
                                     ))}
@@ -626,14 +626,14 @@ export default function POSTerminalPage() {
                             </Select>
 
                             <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-                                <SelectTrigger className="w-[180px] h-13 bg-white/80 backdrop-blur-xl border-slate-200 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 font-medium transition-all text-slate-900">
+                                <SelectTrigger className="w-[180px] h-13 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-slate-200 dark:border-zinc-800 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 dark:focus:border-indigo-500/50 font-medium transition-all text-slate-900 dark:text-zinc-100">
                                     <div className="flex items-center gap-2">
-                                        <Check size={18} className="text-purple-600" />
+                                        <Check size={18} className="text-purple-600 dark:text-purple-400" />
                                         <SelectValue placeholder="Brands" />
                                     </div>
                                 </SelectTrigger>
-                                <SelectContent className="rounded-2xl border-slate-200 shadow-xl overflow-hidden p-1 bg-white text-slate-900">
-                                    <SelectItem value="all" className="rounded-xl font-bold uppercase tracking-widest text-[10px] focus:bg-purple-50 focus:text-purple-600 py-3">All Brands</SelectItem>
+                                <SelectContent className="rounded-2xl border-slate-200 dark:border-zinc-800 shadow-xl overflow-hidden p-1 bg-white dark:bg-zinc-900 text-slate-900 dark:text-zinc-100">
+                                    <SelectItem value="all" className="rounded-xl font-bold uppercase tracking-widest text-[10px] focus:bg-purple-50 dark:focus:bg-purple-500/10 focus:text-purple-600 dark:focus:text-purple-400 py-3">All Brands</SelectItem>
                                     {brands.map(brand => (
                                         <SelectItem key={brand.id} value={brand.id.toString()} className="rounded-xl font-bold uppercase tracking-widest text-[10px] focus:bg-purple-50 focus:text-purple-600 py-3">{brand.name}</SelectItem>
                                     ))}
@@ -661,12 +661,12 @@ export default function POSTerminalPage() {
                                     onClick={() => addToCart(product)}
                                     className="group relative flex flex-col cursor-pointer transition-all duration-500 hover:-translate-y-1"
                                 >
-                                    <div className="absolute inset-3 bg-indigo-500/5 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                                    <div className="absolute inset-3 bg-indigo-500/5 dark:bg-indigo-500/10 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition duration-500"></div>
                                     <div className={cn(
-                                        "relative flex flex-col h-full bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm transition-all group-hover:shadow-lg group-hover:border-indigo-200",
+                                        "relative flex flex-col h-full bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm transition-all group-hover:shadow-lg group-hover:border-indigo-200 dark:group-hover:border-indigo-800",
                                         product.stock_quantity <= 0 && "opacity-60 grayscale-[0.5]"
                                     )}>
-                                        <div className="aspect-[214/300] relative flex items-center justify-center bg-slate-50/50 overflow-hidden text-zinc-900">
+                                        <div className="aspect-[214/300] relative flex items-center justify-center bg-slate-50/50 dark:bg-zinc-800/50 overflow-hidden text-zinc-900 dark:text-zinc-100">
                                             {product.image_url || product.image_path ? (
                                                 <img 
                                                     src={getAssetUrl(product.image_url || product.image_path)} 
@@ -689,22 +689,22 @@ export default function POSTerminalPage() {
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="p-4 flex flex-col gap-1.5 text-zinc-900">
+                                        <div className="p-4 flex flex-col gap-1.5 text-zinc-900 dark:text-zinc-100">
                                             <div className="flex flex-col">
-                                                <h3 className="font-bold text-sm text-slate-800 group-hover:text-indigo-600 transition-colors line-clamp-1 leading-tight">{product.name}</h3>
-                                                <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 mt-0.5">
+                                                <h3 className="font-bold text-sm text-slate-800 dark:text-zinc-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1 leading-tight">{product.name}</h3>
+                                                <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-zinc-500 mt-0.5">
                                                     {categories.find(c => c.id === product.category_id)?.name || "Apparel"}
                                                 </p>
                                             </div>
                                             <div className="flex items-end justify-between mt-1">
-                                                <span className="font-black text-lg tracking-tighter text-slate-900 group-hover:text-indigo-600 transition-colors origin-left">
+                                                 <span className="font-black text-lg tracking-tighter text-slate-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors origin-left">
                                                     ${product.sales_price}
                                                 </span>
                                                 <div className={cn(
                                                     "px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider shadow-sm transition-all",
                                                     product.stock_quantity <= 0
-                                                        ? "bg-slate-100 text-slate-400 border border-slate-200"
-                                                        : "bg-gradient-to-br from-indigo-600 to-violet-600 text-white"
+                                                        ? "bg-slate-100 dark:bg-zinc-800 text-slate-400 dark:text-zinc-500 border border-slate-200 dark:border-zinc-700"
+                                                        : "bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-indigo-500/20"
                                                 )}>
                                                     {product.stock_quantity <= 0 ? (
                                                         "No Stock"
@@ -738,9 +738,9 @@ export default function POSTerminalPage() {
                 </ScrollArea>
 
                 {/* Payment Selection Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 shrink-0 pt-3 border-t border-slate-200 bg-slate-50/50">
-                    <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm h-full flex flex-col gap-3">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600/70">Quick Gateway Selection</p>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 shrink-0 pt-3 border-t border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/50">
+                    <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl p-4 shadow-sm h-full flex flex-col gap-3">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600/70 dark:text-indigo-400/70">Quick Gateway Selection</p>
                         <div className="grid grid-cols-4 gap-2">
                             {[
                                 { id: "Cash", icon: Banknote, color: "from-emerald-500 to-teal-600 shadow-emerald-500/20", border: "border-emerald-200", text: "text-emerald-600" },
@@ -748,14 +748,14 @@ export default function POSTerminalPage() {
                                 { id: "PayPal", icon: Coins, color: "from-sky-400 to-blue-500 shadow-sky-500/20", border: "border-sky-200", text: "text-sky-600" },
                                 { id: "Interac", icon: Coins, color: "from-rose-500 to-orange-600 shadow-rose-500/20", border: "border-rose-200", text: "text-rose-600" },
                             ].map(method => (
-                                <button
+                                 <button
                                     key={method.id}
                                     onClick={() => setPaymentMode(method.id)}
                                     className={cn(
                                         "flex flex-col items-center justify-center gap-1.5 px-1 py-3 rounded-xl border transition-all active:scale-95 group",
                                         paymentMode === method.id
                                             ? cn("bg-gradient-to-br border-transparent shadow-lg -translate-y-0.5 ring-2 ring-white/20", method.color)
-                                            : "bg-white border-slate-200 hover:border-indigo-300 hover:bg-slate-50/50 shadow-sm"
+                                            : "bg-white dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 hover:border-indigo-300 dark:hover:border-indigo-800 hover:bg-slate-50/50 dark:hover:bg-zinc-700/50 shadow-sm"
                                     )}
                                 >
                                     <method.icon
@@ -778,37 +778,37 @@ export default function POSTerminalPage() {
                         </div>
                     </div>
 
-                    <div className="bg-white/40 border border-dashed border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 group hover:bg-white transition-all cursor-default">
-                        <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-300 group-hover:text-indigo-400 transition-colors">
+                     <div className="bg-white/40 dark:bg-zinc-900/40 border border-dashed border-slate-200 dark:border-zinc-800 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 group hover:bg-white dark:hover:bg-zinc-800 transition-all cursor-default">
+                        <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-slate-300 dark:text-zinc-600 group-hover:text-indigo-400 transition-colors">
                             <Plus size={20} />
                         </div>
-                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-300 group-hover:text-slate-400 transition-colors italic">Reserved Space</p>
+                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-300 dark:text-zinc-600 group-hover:text-slate-400 dark:group-hover:text-zinc-500 transition-colors italic">Reserved Space</p>
                     </div>
                 </div>
             </div>
 
             {/* Right Column: Shopping Cart */}
             <div className="w-[420px] flex flex-col h-full relative group/cart">
-                <div className="relative flex-1 flex flex-col bg-white border border-slate-200 rounded-[40px] overflow-hidden shadow-2xl shadow-indigo-500/10">
-                    <div className="py-4 px-6 border-b border-indigo-100 bg-gradient-to-r from-indigo-50/50 via-white to-purple-50/50 shrink-0 relative overflow-hidden text-slate-900">
+                <div className="relative flex-1 flex flex-col bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-[40px] overflow-hidden shadow-2xl shadow-indigo-500/10 dark:shadow-none">
+                    <div className="py-4 px-6 border-b border-indigo-100 dark:border-zinc-800 bg-gradient-to-r from-indigo-50/50 via-white to-purple-50/50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 shrink-0 relative overflow-hidden text-slate-900 dark:text-zinc-100">
                         <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-200 rounded-full mix-blend-multiply filter blur-2xl opacity-30"></div>
                         <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-200 rounded-full mix-blend-multiply filter blur-2xl opacity-30"></div>
 
                         <div className="flex items-center justify-between relative z-10">
                             <div className="flex items-center gap-3">
                                 <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 p-[1px] shadow-lg shadow-indigo-500/20">
-                                    <div className="h-full w-full bg-white rounded-[15px] flex items-center justify-center">
-                                        <ShoppingCart size={18} className="text-indigo-600" />
+                                    <div className="h-full w-full bg-white dark:bg-zinc-900 rounded-[15px] flex items-center justify-center">
+                                        <ShoppingCart size={18} className="text-indigo-600 dark:text-indigo-400" />
                                     </div>
                                 </div>
-                                <div>
+                                 <div>
                                     <h2 className="text-xl font-black italic uppercase tracking-tight bg-gradient-to-r from-blue-600 via-purple-600 to-rose-500 bg-clip-text text-transparent pr-1 truncate">Shopping Cart</h2>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">{cart.length} Items</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-500 mt-1">{cart.length} Items</p>
                                 </div>
                             </div>
-                            <button
+                             <button
                                 onClick={() => setCart([])}
-                                className="h-10 w-10 rounded-2xl bg-white border border-rose-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 shadow-lg shadow-rose-500/10 hover:shadow-xl hover:shadow-rose-500/20 flex items-center justify-center transition-all group/clear text-rose-400"
+                                className="h-10 w-10 rounded-2xl bg-white dark:bg-zinc-800 border border-rose-100 dark:border-rose-900/30 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-200 dark:hover:border-rose-800 shadow-lg shadow-rose-500/10 hover:shadow-xl hover:shadow-rose-500/20 flex items-center justify-center transition-all group/clear text-rose-400"
                                 title="Clear Cart"
                             >
                                 <Trash2 size={16} className="group-hover/clear:scale-110 transition-transform" />
@@ -816,12 +816,12 @@ export default function POSTerminalPage() {
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto cart-scrollbar min-h-0 bg-slate-50/30">
+                     <div className="flex-1 overflow-y-auto cart-scrollbar min-h-0 bg-slate-50/30 dark:bg-zinc-950/30">
                         <div className="space-y-3 px-4 py-4">
                             {cart.map(item => (
-                                <div key={item.id} className="group/item flex items-center gap-4 p-4 rounded-3xl bg-white border border-slate-100 hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-200 transition-all duration-300 relative overflow-hidden">
+                                <div key={item.id} className="group/item flex items-center gap-4 p-4 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-200 dark:hover:border-indigo-800 transition-all duration-300 relative overflow-hidden">
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/5 to-transparent translate-x-[-100%] group-hover/item:translate-x-[100%] transition-transform duration-1000"></div>
-                                    <div className="h-16 w-16 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100 overflow-hidden shadow-sm">
+                                    <div className="h-16 w-16 rounded-2xl bg-slate-50 dark:bg-zinc-800 flex items-center justify-center shrink-0 border border-slate-100 dark:border-zinc-800 overflow-hidden shadow-sm">
                                         {item.image_url || item.image_path ? (
                                             <img 
                                                 src={getAssetUrl(item.image_url || item.image_path)} 
@@ -832,30 +832,30 @@ export default function POSTerminalPage() {
                                             <span className="text-xl font-black italic text-indigo-500/40">[{item.name[0]}]</span>
                                         )}
                                     </div>
-                                    <div className="flex-1 min-w-0 relative z-10">
+                                     <div className="flex-1 min-w-0 relative z-10">
                                         <div className="flex items-start justify-between">
-                                            <h4 className="font-bold text-slate-800 truncate pr-2 group-hover/item:text-indigo-900 transition-colors uppercase italic tracking-tighter text-sm">{item.name}</h4>
-                                            <button
+                                            <h4 className="font-bold text-slate-800 dark:text-zinc-200 truncate pr-2 group-hover/item:text-indigo-900 dark:group-hover/item:text-indigo-400 transition-colors uppercase italic tracking-tighter text-sm">{item.name}</h4>
+                                             <button
                                                 onClick={() => removeFromCart(item.id)}
-                                                className="h-6 w-6 rounded-full bg-rose-50 text-rose-400 hover:bg-rose-500 hover:text-white flex items-center justify-center shrink-0 transition-all shadow-sm"
+                                                className="h-6 w-6 rounded-full bg-rose-50 dark:bg-rose-500/10 text-rose-400 dark:text-rose-400 hover:bg-rose-500 hover:text-white flex items-center justify-center shrink-0 transition-all shadow-sm"
                                             >
                                                 <X size={12} strokeWidth={3} />
                                             </button>
                                         </div>
                                         <div className="flex items-center justify-between mt-2">
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex items-center bg-slate-50 rounded-full border border-slate-200 p-0.5 shadow-sm">
-                                                    <button onClick={() => updateQuantity(item.id, -1)} className="h-6 w-6 flex items-center justify-center rounded-full hover:bg-slate-200 text-slate-400 transition-colors"><Minus size={10} /></button>
-                                                    <span className="w-6 text-center text-xs font-black text-slate-700">{item.quantity}</span>
+                                             <div className="flex items-center gap-3">
+                                                <div className="flex items-center bg-slate-50 dark:bg-zinc-800 rounded-full border border-slate-200 dark:border-zinc-700 p-0.5 shadow-sm">
+                                                    <button onClick={() => updateQuantity(item.id, -1)} className="h-6 w-6 flex items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-400 dark:text-zinc-500 transition-colors"><Minus size={10} /></button>
+                                                    <span className="w-6 text-center text-xs font-black text-slate-700 dark:text-zinc-300">{item.quantity}</span>
                                                     <button onClick={() => updateQuantity(item.id, 1)} className="h-6 w-6 flex items-center justify-center rounded-full bg-indigo-600 text-white shadow-md hover:scale-105 transition-all"><Plus size={10} /></button>
                                                 </div>
                                                 <div className="flex items-center gap-1 group/price relative">
                                                     <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest">x</span>
                                                     <div className="relative">
                                                         <span className="absolute left-1 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400">$</span>
-                                                        <input
+                                                     <input
                                                             type="number"
-                                                            className="w-16 h-6 pl-3.5 pr-1 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-black text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                            className="w-16 h-6 pl-3.5 pr-1 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg text-[10px] font-black text-slate-600 dark:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 dark:focus:border-indigo-500/50 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                             value={item.cart_price ?? item.sales_price ?? 0}
                                                             onChange={(e) => updatePrice(item.id, Number(e.target.value))}
                                                             step="0.01"
@@ -863,7 +863,7 @@ export default function POSTerminalPage() {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <span className="font-black text-slate-900 italic text-sm">${((item.cart_price || item.sales_price) * item.quantity).toFixed(2)}</span>
+                                             <span className="font-black text-slate-900 dark:text-zinc-100 italic text-sm">${((item.cart_price || item.sales_price) * item.quantity).toFixed(2)}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -877,40 +877,40 @@ export default function POSTerminalPage() {
                         </div>
                     </div>
 
-                    <div className="p-6 bg-white border-t border-slate-200 space-y-4 shrink-0 shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
+                     <div className="p-6 bg-white dark:bg-zinc-900 border-t border-slate-200 dark:border-zinc-800 space-y-4 shrink-0 shadow-[0_-8px_30px_rgb(0,0,0,0.04)] dark:shadow-none">
                         <div className="space-y-2">
-                            <h3 className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400">Order Summary</h3>
+                            <h3 className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-zinc-500">Order Summary</h3>
                             <div className="space-y-1">
-                                <div className="flex justify-between text-[11px] font-medium text-slate-500 tracking-tight">
+                                <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-400 tracking-tight">
                                     <span>Subtotal</span>
-                                    <span className="text-slate-900 font-black">${totals.subtotal.toFixed(2)}</span>
+                                    <span className="text-slate-900 dark:text-zinc-100 font-black">${totals.subtotal.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-[11px] font-medium text-slate-500 tracking-tight">
+                                <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-400 tracking-tight">
                                     <span>GST (5.00%)</span>
-                                    <span className="text-slate-900 font-black">${totals.gst.toFixed(2)}</span>
+                                    <span className="text-slate-900 dark:text-zinc-100 font-black">${totals.gst.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-[11px] font-medium text-slate-500 tracking-tight">
+                                <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-400 tracking-tight">
                                     <span>QST (9.975%)</span>
-                                    <span className="text-slate-900 font-black">${totals.qst.toFixed(2)}</span>
+                                    <span className="text-slate-900 dark:text-zinc-100 font-black">${totals.qst.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-[11px] font-medium text-slate-500 tracking-tight">
+                                <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-400 tracking-tight">
                                     <div className="flex items-center gap-2">
                                         <span>Discount</span>
                                         <input
                                             type="number"
-                                            className="w-16 h-5 bg-slate-50 border border-slate-200 rounded px-1 text-[9px] font-black focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                            className="w-16 h-5 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded px-1 text-[9px] font-black focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                             value={discount}
                                             onChange={(e) => setDiscount(e.target.value === "" ? "" : parseFloat(e.target.value))}
                                             placeholder="0.00"
                                         />
                                     </div>
-                                    <span className="text-rose-600 font-black">-${Number(discount).toFixed(2)}</span>
+                                    <span className="text-rose-600 dark:text-rose-400 font-black">-${Number(discount).toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex justify-between items-center group/total py-2">
-                            <span className="text-xl font-black italic uppercase tracking-tighter text-slate-400 group-hover/total:text-indigo-600 transition-colors">Grand Total</span>
+                        <div className="flex justify-between items-center group/total py-2 text-slate-900 dark:text-zinc-100">
+                             <span className="text-xl font-black italic uppercase tracking-tighter text-slate-400 dark:text-zinc-500 group-hover/total:text-indigo-600 dark:group-hover/total:text-indigo-400 transition-colors">Grand Total</span>
                             <span className="text-2xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent italic tracking-tight transition-all pr-1">
                                 ${totals.total.toFixed(2)}
                             </span>
@@ -937,11 +937,11 @@ export default function POSTerminalPage() {
                 </div>
             </div>
 
-            {/* Checkout Confirmation Modal */}
+             {/* Checkout Confirmation Modal */}
             <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-                <DialogContent className="max-w-md bg-white border border-slate-200 rounded-[40px] p-8 shadow-2xl text-slate-900 max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-md bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-[40px] p-8 shadow-2xl text-slate-900 dark:text-zinc-100 max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle className="text-center font-black uppercase tracking-tighter text-3xl italic text-slate-900 leading-none">Confirm <span className="text-indigo-600">Checkout</span></DialogTitle>
+                        <DialogTitle className="text-center font-black uppercase tracking-tighter text-3xl italic text-slate-900 dark:text-zinc-100 leading-none">Confirm <span className="text-indigo-600 dark:text-indigo-400">Checkout</span></DialogTitle>
                     </DialogHeader>
 
                     <div className="space-y-6 mt-6">
@@ -965,7 +965,7 @@ export default function POSTerminalPage() {
                                         step="0.01"
                                         value={discount}
                                         onChange={(e) => setDiscount(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                        className="h-10 pl-7 text-right rounded-xl border-slate-200 font-black text-sm pr-3 focus:ring-2 focus:ring-indigo-500/20"
+                                         className="h-10 pl-7 text-right rounded-xl border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 font-black text-sm pr-3 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 dark:text-zinc-100"
                                     />
                                 </div>
                             </div>
@@ -975,7 +975,7 @@ export default function POSTerminalPage() {
                                     <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-1 block">Grand Total</span>
                                     <span className="text-3xl font-black italic tracking-tighter text-indigo-700 leading-none">${totals.roundedTotal.toFixed(2)}</span>
                                 </div>
-                                <div className="flex items-center gap-2 bg-indigo-50/50 px-3 py-2 rounded-xl border border-indigo-100">
+                                 <div className="flex items-center gap-2 bg-indigo-50/50 dark:bg-indigo-500/10 px-3 py-2 rounded-xl border border-indigo-100 dark:border-indigo-900/50">
                                     <input
                                         type="checkbox"
                                         id="roundOff"
@@ -998,9 +998,9 @@ export default function POSTerminalPage() {
                                         onClick={() => setCheckoutStatus(status as any)}
                                         className={cn(
                                             "h-12 rounded-2xl font-black uppercase tracking-tighter text-[11px] border transition-all active:scale-95",
-                                            checkoutStatus === status
+                                             checkoutStatus === status
                                                 ? "bg-indigo-600 border-transparent text-white shadow-lg shadow-indigo-600/20"
-                                                : "bg-white border-slate-200 text-slate-400 hover:border-indigo-300 hover:bg-slate-50"
+                                                : "bg-white dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-slate-400 dark:text-zinc-500 hover:border-indigo-300 dark:hover:border-indigo-800 hover:bg-slate-50 dark:hover:bg-zinc-700/50"
                                         )}
                                     >
                                         {status}
@@ -1011,8 +1011,8 @@ export default function POSTerminalPage() {
 
                         {/* Paid Amount Input */}
                         <div className="space-y-3">
-                            {checkoutStatus === "Split" ? (
-                                <div className="space-y-3 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                             {checkoutStatus === "Split" ? (
+                                <div className="space-y-3 bg-slate-50/50 dark:bg-zinc-950/50 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800">
                                     <div className="grid grid-cols-2 gap-3">
                                         {[
                                             { label: "Cash", state: splitCash, setter: setSplitCash },
@@ -1027,23 +1027,23 @@ export default function POSTerminalPage() {
                                                     type="number"
                                                     step="0.01"
                                                     value={method.state}
-                                                    onChange={(e) => method.setter(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                                    className="h-12 pl-6 pt-5 bg-white border-slate-200 font-black text-sm focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                                                     onChange={(e) => method.setter(e.target.value === "" ? "" : parseFloat(e.target.value))}
+                                                    className="h-12 pl-6 pt-5 bg-white dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 font-black text-sm focus:ring-2 focus:ring-indigo-500/20 transition-all text-slate-900 dark:text-zinc-100"
                                                     placeholder="0.00"
                                                 />
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="flex justify-between items-center py-2 border-t border-slate-200 border-dashed mt-2">
-                                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Split Total</span>
-                                        <span className="text-lg font-black text-indigo-600">${Number(checkoutPaidAmount).toFixed(2)}</span>
+                                     <div className="flex justify-between items-center py-2 border-t border-slate-200 dark:border-zinc-800 border-dashed mt-2">
+                                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-zinc-400">Split Total</span>
+                                        <span className="text-lg font-black text-indigo-600 dark:text-indigo-400">${Number(checkoutPaidAmount).toFixed(2)}</span>
                                     </div>
                                     {Number(checkoutPaidAmount) < totals.roundedTotal ? (
-                                        <p className="text-[10px] font-bold text-amber-500 uppercase tracking-tight bg-amber-50 rounded-lg p-2 border border-amber-100 italic">
+                                         <p className="text-[10px] font-bold text-amber-500 dark:text-amber-400 uppercase tracking-tight bg-amber-50 dark:bg-amber-950/30 rounded-lg p-2 border border-amber-100 dark:border-amber-900/30 italic">
                                             Remaining Due: ${(totals.roundedTotal - Number(checkoutPaidAmount)).toFixed(2)} will be record as debt.
                                         </p>
                                     ) : Number(checkoutPaidAmount) > totals.roundedTotal ? (
-                                        <p className="text-[14px] font-black text-black uppercase tracking-tight bg-emerald-50 rounded-lg p-2 border border-emerald-100 italic">
+                                         <p className="text-[14px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-tight bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-2 border border-emerald-100 dark:border-emerald-900/30 italic">
                                             Change Return: ${(Number(checkoutPaidAmount) - totals.roundedTotal).toFixed(2)}
                                         </p>
                                     ) : null}
@@ -1059,12 +1059,12 @@ export default function POSTerminalPage() {
                                             type="number"
                                             step="0.01"
                                             value={checkoutPaidAmount}
-                                            onChange={(e) => setCheckoutPaidAmount(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                            className="h-14 pl-10 rounded-2xl border-slate-200 bg-slate-50 font-black text-lg focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                                             onChange={(e) => setCheckoutPaidAmount(e.target.value === "" ? "" : parseFloat(e.target.value))}
+                                            className="h-14 pl-10 rounded-2xl border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 font-black text-lg focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900 dark:text-zinc-100"
                                         />
                                     </div>
-                                    {checkoutStatus === "Paid" && Number(checkoutPaidAmount) > totals.roundedTotal && (
-                                        <p className="text-[14px] font-black text-black uppercase tracking-tight pl-1 bg-emerald-50 rounded-lg p-2 border border-emerald-100 italic mt-2">
+                                     {checkoutStatus === "Paid" && Number(checkoutPaidAmount) > totals.roundedTotal && (
+                                        <p className="text-[14px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-tight pl-1 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-2 border border-emerald-100 dark:border-emerald-900/30 italic mt-2">
                                             Change Return: ${(Number(checkoutPaidAmount) - totals.roundedTotal).toFixed(2)}
                                         </p>
                                     )}
@@ -1089,8 +1089,8 @@ export default function POSTerminalPage() {
 
                         {/* Action Buttons */}
                         <div className="flex gap-4 pt-4">
-                            <button
-                                className="flex-1 h-14 rounded-full bg-white border border-slate-200 font-black uppercase tracking-widest text-[11px] text-slate-400 hover:bg-slate-50 transition-all active:scale-95"
+                             <button
+                                className="flex-1 h-14 rounded-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 font-black uppercase tracking-widest text-[11px] text-slate-400 dark:text-zinc-500 hover:bg-slate-50 dark:hover:bg-zinc-700 transition-all active:scale-95 text-slate-900 dark:text-zinc-100"
                                 onClick={() => setIsConfirmOpen(false)}
                                 disabled={loading}
                             >
@@ -1112,11 +1112,11 @@ export default function POSTerminalPage() {
                 </DialogContent>
             </Dialog>
 
-            {/* Receipt Modal */}
+             {/* Receipt Modal */}
             <Dialog open={isReceiptOpen} onOpenChange={setIsReceiptOpen}>
-                <DialogContent className="max-w-sm bg-white border border-slate-200 rounded-[40px] p-8 shadow-2xl text-slate-900">
+                <DialogContent className="max-w-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-[40px] p-8 shadow-2xl text-slate-900 dark:text-zinc-100">
                     <DialogHeader>
-                        <DialogTitle className="text-center font-black uppercase tracking-tighter text-3xl italic text-slate-900 leading-none">Sale <span className="text-indigo-600">Confirmed</span></DialogTitle>
+                        <DialogTitle className="text-center font-black uppercase tracking-tighter text-3xl italic text-slate-900 dark:text-zinc-100 leading-none">Sale <span className="text-indigo-600 dark:text-indigo-400">Confirmed</span></DialogTitle>
                     </DialogHeader>
 
                     <ScrollArea className="max-h-[70vh] pr-4 -mr-4 cart-scrollbar">
@@ -1131,8 +1131,8 @@ export default function POSTerminalPage() {
                                             className="h-full w-auto object-contain logo-img"
                                         />
                                     ) : (
-                                        <div className="h-10 w-10 rounded-xl bg-indigo-50 flex items-center justify-center border border-indigo-100 logo-div">
-                                            <ShoppingCart size={20} className="text-indigo-600" />
+                                         <div className="h-10 w-10 rounded-xl bg-indigo-50 dark:bg-zinc-800 flex items-center justify-center border border-indigo-100 dark:border-zinc-700 logo-div">
+                                            <ShoppingCart size={20} className="text-indigo-600 dark:text-indigo-400" />
                                         </div>
                                     )}
                                 </div>
@@ -1212,10 +1212,10 @@ export default function POSTerminalPage() {
                             </div>
 
                             <div className="text-center mt-6 space-y-2">
-                                <div className="payment-badge inline-block px-4 py-1.5 border border-slate-900 rounded-lg bg-white shadow-[4px_4px_0px_rgba(0,0,0,0.1)] text-[8px] font-black uppercase tracking-widest text-slate-900 italic">
+                                 <div className="payment-badge inline-block px-4 py-1.5 border border-slate-900 dark:border-zinc-500 rounded-lg bg-white dark:bg-zinc-800 shadow-[4px_4px_0px_rgba(0,0,0,0.1)] text-[8px] font-black uppercase tracking-widest text-slate-900 dark:text-zinc-100 italic">
                                     [{lastSale?.payment_type || paymentMode}] SALE
                                 </div>
-                                <p className="text-[8px] font-black italic uppercase tracking-[0.1em] text-indigo-600 opacity-60">Merci pour votre confiance!</p>
+                                <p className="text-[8px] font-black italic uppercase tracking-[0.1em] text-indigo-600 dark:text-indigo-400 opacity-60">Merci pour votre confiance!</p>
 
                                 {(currentCompany?.pos_email || currentCompany?.pos_website || currentCompany?.pos_mobile) && (
                                     <div className="mt-4 pt-4 border-t border-dotted border-black space-y-1">

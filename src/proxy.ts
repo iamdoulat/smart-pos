@@ -6,8 +6,11 @@ export function proxy(request: NextRequest) {
 
     const { pathname } = request.nextUrl;
 
-    // Public paths
-    if (pathname.startsWith('/login') || pathname.startsWith('/register') || pathname === '/') {
+    // Public paths - accessible without authentication
+    const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
+    const isPublicPath = publicPaths.some(path => pathname.startsWith(path));
+
+    if (isPublicPath || pathname === '/') {
         // If already logged in, redirect away from auth pages to dashboard
         if (token && (pathname.startsWith('/login') || pathname.startsWith('/register'))) {
             return NextResponse.redirect(new URL('/dashboard', request.url));

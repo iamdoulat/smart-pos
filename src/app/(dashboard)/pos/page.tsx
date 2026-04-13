@@ -37,7 +37,7 @@ import {
     MessageCircle
 } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn, getAssetUrl } from "@/lib/utils";
 import {
     Dialog,
     DialogContent,
@@ -667,8 +667,12 @@ export default function POSTerminalPage() {
                                         product.stock_quantity <= 0 && "opacity-60 grayscale-[0.5]"
                                     )}>
                                         <div className="aspect-[214/300] relative flex items-center justify-center bg-slate-50/50 overflow-hidden text-zinc-900">
-                                            {product.image_path ? (
-                                                <img src={`${API_BASE_URL}/${product.image_path}`} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition duration-700 ease-out" />
+                                            {product.image_url || product.image_path ? (
+                                                <img 
+                                                    src={getAssetUrl(product.image_url || product.image_path)} 
+                                                    alt={product.name} 
+                                                    className="w-full h-full object-cover group-hover:scale-110 transition duration-700 ease-out" 
+                                                />
                                             ) : (
                                                 <div className="flex flex-col items-center gap-4 opacity-10">
                                                     <Layers size={48} className="text-slate-900" />
@@ -818,8 +822,12 @@ export default function POSTerminalPage() {
                                 <div key={item.id} className="group/item flex items-center gap-4 p-4 rounded-3xl bg-white border border-slate-100 hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-200 transition-all duration-300 relative overflow-hidden">
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/5 to-transparent translate-x-[-100%] group-hover/item:translate-x-[100%] transition-transform duration-1000"></div>
                                     <div className="h-16 w-16 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100 overflow-hidden shadow-sm">
-                                        {item.image_path ? (
-                                            <img src={`${API_BASE_URL}/${item.image_path}`} alt={item.name} className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500" />
+                                        {item.image_url || item.image_path ? (
+                                            <img 
+                                                src={getAssetUrl(item.image_url || item.image_path)} 
+                                                alt={item.name} 
+                                                className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500" 
+                                            />
                                         ) : (
                                             <span className="text-xl font-black italic text-indigo-500/40">[{item.name[0]}]</span>
                                         )}
@@ -1116,9 +1124,9 @@ export default function POSTerminalPage() {
                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500" />
                             <div className="flex flex-col items-center mb-3">
                                 <div className="h-10 w-10 flex items-center justify-center mb-1">
-                                    {currentCompany?.logo_path ? (
+                                    {currentCompany?.logo_url || currentCompany?.logo_path ? (
                                         <img
-                                            src={`${API_BASE_URL}/storage/${currentCompany.logo_path}`}
+                                            src={getAssetUrl(currentCompany.logo_url || currentCompany.logo_path)}
                                             alt="Logo"
                                             className="h-full w-auto object-contain logo-img"
                                         />
@@ -1220,16 +1228,16 @@ export default function POSTerminalPage() {
                                     </div>
                                 )}
 
-                                {currentCompany?.qr_code_path && (
-                                    <div className="mt-4 flex flex-col items-center gap-1">
-                                        <p className="text-[8px] font-black uppercase tracking-widest text-rose-500">Review on Google Business</p>
-                                        <img
-                                            src={`${API_BASE_URL}/storage/${currentCompany.qr_code_path}`}
-                                            alt="Review QR"
-                                            className="qr-img"
-                                        />
-                                    </div>
-                                )}
+                                    {currentCompany?.qr_code_url || currentCompany?.qr_code_path ? (
+                                        <div className="mt-4 flex flex-col items-center gap-1">
+                                            <p className="text-[8px] font-black uppercase tracking-widest text-rose-500">Review on Google Business</p>
+                                            <img
+                                                src={getAssetUrl(currentCompany.qr_code_url || currentCompany.qr_code_path)}
+                                                alt="Review QR"
+                                                className="qr-img"
+                                            />
+                                        </div>
+                                    ) : null}
                             </div>
                         </div>
                     </ScrollArea>

@@ -108,7 +108,7 @@ function SuppliersContent() {
                         <Truck size={20} className="md:w-6 md:h-6" />
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase italic py-1 leading-none mb-1">Suppliers</h2>
+                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase py-1 leading-none mb-1">Suppliers</h2>
                         <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
                             Manage your vendors and supply chain partners.
                         </p>
@@ -120,14 +120,14 @@ function SuppliersContent() {
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-purple-500 transition-colors" size={20} />
                         <Input
                             placeholder="Search suppliers by name, email or phone..."
-                            className="pl-12 h-12 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-full shadow-sm focus:ring-2 focus:ring-purple-500 transition-all font-medium"
+                            className="pl-12 h-12 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm focus:ring-2 focus:ring-purple-500 transition-all font-medium"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <Button
                         onClick={() => router.push('/contacts/suppliers/form')}
-                        className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 text-white rounded-full px-8 h-12 shadow-lg shadow-indigo-500/25 font-black uppercase italic tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0"
+                        className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 text-white rounded-xl px-8 h-12 shadow-lg shadow-indigo-500/25 font-black uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0"
                     >
                         <PlusSquare className="mr-2 h-5 w-5" /> Add Supplier
                     </Button>
@@ -140,11 +140,10 @@ function SuppliersContent() {
                     <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
                 </div>
             ) : (
-                <div className="bg-white dark:bg-zinc-900/50 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden relative">
-                    <div className="h-2 absolute top-0 left-0 right-0 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500" />
-                    <div className="overflow-x-auto mt-2">
+                <div className="bg-white dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden relative">
+                    <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-zinc-50 dark:bg-zinc-900/50 text-zinc-500 dark:text-zinc-400 uppercase font-black tracking-wider text-[10px]">
+                            <thead className="bg-zinc-50 dark:bg-zinc-900/50 text-black dark:text-white uppercase font-black tracking-widest text-xs">
                                 <tr>
                                     <th className="px-6 py-4 rounded-tl-xl">Supplier Name</th>
                                     <th className="px-6 py-4">Mobile No.</th>
@@ -167,7 +166,7 @@ function SuppliersContent() {
                                                     <span>{contact.mobile || contact.phone}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-zinc-400 italic text-xs">No mobile</span>
+                                                <span className="text-zinc-400 text-xs">No mobile</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4">
@@ -177,7 +176,7 @@ function SuppliersContent() {
                                                     <span>{contact.email}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-zinc-400 italic text-xs">No email</span>
+                                                <span className="text-zinc-400 text-xs">No email</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 text-center">
@@ -192,7 +191,7 @@ function SuppliersContent() {
                                                     <span className="truncate leading-relaxed" title={contact.address}>{contact.address}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-zinc-400 italic text-xs">No address</span>
+                                                <span className="text-zinc-400 text-xs">No address</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 text-right">
@@ -215,19 +214,19 @@ function SuppliersContent() {
                                                             <Trash2 size={14} />
                                                         </Button>
                                                     </AlertDialogTrigger>
-                                                    <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden">
+                                                    <AlertDialogContent className="rounded-xl border-0 shadow-2xl p-0 overflow-hidden">
                                                         <div className="bg-red-500 p-8 text-white">
                                                             <div className="h-16 w-16 rounded-2xl bg-white/20 flex items-center justify-center mb-4">
                                                                 <Trash2 size={32} />
                                                             </div>
-                                                            <AlertDialogTitle className="text-2xl font-black italic tracking-tighter uppercase leading-none">Delete Supplier?</AlertDialogTitle>
+                                                            <AlertDialogTitle className="text-2xl font-black tracking-tighter uppercase leading-none">Delete Supplier?</AlertDialogTitle>
                                                             <AlertDialogDescription className="text-red-50 mt-2 font-medium">
                                                                 This action will permanently delete <span className="font-bold underline">{contact.name}</span> and all associated purchase records.
                                                             </AlertDialogDescription>
                                                         </div>
                                                         <AlertDialogFooter className="p-6 bg-white dark:bg-zinc-950 gap-3">
-                                                            <AlertDialogCancel className="rounded-full border-zinc-200 dark:border-zinc-800 font-bold px-8 h-12">Cancel</AlertDialogCancel>
-                                                            <AlertDialogAction onClick={() => handleDelete(contact.id)} className="bg-red-600 hover:bg-red-700 text-white rounded-full font-bold px-10 h-12 shadow-lg shadow-red-500/20 border-0">Confirm Delete</AlertDialogAction>
+                                                            <AlertDialogCancel className="rounded-xl border-zinc-200 dark:border-zinc-800 font-bold px-8 h-12">Cancel</AlertDialogCancel>
+                                                            <AlertDialogAction onClick={() => handleDelete(contact.id)} className="bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold px-10 h-12 shadow-lg shadow-red-500/20 border-0">Confirm Delete</AlertDialogAction>
                                                         </AlertDialogFooter>
                                                     </AlertDialogContent>
                                                 </AlertDialog>
@@ -249,7 +248,7 @@ function SuppliersContent() {
                                                 {!searchTerm && (
                                                     <Button
                                                         onClick={() => router.push('/contacts/suppliers/form')}
-                                                        className="mt-8 bg-purple-600 hover:bg-purple-700 text-white rounded-full h-12 px-8 font-bold shadow-lg shadow-purple-500/20"
+                                                        className="mt-8 bg-purple-600 hover:bg-purple-700 text-white rounded-xl h-12 px-8 font-bold shadow-lg shadow-purple-500/20"
                                                     >
                                                         <PlusSquare className="mr-2 h-5 w-5" /> Add Supplier
                                                     </Button>
@@ -275,9 +274,9 @@ function SuppliersContent() {
                                     size="sm"
                                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                                     disabled={currentPage === 1}
-                                    className="rounded-full h-9 px-4 border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest hover:bg-white dark:hover:bg-zinc-800"
+                                    className="rounded-xl h-9 w-9 p-0 border-zinc-200 dark:border-zinc-800 text-black dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center"
                                 >
-                                    <ChevronLeft size={14} className="mr-1" /> PREV
+                                    <ChevronLeft size={16} />
                                 </Button>
 
                                 <div className="flex items-center gap-1">
@@ -292,10 +291,10 @@ function SuppliersContent() {
                                                 key={pageNum}
                                                 onClick={() => setCurrentPage(pageNum)}
                                                 className={cn(
-                                                    "h-8 w-8 rounded-full text-[10px] font-black transition-all",
+                                                    "h-9 w-9 rounded-xl text-sm font-black transition-all",
                                                     currentPage === pageNum
                                                         ? "bg-purple-600 text-white shadow-lg shadow-purple-500/30"
-                                                        : "text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                                        : "text-black dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-transparent"
                                                 )}
                                             >
                                                 {pageNum}
@@ -309,9 +308,9 @@ function SuppliersContent() {
                                     size="sm"
                                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                                     disabled={currentPage === totalPages}
-                                    className="rounded-full h-9 px-4 border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest hover:bg-white dark:hover:bg-zinc-800"
+                                    className="rounded-xl h-9 w-9 p-0 border-zinc-200 dark:border-zinc-800 text-black dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center"
                                 >
-                                    NEXT <ChevronRight size={14} className="ml-1" />
+                                    <ChevronRight size={16} />
                                 </Button>
                             </div>
                         </div>

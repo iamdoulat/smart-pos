@@ -121,10 +121,10 @@ export default function TransactionsPage() {
                         <Receipt size={20} className="md:w-6 md:h-6" />
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-500 bg-clip-text text-transparent tracking-tighter uppercase italic pr-4 leading-tight mb-1">
+                        <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-500 bg-clip-text text-transparent tracking-tight uppercase pr-4 leading-tight mb-1">
                             Transactions
                         </h2>
-                        <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
+                        <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-semibold tracking-tight">
                             Track all your income and expenses in one place.
                         </p>
                     </div>
@@ -141,7 +141,7 @@ export default function TransactionsPage() {
                     </div>
                     <Button
                         onClick={() => router.push("/transactions/form")}
-                        className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-500 text-white rounded-full px-8 h-12 shadow-lg shadow-emerald-500/25 font-black uppercase italic tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0"
+                        className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-500 text-white rounded-full px-8 h-12 shadow-lg shadow-emerald-500/25 font-bold uppercase tracking-tight transition-all hover:scale-[1.02] active:scale-95 border-0"
                     >
                         <PlusSquare className="mr-2 h-5 w-5" /> Add Transaction
                     </Button>
@@ -156,8 +156,8 @@ export default function TransactionsPage() {
                         <TrendingUp size={28} className="text-emerald-500" />
                     </div>
                     <div>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-widest mb-1">Total Income</p>
-                        <p className="text-2xl font-black text-emerald-500">{currency} {fmt(totalIncome)}</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase tracking-wider mb-1">Total Income</p>
+                        <p className="text-2xl font-bold text-emerald-500">{currency} {fmt(totalIncome)}</p>
                     </div>
                 </div>
                 {/* Expense */}
@@ -166,8 +166,8 @@ export default function TransactionsPage() {
                         <TrendingDown size={28} className="text-rose-500" />
                     </div>
                     <div>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-widest mb-1">Total Expenses</p>
-                        <p className="text-2xl font-black text-rose-500">{currency} {fmt(totalExpense)}</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase tracking-wider mb-1">Total Expenses</p>
+                        <p className="text-2xl font-bold text-rose-500">{currency} {fmt(totalExpense)}</p>
                     </div>
                 </div>
                 {/* Net */}
@@ -307,7 +307,7 @@ export default function TransactionsPage() {
                                                             <div className="h-16 w-16 rounded-2xl bg-white/20 flex items-center justify-center mb-4">
                                                                 <Trash2 size={32} />
                                                             </div>
-                                                            <AlertDialogTitle className="text-2xl font-black italic tracking-tighter uppercase leading-none">Delete Transaction?</AlertDialogTitle>
+                                                            <AlertDialogTitle className="text-2xl font-bold tracking-tight uppercase leading-none">Delete Transaction?</AlertDialogTitle>
                                                             <AlertDialogDescription className="text-red-50 mt-2 font-medium">
                                                                 This will permanently delete the {TYPE_LABELS[tx.type]} of <span className="font-bold underline">{currency} {fmt(parseFloat(String(tx.amount)))}</span>.
                                                             </AlertDialogDescription>

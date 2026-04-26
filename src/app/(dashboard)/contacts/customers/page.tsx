@@ -98,7 +98,7 @@ function CustomersContent() {
                         <Users size={20} className="md:w-6 md:h-6" />
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase italic py-1 leading-none mb-1">Customers</h2>
+                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase py-1 leading-none mb-1">Customers</h2>
                         <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
                             Manage your customer database and relations.
                         </p>
@@ -117,7 +117,7 @@ function CustomersContent() {
                     </div>
                     <Button
                         onClick={() => router.push('/contacts/customers/form')}
-                        className="w-full sm:w-auto bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 text-white rounded-full px-8 h-12 shadow-lg shadow-orange-500/25 font-black uppercase italic tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0"
+                        className="w-full sm:w-auto bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 text-white rounded-full px-8 h-12 shadow-lg shadow-orange-500/25 font-black uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0"
                     >
                         <PlusSquare className="mr-2 h-5 w-5" /> Add Customer
                     </Button>
@@ -130,19 +130,18 @@ function CustomersContent() {
                     <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
                 </div>
             ) : (
-                <div className="bg-white dark:bg-zinc-900/50 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden relative">
-                    <div className="h-2 absolute top-0 left-0 right-0 bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500" />
-                    <div className="overflow-x-auto mt-2">
+                <div className="bg-white dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden relative">
+                    <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-zinc-50 dark:bg-zinc-900/50 text-zinc-500 dark:text-zinc-400 uppercase font-black tracking-wider text-[10px]">
+                            <thead className="bg-zinc-50 dark:bg-zinc-900/50">
                                 <tr>
-                                    <th className="px-6 py-4 rounded-tl-xl">CID</th>
-                                    <th className="px-6 py-4">Customer Name</th>
-                                    <th className="px-6 py-4">Mobile</th>
-                                    <th className="px-6 py-4">Email</th>
-                                    <th className="px-6 py-4 text-center">Opening Balance</th>
-                                    <th className="px-6 py-4">Address</th>
-                                    <th className="px-6 py-4 text-right rounded-tr-xl">Actions</th>
+                                    <th className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">CID</th>
+                                    <th className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Customer Name</th>
+                                    <th className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Mobile</th>
+                                    <th className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Email</th>
+                                    <th className="px-6 py-4 text-center font-black text-xs text-black dark:text-white uppercase tracking-widest">Opening Balance</th>
+                                    <th className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Address</th>
+                                    <th className="px-6 py-4 text-right font-black text-xs text-black dark:text-white uppercase tracking-widest">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
@@ -163,7 +162,7 @@ function CustomersContent() {
                                                     <span>{contact.mobile || contact.phone}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-zinc-400 italic text-xs">No mobile</span>
+                                                <span className="text-zinc-400 text-xs font-medium">No mobile</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4">
@@ -173,7 +172,7 @@ function CustomersContent() {
                                                     <span>{contact.email}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-zinc-400 italic text-xs">No email</span>
+                                                <span className="text-zinc-400 text-xs font-medium">No email</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 text-center">
@@ -188,7 +187,7 @@ function CustomersContent() {
                                                     <span className="truncate leading-relaxed" title={contact.address}>{contact.address}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-zinc-400 italic text-xs">No address</span>
+                                                <span className="text-zinc-400 text-xs font-medium">No address</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 text-right">
@@ -216,7 +215,7 @@ function CustomersContent() {
                                                             <div className="h-16 w-16 rounded-2xl bg-white/20 flex items-center justify-center mb-4">
                                                                 <Trash2 size={32} />
                                                             </div>
-                                                            <AlertDialogTitle className="text-2xl font-black italic tracking-tighter uppercase leading-none">Delete Customer?</AlertDialogTitle>
+                                                            <AlertDialogTitle className="text-2xl font-black tracking-tighter uppercase leading-none">Delete Customer?</AlertDialogTitle>
                                                             <AlertDialogDescription className="text-red-50 mt-2 font-medium">
                                                                 This action will permanently delete <span className="font-bold underline">{contact.name}</span> and all associated transaction history.
                                                             </AlertDialogDescription>
@@ -271,9 +270,9 @@ function CustomersContent() {
                                     size="sm"
                                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                                     disabled={currentPage === 1}
-                                    className="rounded-full h-9 px-4 border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest hover:bg-white dark:hover:bg-zinc-800"
+                                    className="rounded-xl h-10 w-10 p-0 flex items-center justify-center border border-zinc-200 dark:border-zinc-800 font-bold text-zinc-500 hover:text-indigo-600 hover:bg-white dark:hover:bg-zinc-800 shadow-sm transition-all"
                                 >
-                                    <ChevronLeft size={14} className="mr-1" /> PREV
+                                    <ChevronLeft size={18} />
                                 </Button>
 
                                 <div className="flex items-center gap-1">
@@ -288,10 +287,10 @@ function CustomersContent() {
                                                 key={pageNum}
                                                 onClick={() => setCurrentPage(pageNum)}
                                                 className={cn(
-                                                    "h-8 w-8 rounded-full text-[10px] font-black transition-all",
+                                                    "h-10 w-10 rounded-xl text-xs font-black transition-all flex items-center justify-center",
                                                     currentPage === pageNum
-                                                        ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
-                                                        : "text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                                        ? "bg-gradient-to-br from-amber-500 via-indigo-600 to-pink-500 text-white shadow-lg shadow-indigo-500/30"
+                                                        : "bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-300 dark:hover:border-zinc-700"
                                                 )}
                                             >
                                                 {pageNum}
@@ -305,9 +304,9 @@ function CustomersContent() {
                                     size="sm"
                                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                                     disabled={currentPage === totalPages}
-                                    className="rounded-full h-9 px-4 border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest hover:bg-white dark:hover:bg-zinc-800"
+                                    className="rounded-xl h-10 w-10 p-0 flex items-center justify-center border border-zinc-200 dark:border-zinc-800 font-bold text-zinc-500 hover:text-indigo-600 hover:bg-white dark:hover:bg-zinc-800 shadow-sm transition-all"
                                 >
-                                    NEXT <ChevronRight size={14} className="ml-1" />
+                                    <ChevronRight size={18} />
                                 </Button>
                             </div>
                         </div>

@@ -42,6 +42,15 @@ import {
     DropdownMenuTrigger,
     DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from "lucide-react";
 
 export default function PosHistoryPage() {
     const router = useRouter();
@@ -151,7 +160,7 @@ export default function PosHistoryPage() {
                         <Receipt size={20} className="md:w-6 md:h-6" />
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase italic pr-4 leading-tight mb-1">
+                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase pr-4 leading-tight mb-1">
                             POS History
                         </h2>
                         <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
@@ -171,7 +180,7 @@ export default function PosHistoryPage() {
                     </div>
                     <Button
                         onClick={() => router.push("/pos")}
-                        className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white rounded-full px-8 h-12 shadow-lg shadow-indigo-500/25 font-black uppercase italic tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0"
+                        className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white rounded-full px-8 h-12 shadow-lg shadow-indigo-500/25 font-black uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0"
                     >
                         <PlusSquare className="mr-2 h-5 w-5" /> New Terminal Sale
                     </Button>
@@ -217,25 +226,24 @@ export default function PosHistoryPage() {
                     </div>
                 </div>
             ) : (
-                <div className="bg-white dark:bg-zinc-900/50 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden relative">
-                    <div className="h-2 absolute top-0 left-0 right-0 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500" />
-                    <div className="overflow-x-auto mt-2">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-400 uppercase font-black tracking-widest text-[9px]">
-                                <tr>
-                                    <th className="px-8 py-5">Sale Info</th>
-                                    <th className="px-6 py-5">Customer</th>
-                                    <th className="px-6 py-5">Date</th>
-                                    <th className="px-6 py-5">Payment Method</th>
-                                    <th className="px-6 py-5">Grand Total</th>
-                                    <th className="px-6 py-5">Status</th>
-                                    <th className="px-8 py-5 text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
+                <div className="bg-white dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden relative">
+                    <div className="mt-2">
+                        <Table>
+                            <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/50">
+                                <TableRow className="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800">
+                                    <TableHead className="px-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Sale Info</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Customer</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Date</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Payment Method</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Grand Total</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Status</TableHead>
+                                    <TableHead className="px-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Action</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
                                 {paginatedSales.map((sale) => (
-                                    <tr key={sale.id} className="hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-colors group">
-                                        <td className="px-8 py-5">
+                                    <TableRow key={sale.id} className="hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-colors group border-zinc-100 dark:border-zinc-800">
+                                        <TableCell className="px-8 py-4">
                                             <div className="flex flex-col">
                                                 <span className="font-black text-zinc-900 dark:text-zinc-100 text-sm tracking-tight group-hover:text-indigo-600 transition-colors">
                                                     {sale.sales_code}
@@ -244,8 +252,8 @@ export default function PosHistoryPage() {
                                                     <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter">REF: {sale.reference_no}</span>
                                                 )}
                                             </div>
-                                        </td>
-                                        <td className="px-6 py-5">
+                                        </TableCell>
+                                        <TableCell className="px-6 py-4">
                                             <div className="flex items-center gap-2">
                                                 <div className="h-7 w-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-black text-zinc-400">
                                                     {(sale as any).customer?.name?.[0] || "W"}
@@ -254,21 +262,21 @@ export default function PosHistoryPage() {
                                                     {(sale as any).customer?.name || "Walk-in Customer"}
                                                 </span>
                                             </div>
-                                        </td>
-                                        <td className="px-6 py-5">
+                                        </TableCell>
+                                        <TableCell className="px-6 py-4">
                                             <div className="flex items-center gap-1.5 text-zinc-500 font-medium">
                                                 <Calendar size={13} className="opacity-40" />
                                                 <span className="text-xs">
                                                     {new Date(sale.sales_date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
                                                 </span>
                                             </div>
-                                        </td>
-                                        <td className="px-6 py-5">
+                                        </TableCell>
+                                        <TableCell className="px-6 py-4">
                                             <Badge variant="outline" className="rounded-full bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-800 text-[10px] font-black uppercase tracking-wider px-3 py-0.5">
                                                 {sale.payment_type || "Cash"}
                                             </Badge>
-                                        </td>
-                                        <td className="px-6 py-5">
+                                        </TableCell>
+                                        <TableCell className="px-6 py-4">
                                             <div className="flex flex-col">
                                                 <span className="font-black text-zinc-900 dark:text-zinc-100 text-base">
                                                     {currency} {fmt(parseFloat(String(sale.grand_total)))}
@@ -277,11 +285,11 @@ export default function PosHistoryPage() {
                                                     Paid: {fmt(parseFloat(String(sale.paid_amount || 0)))}
                                                 </span>
                                             </div>
-                                        </td>
-                                        <td className="px-6 py-5">
+                                        </TableCell>
+                                        <TableCell className="px-6 py-4">
                                             <StatusBadge status={sale.payment_status || 'Paid'} />
-                                        </td>
-                                        <td className="px-8 py-5 text-right">
+                                        </TableCell>
+                                        <TableCell className="px-8 py-4 text-right">
                                             <div className="flex justify-end">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
@@ -326,17 +334,17 @@ export default function PosHistoryPage() {
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                    </TableRow>
                                 ))}
                                 {filtered.length === 0 && (
-                                    <tr>
-                                        <td colSpan={7} className="px-6 py-24 text-center">
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="px-6 py-24 text-center">
                                             <div className="flex flex-col items-center justify-center">
                                                 <div className="h-24 w-24 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center text-zinc-200 mb-6">
                                                     <ShoppingCart size={48} />
                                                 </div>
-                                                <h3 className="text-2xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tighter uppercase">No POS records found</h3>
+                                                <h3 className="text-2xl font-black text-zinc-900 dark:text-zinc-100 tracking-tighter uppercase">No POS records found</h3>
                                                 <p className="text-zinc-500 dark:text-zinc-400 text-sm max-w-sm mt-2 font-medium">
                                                     {searchTerm || statusFilter !== "all"
                                                         ? "No sales match your current search or filter criteria."
@@ -345,17 +353,17 @@ export default function PosHistoryPage() {
                                                 {(!searchTerm && statusFilter === "all") && (
                                                     <Button
                                                         onClick={() => router.push("/pos")}
-                                                        className="mt-8 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full h-12 px-10 font-black uppercase italic tracking-tighter shadow-xl shadow-indigo-500/20"
+                                                        className="mt-8 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full h-12 px-10 font-black uppercase tracking-tighter shadow-xl shadow-indigo-500/20"
                                                     >
                                                         <PlusSquare className="mr-2 h-5 w-5" /> Launch Terminal
                                                     </Button>
                                                 )}
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                    </TableRow>
                                 )}
-                            </tbody>
-                        </table>
+                            </TableBody>
+                        </Table>
                     </div>
                     {filtered.length > 0 && (
                         <div className="px-8 py-4 bg-zinc-50/50 dark:bg-zinc-900/50 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -364,34 +372,32 @@ export default function PosHistoryPage() {
                             </span>
 
                             {/* Pagination Controls */}
-                            <div className="flex items-center gap-2 order-1 sm:order-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
+                            <div className="flex items-center gap-3 order-1 sm:order-2">
+                                <button
                                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                                     disabled={currentPage === 1}
-                                    className="rounded-full h-9 px-4 border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest hover:bg-white dark:hover:bg-zinc-800"
+                                    className="h-10 w-10 rounded-xl flex items-center justify-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
                                 >
-                                    <ChevronLeft size={14} className="mr-1" /> PREV
-                                </Button>
+                                    <ChevronLeftIcon size={18} />
+                                </button>
 
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-2">
                                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                                         let pageNum = i + 1;
-                                        // Simple dynamic range around current page
                                         if (totalPages > 5 && currentPage > 3) {
                                             pageNum = Math.min(currentPage - 2 + i, totalPages - 4 + i);
                                         }
 
+                                        const isActive = currentPage === pageNum;
                                         return (
                                             <button
                                                 key={pageNum}
                                                 onClick={() => setCurrentPage(pageNum)}
                                                 className={cn(
-                                                    "h-8 w-8 rounded-full text-[10px] font-black transition-all",
-                                                    currentPage === pageNum
-                                                        ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
-                                                        : "text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                                    "h-10 w-10 rounded-xl text-xs font-black transition-all flex items-center justify-center",
+                                                    isActive
+                                                        ? "bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white shadow-lg shadow-indigo-500/30"
+                                                        : "bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-300 dark:hover:border-zinc-700"
                                                 )}
                                             >
                                                 {pageNum}
@@ -400,15 +406,13 @@ export default function PosHistoryPage() {
                                     })}
                                 </div>
 
-                                <Button
-                                    variant="outline"
-                                    size="sm"
+                                <button
                                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                                     disabled={currentPage === totalPages}
-                                    className="rounded-full h-9 px-4 border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest hover:bg-white dark:hover:bg-zinc-800"
+                                    className="h-10 w-10 rounded-xl flex items-center justify-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
                                 >
-                                    NEXT <ChevronRight size={14} className="ml-1" />
-                                </Button>
+                                    <ChevronRightIcon size={18} />
+                                </button>
                             </div>
                         </div>
                     )}
@@ -466,11 +470,11 @@ function ModernStatCard({ title, value, description, icon: Icon, color }: any) {
     };
 
     return (
-        <div className={cn("rounded-[24px] overflow-hidden text-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative group w-full", gradientClasses[color])}>
+        <div className={cn("rounded-xl overflow-hidden text-white transition-all duration-300 shadow-xl hover:-translate-y-1 relative group w-full", gradientClasses[color])}>
             <div className="p-5 flex flex-col justify-center h-[120px]">
                 <div className="flex justify-between items-start">
                     <div className="space-y-1">
-                        <p className="text-[10px] uppercase font-black tracking-wider text-white/90 drop-shadow-sm">{title}</p>
+                        <p className="text-[15px] uppercase font-bold tracking-wider text-white/90 drop-shadow-sm">{title}</p>
                         <h3 className="text-3xl font-black tracking-tight text-white drop-shadow-md">{value}</h3>
                     </div>
                     <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center mt-1 shadow-inner border border-white/10">

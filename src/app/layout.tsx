@@ -16,8 +16,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
-  title: "Smart POS Software",
-  description: "Modern SME Accounting System",
+  title: "Hurpori POS Software",
+  description: "Tailored Technology for the Modern Boutique",
 };
 
 export default function RootLayout({

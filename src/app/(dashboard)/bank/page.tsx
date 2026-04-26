@@ -70,10 +70,9 @@ function BankAccountCard({ account, index, onDelete }: { account: any; index: nu
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.07, duration: 0.4 }}
-            className="group bg-white dark:bg-zinc-900/60 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-lg hover:shadow-2xl transition-all overflow-hidden relative"
+            className="group bg-white dark:bg-zinc-900/60 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-lg hover:shadow-2xl transition-all overflow-hidden relative"
         >
-            {/* Gradient accent bar */}
-            <div className={cn("h-1.5 absolute top-0 left-0 right-0 bg-gradient-to-r", colorSet.gradient)} />
+
 
             {/* Watermark icon */}
             <div className="absolute top-6 right-6 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -83,7 +82,7 @@ function BankAccountCard({ account, index, onDelete }: { account: any; index: nu
             <div className="p-8 pt-10 space-y-6 relative z-10">
                 {/* Top row */}
                 <div className="flex items-start justify-between">
-                    <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500", colorSet.icon)}>
+                    <div className={cn("h-14 w-14 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500", colorSet.icon)}>
                         <Icon size={28} strokeWidth={2} />
                     </div>
                     <div className={cn("inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border",
@@ -103,21 +102,21 @@ function BankAccountCard({ account, index, onDelete }: { account: any; index: nu
                 {/* Balance */}
                 <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800">
                     <p className="text-[10px] text-zinc-400 font-black uppercase tracking-[0.2em]">Current Balance</p>
-                    <p className={cn("text-3xl font-black mt-1 tracking-tighter italic", isNegative ? "text-rose-500" : "text-zinc-900 dark:text-zinc-100")}>
+                    <p className={cn("text-3xl font-black mt-1 tracking-tighter", isNegative ? "text-rose-500" : "text-zinc-900 dark:text-zinc-100")}>
                         {isNegative ? "-" : ""}${Math.abs(balance).toLocaleString("en-CA", { minimumFractionDigits: 2 })}
                     </p>
                 </div>
 
                 {/* Actions */}
                 <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <Button variant="ghost" size="sm" className="flex-1 rounded-2xl h-10 bg-zinc-50 dark:bg-zinc-800 text-zinc-500 hover:text-indigo-600 border border-zinc-100 dark:border-zinc-700 text-xs font-black uppercase tracking-widest">
+                    <Button variant="ghost" size="sm" className="flex-1 rounded-xl h-10 bg-zinc-50 dark:bg-zinc-800 text-zinc-500 hover:text-indigo-600 border border-zinc-100 dark:border-zinc-700 text-xs font-black uppercase tracking-widest">
                         <RefreshCw size={14} className="mr-2" /> Reconcile
                     </Button>
                     <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => onDelete(account.id)}
-                        className="h-10 w-10 rounded-2xl bg-zinc-50 dark:bg-zinc-800 text-zinc-400 hover:text-rose-600 border border-zinc-100 dark:border-zinc-700"
+                        className="h-10 w-10 rounded-xl bg-zinc-50 dark:bg-zinc-800 text-zinc-400 hover:text-rose-600 border border-zinc-100 dark:border-zinc-700"
                     >
                         <Trash2 size={16} />
                     </Button>
@@ -154,29 +153,28 @@ function NewBankDialog({ open, onClose, onCreated, companyId }: { open: boolean;
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-[2rem] p-0 overflow-hidden max-w-lg">
-                <div className="h-1.5 bg-gradient-to-r from-blue-500 via-indigo-600 to-blue-400" />
+            <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-xl p-0 overflow-hidden max-w-lg">
                 <div className="p-8 space-y-8">
                     <DialogHeader>
-                        <DialogTitle className="text-2xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tighter uppercase">Link Bank Account</DialogTitle>
+                        <DialogTitle className="text-2xl font-black text-zinc-900 dark:text-zinc-100 tracking-tighter uppercase">Link Bank Account</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-3">
                             <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Bank / Institution Name</Label>
-                            <Input value={form.bank_name} onChange={e => setForm({ ...form, bank_name: e.target.value })} placeholder="e.g. RBC Royal Bank" required className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium" />
+                            <Input value={form.bank_name} onChange={e => setForm({ ...form, bank_name: e.target.value })} placeholder="e.g. RBC Royal Bank" required className="h-14 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium" />
                         </div>
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-3">
                                 <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Account Number</Label>
-                                <Input value={form.account_number} onChange={e => setForm({ ...form, account_number: e.target.value })} placeholder="Last 4 digits..." className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono" />
+                                <Input value={form.account_number} onChange={e => setForm({ ...form, account_number: e.target.value })} placeholder="Last 4 digits..." className="h-14 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono" />
                             </div>
                             <div className="space-y-3">
                                 <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Account Type</Label>
                                 <Select value={form.account_type} onValueChange={v => setForm({ ...form, account_type: v })}>
-                                    <SelectTrigger className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
+                                    <SelectTrigger className="h-14 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2">
+                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-xl p-2">
                                         {ACCOUNT_TYPES.map(t => (
                                             <SelectItem key={t} value={t} className="rounded-xl h-10 font-bold focus:bg-indigo-600 focus:text-white">{t}</SelectItem>
                                         ))}
@@ -188,12 +186,12 @@ function NewBankDialog({ open, onClose, onCreated, companyId }: { open: boolean;
                             <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Opening Balance ($)</Label>
                             <div className="relative">
                                 <span className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-400 font-black text-xl">$</span>
-                                <Input type="number" step="0.01" value={form.initial_balance} onChange={e => setForm({ ...form, initial_balance: e.target.value })} placeholder="0.00" className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-black text-xl pl-12" />
+                                <Input type="number" step="0.01" value={form.initial_balance} onChange={e => setForm({ ...form, initial_balance: e.target.value })} placeholder="0.00" className="h-14 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-black text-xl pl-12" />
                             </div>
                         </div>
                         <DialogFooter className="gap-4 pt-2">
-                            <Button type="button" variant="ghost" onClick={onClose} className="rounded-2xl h-12 px-8 font-black text-xs uppercase tracking-[0.15em] text-zinc-500">Cancel</Button>
-                            <Button type="submit" disabled={loading} className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full h-12 px-8 font-black uppercase italic tracking-tight shadow-lg shadow-blue-500/20 flex items-center gap-2">
+                            <Button type="button" variant="ghost" onClick={onClose} className="rounded-xl h-12 px-8 font-black text-xs uppercase tracking-[0.15em] text-zinc-500">Cancel</Button>
+                            <Button type="submit" disabled={loading} className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl h-12 px-8 font-black uppercase tracking-tighter shadow-lg shadow-blue-500/20 flex items-center gap-2">
                                 {loading ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} strokeWidth={3} />}
                                 {loading ? "Linking..." : "Link Account"}
                             </Button>
@@ -206,37 +204,33 @@ function NewBankDialog({ open, onClose, onCreated, companyId }: { open: boolean;
 }
 
 // ── Summary Stat Card ─────────────────────────────────────────
-function StatCard({ label, value, icon: Icon, gradient, shadow, description }: {
+function StatCard({ label, value, icon: Icon, color, description }: {
     label: string; value: string; icon: React.ElementType;
-    gradient: string; shadow: string; description: string;
+    color: string; description: string;
 }) {
+    const gradientClasses: any = {
+        blue: "bg-gradient-to-r from-[#2B5BFF] to-[#5138EE]",
+        indigo: "bg-gradient-to-r from-[#2B5BFF] to-[#5138EE]",
+        emerald: "bg-gradient-to-r from-[#00D09E] to-[#019DA3]",
+    };
+
     return (
-        <div className={cn(
-            "relative rounded-[2.5rem] p-7 flex flex-col gap-4 overflow-hidden cursor-default transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl group",
-            "bg-gradient-to-br shadow-xl", gradient, shadow
-        )}>
-            {/* Decorative Glass Blobs */}
-            <div className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-700" />
-            <div className="absolute -top-12 -left-10 h-32 w-32 rounded-full bg-white/10 blur-2xl pointer-events-none group-hover:scale-110 transition-transform duration-700" />
-
-            <div className="relative z-10 flex justify-between items-start">
-                <div className="space-y-1.5">
-                    <p className="text-[10px] text-white/70 font-black uppercase tracking-[0.25em]">{label}</p>
-                    <p className="text-3xl font-black text-white italic tracking-tighter leading-none">{value}</p>
+        <div className={cn("rounded-xl overflow-hidden text-white transition-all duration-300 shadow-xl hover:-translate-y-1 relative group w-full", gradientClasses[color])}>
+            <div className="p-5 flex flex-col justify-center h-[120px]">
+                <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                        <p className="text-[15px] uppercase font-bold tracking-wider text-white/90 drop-shadow-sm">{label}</p>
+                        <h3 className="text-3xl font-black tracking-tight text-white drop-shadow-md">{value}</h3>
+                    </div>
+                    <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center mt-1 shadow-inner border border-white/10">
+                        <Icon size={16} className="text-white drop-shadow-sm" strokeWidth={2.5} />
+                    </div>
                 </div>
-                <div className="h-14 w-14 rounded-2xl bg-white/20 backdrop-blur-xl flex items-center justify-center shrink-0 border border-white/30 shadow-inner group-hover:rotate-12 transition-transform duration-500">
-                    <Icon size={26} className="text-white" />
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-white/90 mt-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-90"><path d="M7 7h10v10" /><path d="M7 17 17 7" /></svg>
+                    <span>{description}</span>
                 </div>
             </div>
-
-            <div className="relative z-10 pt-2 border-t border-white/10">
-                <p className="text-[11px] text-white/80 font-bold leading-relaxed max-w-[90%]">
-                    {description}
-                </p>
-            </div>
-
-            {/* Subtle Shine Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
         </div>
     );
 }
@@ -304,7 +298,7 @@ export default function BankPage() {
                         <Building2 size={24} />
                     </div>
                     <div>
-                        <h2 className="text-2xl md:text-4xl font-black bg-gradient-to-r from-blue-500 via-indigo-600 to-blue-400 bg-clip-text text-transparent tracking-tighter uppercase italic leading-none mb-2">
+                        <h2 className="text-2xl md:text-4xl font-black bg-gradient-to-r from-blue-500 via-indigo-600 to-blue-400 bg-clip-text text-transparent tracking-tighter uppercase leading-none mb-2">
                             Bank &amp; Payments
                         </h2>
                         <p className="text-xs md:text-base text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
@@ -315,13 +309,13 @@ export default function BankPage() {
                 <div className="flex items-center gap-4">
                     <Button
                         variant="ghost"
-                        className="h-14 rounded-full px-8 border border-zinc-200 dark:border-zinc-700 font-black text-xs uppercase tracking-[0.15em] text-zinc-500 hover:text-blue-600 hover:border-blue-400 dark:hover:border-blue-500 transition-all gap-3"
+                        className="h-14 rounded-xl px-8 border border-zinc-200 dark:border-zinc-700 font-black text-xs uppercase tracking-[0.15em] text-zinc-500 hover:text-blue-600 hover:border-blue-400 dark:hover:border-blue-500 transition-all gap-3"
                     >
                         <RefreshCw size={16} /> Reconcile
                     </Button>
                     <Button
                         onClick={() => setShowNewDialog(true)}
-                        className="bg-gradient-to-r from-blue-500 via-indigo-600 to-indigo-500 text-white rounded-full px-8 h-14 shadow-lg shadow-blue-500/25 font-black uppercase italic tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0 whitespace-nowrap text-base gap-3"
+                        className="bg-gradient-to-r from-blue-500 via-indigo-600 to-indigo-500 text-white rounded-xl px-8 h-14 shadow-lg shadow-blue-500/25 font-black uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0 whitespace-nowrap text-base gap-3"
                     >
                         <Plus size={20} strokeWidth={3} /> Link Account
                     </Button>
@@ -334,30 +328,27 @@ export default function BankPage() {
                     label="Total Liquidity"
                     value={`$${totalBalance.toLocaleString("en-CA", { minimumFractionDigits: 2 })}`}
                     icon={DollarSign}
-                    gradient="from-blue-600 via-indigo-600 to-blue-500"
-                    shadow="shadow-blue-500/30"
+                    color="blue"
                     description="Combined balance across all linked financial accounts."
                 />
                 <StatCard
                     label="Linked Accounts"
-                    value={`${totalAccounts} Account${totalAccounts !== 1 ? "s" : ""}`}
+                    value={`${totalAccounts}`}
                     icon={CreditCard}
-                    gradient="from-indigo-600 via-violet-600 to-purple-500"
-                    shadow="shadow-violet-500/30"
+                    color="indigo"
                     description="Financial institutions connected to this company profile."
                 />
                 <StatCard
                     label="Active Accounts"
-                    value={`${positiveAccounts.length} Healthy`}
+                    value={`${positiveAccounts.length}`}
                     icon={ArrowUpRight}
-                    gradient="from-emerald-500 via-teal-600 to-cyan-500"
-                    shadow="shadow-emerald-500/30"
+                    color="emerald"
                     description="Accounts with a positive or zero balance — financially healthy."
                 />
             </div>
 
             {/* ── Search ── */}
-            <div className="flex items-center gap-4 bg-white dark:bg-zinc-900/50 p-2 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-sm focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
+            <div className="flex items-center gap-4 bg-white dark:bg-zinc-900/50 p-2 rounded-full border border-zinc-200 dark:border-zinc-800 shadow-sm focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
                 <div className="relative flex-1">
                     <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-400" size={20} />
                     <Input
@@ -379,9 +370,8 @@ export default function BankPage() {
                     </AnimatePresence>
                 </div>
             ) : (
-                <div className="bg-white dark:bg-zinc-900/50 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-xl relative overflow-hidden">
-                    <div className="h-1.5 absolute top-0 left-0 right-0 bg-gradient-to-r from-blue-500 via-indigo-600 to-blue-400" />
-                    <div className="flex flex-col items-center gap-6 py-24 mt-1.5">
+                <div className="bg-white dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xl relative overflow-hidden">
+                    <div className="flex flex-col items-center gap-6 py-24">
                         <div className="h-20 w-20 rounded-3xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
                             <Banknote size={40} className="text-blue-400" />
                         </div>
@@ -398,7 +388,7 @@ export default function BankPage() {
                         {accounts.length === 0 && (
                             <Button
                                 onClick={() => setShowNewDialog(true)}
-                                className="rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-black h-14 px-10 shadow-lg shadow-blue-500/20 uppercase italic tracking-tight gap-3"
+                                className="rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-black h-14 px-10 shadow-lg shadow-blue-500/20 uppercase tracking-tight gap-3"
                             >
                                 <Plus size={18} strokeWidth={3} /> Link First Account
                             </Button>

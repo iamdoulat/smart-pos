@@ -43,6 +43,15 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from "lucide-react";
 
 /* ─── Types ────────────────────────────────────────────────────────────── */
 interface Product {
@@ -178,7 +187,7 @@ export default function InventoryPage() {
                         <Package size={22} />
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-blue-500 via-violet-600 to-indigo-500 bg-clip-text text-transparent tracking-tighter uppercase italic pr-4 leading-tight mb-1">
+                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-blue-500 via-violet-600 to-indigo-500 bg-clip-text text-transparent tracking-tighter uppercase pr-4 leading-tight mb-1">
                             Inventory
                         </h2>
                         <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
@@ -199,7 +208,7 @@ export default function InventoryPage() {
                     </div>
                     <Button
                         onClick={() => router.push("/inventory/add")}
-                        className="bg-gradient-to-r from-blue-500 via-violet-600 to-indigo-600 text-white rounded-full px-6 h-11 shadow-lg shadow-violet-500/30 font-black uppercase italic tracking-tighter transition-all hover:scale-[1.02] hover:shadow-violet-500/40 active:scale-95 border-0 whitespace-nowrap"
+                        className="bg-gradient-to-r from-blue-500 via-violet-600 to-indigo-600 text-white rounded-full px-6 h-11 shadow-lg shadow-violet-500/30 font-black uppercase tracking-tighter transition-all hover:scale-[1.02] hover:shadow-violet-500/40 active:scale-95 border-0 whitespace-nowrap"
                     >
                         <Plus className="mr-2 h-4 w-4" /> Add Product
                     </Button>
@@ -268,34 +277,29 @@ export default function InventoryPage() {
                     <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
                 </div>
             ) : (
-                <div className="bg-white dark:bg-zinc-900/50 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden relative">
-                    {/* top accent bar */}
-                    <div className="h-1.5 absolute top-0 left-0 right-0 bg-gradient-to-r from-violet-500 via-purple-600 to-indigo-500" />
-
-                    <div className="overflow-x-auto mt-1.5">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-zinc-50 dark:bg-zinc-900/50 text-zinc-500 dark:text-zinc-400 uppercase font-black tracking-wider text-[10px]">
-                                <tr>
-                                    <th className="px-6 py-4">Product</th>
-                                    <th className="px-6 py-4">SKU</th>
-                                    <th className="px-6 py-4">Buy Price</th>
-                                    <th className="px-6 py-4">Sell Price</th>
-                                    <th className="px-6 py-4">Margin</th>
-                                    <th className="px-6 py-4">Stock</th>
-                                    <th className="px-6 py-4 text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
+                <div className="bg-white dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden relative">
+                    <div className="mt-2">
+                        <Table>
+                            <TableHeader className="bg-zinc-50 dark:bg-zinc-900/50">
+                                <TableRow className="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800">
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Product</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">SKU</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Buy Price</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Sell Price</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Margin</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Stock</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Action</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
                                 {paginated.map((p) => {
-                                    const st = stockStatus(p.stock_quantity, p.low_stock_threshold);
                                     const buyP = parseFloat(p.purchase_price.toString());
                                     const sellP = parseFloat(p.sales_price.toString());
                                     const margin = buyP > 0 ? ((sellP - buyP) / buyP) * 100 : 0;
 
                                     return (
-                                        <tr key={p.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
-                                            {/* Product */}
-                                            <td className="px-6 py-4">
+                                        <TableRow key={p.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group border-zinc-100 dark:border-zinc-800">
+                                            <TableCell className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="h-10 w-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden border border-zinc-200 dark:border-zinc-700">
                                                         {p.image_url ? (
@@ -318,10 +322,9 @@ export default function InventoryPage() {
                                                         )}
                                                     </div>
                                                 </div>
-                                            </td>
+                                            </TableCell>
 
-                                            {/* SKU */}
-                                            <td className="px-6 py-4">
+                                            <TableCell className="px-6 py-4">
                                                 {p.sku ? (
                                                     <span className="text-xs font-mono bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-lg text-zinc-600 dark:text-zinc-400">
                                                         {p.sku}
@@ -329,24 +332,21 @@ export default function InventoryPage() {
                                                 ) : (
                                                     <span className="text-zinc-300 dark:text-zinc-600">—</span>
                                                 )}
-                                            </td>
+                                            </TableCell>
 
-                                            {/* Buy Price */}
-                                            <td className="px-6 py-4">
+                                            <TableCell className="px-6 py-4">
                                                 <span className="font-semibold text-zinc-700 dark:text-zinc-300">
                                                     {currency} {fmt(buyP)}
                                                 </span>
-                                            </td>
+                                            </TableCell>
 
-                                            {/* Sell Price */}
-                                            <td className="px-6 py-4">
+                                            <TableCell className="px-6 py-4">
                                                 <span className="font-bold text-emerald-600 dark:text-emerald-400">
                                                     {currency} {fmt(sellP)}
                                                 </span>
-                                            </td>
+                                            </TableCell>
 
-                                            {/* Margin */}
-                                            <td className="px-6 py-4">
+                                            <TableCell className="px-6 py-4">
                                                 <span className={cn(
                                                     "inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full",
                                                     margin >= 0
@@ -356,15 +356,13 @@ export default function InventoryPage() {
                                                     <TrendingUp size={11} />
                                                     {margin.toFixed(1)}%
                                                 </span>
-                                            </td>
+                                            </TableCell>
 
-                                            {/* Stock */}
-                                            <td className="px-6 py-4">
+                                            <TableCell className="px-6 py-4">
                                                 <StockBadge qty={p.stock_quantity} threshold={p.low_stock_threshold} />
-                                            </td>
+                                            </TableCell>
 
-                                            {/* Actions */}
-                                            <td className="px-6 py-4 text-right">
+                                            <TableCell className="px-6 py-4 text-right">
                                                 <div className="flex justify-end">
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
@@ -391,12 +389,12 @@ export default function InventoryPage() {
                                                                         <Trash2 size={14} /> Delete Product
                                                                     </DropdownMenuItem>
                                                                 </AlertDialogTrigger>
-                                                                <AlertDialogContent className="rounded-[2rem] border-0 shadow-2xl p-0 overflow-hidden">
+                                                                <AlertDialogContent className="rounded-xl border-0 shadow-2xl p-0 overflow-hidden">
                                                                     <div className="bg-red-500 p-8 text-white">
                                                                         <div className="h-14 w-14 rounded-2xl bg-white/20 flex items-center justify-center mb-4">
                                                                             <Trash2 size={28} />
                                                                         </div>
-                                                                        <AlertDialogTitle className="text-2xl font-black italic tracking-tighter uppercase leading-none">
+                                                                        <AlertDialogTitle className="text-2xl font-black tracking-tighter uppercase leading-none">
                                                                             Delete Product?
                                                                         </AlertDialogTitle>
                                                                         <AlertDialogDescription className="text-red-50 mt-2 font-medium">
@@ -419,15 +417,15 @@ export default function InventoryPage() {
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
                                                 </div>
-                                            </td>
-                                        </tr>
+                                            </TableCell>
+                                        </TableRow>
                                     );
                                 })}
 
                                 {/* Empty state */}
                                 {filtered.length === 0 && (
-                                    <tr>
-                                        <td colSpan={7} className="px-6 py-20 text-center">
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="px-6 py-20 text-center">
                                             <div className="flex flex-col items-center justify-center">
                                                 <div className="h-20 w-20 rounded-3xl bg-gradient-to-br from-violet-100 to-indigo-100 dark:from-violet-900/20 dark:to-indigo-900/20 flex items-center justify-center mb-6">
                                                     <Package size={40} className="text-violet-400" />
@@ -449,11 +447,11 @@ export default function InventoryPage() {
                                                     </Button>
                                                 )}
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                    </TableRow>
                                 )}
-                            </tbody>
-                        </table>
+                            </TableBody>
+                        </Table>
                     </div>
 
                     {/* Footer count */}
@@ -464,33 +462,32 @@ export default function InventoryPage() {
                             </span>
 
                             {/* Pagination Controls */}
-                            <div className="flex items-center gap-2 order-1 sm:order-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
+                            <div className="flex items-center gap-3 order-1 sm:order-2">
+                                <button
                                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                                     disabled={currentPage === 1}
-                                    className="rounded-full h-9 px-4 border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest hover:bg-white dark:hover:bg-zinc-800"
+                                    className="h-10 w-10 rounded-xl flex items-center justify-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
                                 >
-                                    <ChevronLeft size={14} className="mr-1" /> PREV
-                                </Button>
+                                    <ChevronLeftIcon size={18} />
+                                </button>
 
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-2">
                                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                                         let pageNum = i + 1;
                                         if (totalPages > 5 && currentPage > 3) {
                                             pageNum = Math.min(currentPage - 2 + i, totalPages - 4 + i);
                                         }
 
+                                        const isActive = currentPage === pageNum;
                                         return (
                                             <button
                                                 key={pageNum}
                                                 onClick={() => setCurrentPage(pageNum)}
                                                 className={cn(
-                                                    "h-8 w-8 rounded-full text-[10px] font-black transition-all",
-                                                    currentPage === pageNum
-                                                        ? "bg-violet-600 text-white shadow-lg shadow-violet-500/30"
-                                                        : "text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                                    "h-10 w-10 rounded-xl text-xs font-black transition-all flex items-center justify-center",
+                                                    isActive
+                                                        ? "bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white shadow-lg shadow-indigo-500/30"
+                                                        : "bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-300 dark:hover:border-zinc-700"
                                                 )}
                                             >
                                                 {pageNum}
@@ -499,15 +496,13 @@ export default function InventoryPage() {
                                     })}
                                 </div>
 
-                                <Button
-                                    variant="outline"
-                                    size="sm"
+                                <button
                                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                                     disabled={currentPage === totalPages}
-                                    className="rounded-full h-9 px-4 border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest hover:bg-white dark:hover:bg-zinc-800"
+                                    className="h-10 w-10 rounded-xl flex items-center justify-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
                                 >
-                                    NEXT <ChevronRight size={14} className="ml-1" />
-                                </Button>
+                                    <ChevronRightIcon size={18} />
+                                </button>
                             </div>
                         </div>
                     )}
@@ -537,9 +532,9 @@ function SummaryCard({
 }) {
     return (
         <div className={cn(
-            "relative rounded-3xl p-5 flex items-center justify-between overflow-hidden cursor-default",
+            "relative rounded-xl p-5 flex items-center justify-between overflow-hidden cursor-default",
             "bg-gradient-to-br", gradient,
-            "shadow-lg", shadow,
+            "shadow-xl", shadow,
             "transition-transform hover:-translate-y-0.5 hover:shadow-xl"
         )}>
             {/* Decorative blurred circle */}
@@ -547,7 +542,7 @@ function SummaryCard({
             <div className="absolute -top-6 -left-4 h-20 w-20 rounded-full bg-white/10 blur-xl pointer-events-none" />
 
             <div className="relative z-10">
-                <p className="text-[10px] text-white/70 font-black uppercase tracking-widest mb-1">
+                <p className="text-[15px] text-white/90 font-bold uppercase tracking-widest mb-1">
                     {label}
                 </p>
                 <p className="text-2xl font-black text-white truncate">{value}</p>

@@ -85,17 +85,17 @@ export default function PurchasesPage() {
                 />
             </div>
 
-            <Card className="border-zinc-800 bg-zinc-900/50 backdrop-blur-sm">
+            <Card className="border-zinc-800 bg-zinc-900/50 backdrop-blur-sm rounded-xl">
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader className="border-zinc-800">
                             <TableRow className="hover:bg-transparent border-zinc-800">
-                                <TableHead className="text-zinc-400">Bill #</TableHead>
-                                <TableHead className="text-zinc-400">Vendor</TableHead>
-                                <TableHead className="text-zinc-400">Category</TableHead>
-                                <TableHead className="text-zinc-400">Date</TableHead>
-                                <TableHead className="text-zinc-400 text-right">Amount</TableHead>
-                                <TableHead className="text-zinc-400 text-right">Actions</TableHead>
+                                <TableHead className="text-black dark:text-white font-black uppercase tracking-widest">Bill #</TableHead>
+                                <TableHead className="text-black dark:text-white font-black uppercase tracking-widest">Vendor</TableHead>
+                                <TableHead className="text-black dark:text-white font-black uppercase tracking-widest">Category</TableHead>
+                                <TableHead className="text-black dark:text-white font-black uppercase tracking-widest">Date</TableHead>
+                                <TableHead className="text-black dark:text-white font-black uppercase tracking-widest text-right">Amount</TableHead>
+                                <TableHead className="text-black dark:text-white font-black uppercase tracking-widest text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -145,7 +145,7 @@ function SummaryCard({ title, value, icon: Icon, color }: any) {
             <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-sm font-medium text-zinc-500">{title}</p>
+                        <p className="text-[15px] font-black text-zinc-500 uppercase tracking-widest">{title}</p>
                         <h3 className="text-2xl font-bold text-zinc-100 mt-1">{value}</h3>
                     </div>
                     <div className={cn("p-2 rounded-lg bg-zinc-800", color)}>

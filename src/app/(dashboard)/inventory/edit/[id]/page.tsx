@@ -286,7 +286,7 @@ export default function EditProductPage() {
                             <Package size={22} />
                         </div>
                         <div>
-                            <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase italic leading-none mb-1">
+                            <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase leading-none mb-1">
                                 Edit Product
                             </h2>
                             <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
@@ -298,8 +298,7 @@ export default function EditProductPage() {
             </div>
 
             {/* ── Form Content ── */}
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[2.5rem] shadow-xl overflow-hidden relative">
-                <div className="h-2 absolute top-0 left-0 right-0 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500" />
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl overflow-hidden relative">
 
                 <div className="p-8 md:p-10 space-y-10">
                     {/* Section 1: Item Details */}
@@ -626,14 +625,14 @@ export default function EditProductPage() {
                     <Button
                         onClick={handleSave}
                         disabled={saving}
-                        className="bg-gradient-to-r from-orange-500 via-purple-500 to-indigo-600 hover:scale-[1.02] active:scale-95 text-white rounded-full px-12 h-12 font-black uppercase italic tracking-tighter min-w-[160px] shadow-lg shadow-purple-500/25 border-0 transition-all"
+                        className="bg-gradient-to-r from-orange-500 via-purple-500 to-indigo-600 hover:scale-[1.02] active:scale-95 text-white rounded-xl px-12 h-12 font-black uppercase tracking-tighter min-w-[160px] shadow-lg shadow-purple-500/25 border-0 transition-all"
                     >
                         {saving ? <Loader2 className="animate-spin h-5 w-5" /> : "Save"}
                     </Button>
                     <Button
                         variant="secondary"
                         onClick={() => router.back()}
-                        className="bg-gradient-to-r from-rose-500 via-red-500 to-orange-600 hover:scale-[1.02] active:scale-95 text-white rounded-full px-12 h-12 font-black uppercase italic tracking-tighter min-w-[160px] shadow-lg shadow-rose-500/25 border-0 transition-all"
+                        className="bg-gradient-to-r from-rose-500 via-red-500 to-orange-600 hover:scale-[1.02] active:scale-95 text-white rounded-xl px-12 h-12 font-black uppercase tracking-tighter min-w-[160px] shadow-lg shadow-rose-500/25 border-0 transition-all"
                     >
                         Close
                     </Button>
@@ -658,7 +657,7 @@ function Field({
 }) {
     return (
         <div className="space-y-2">
-            <label className="flex items-center gap-1.5 text-sm font-bold text-zinc-900 dark:text-zinc-100 leading-none">
+            <label className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-black dark:text-white leading-none">
                 {label}
                 {required && <span className="text-rose-500">*</span>}
             </label>

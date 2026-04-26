@@ -20,7 +20,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Link from "next/link";
-import { Loader2, Fingerprint } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { cn, getAssetUrl } from "@/lib/utils";
+import logoImg from "@/assets/logo.png";
+import bgImg from "@/assets/auth-bg.png";
+import Image from "next/image";
 
 const registerSchema = z.object({
     name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -33,16 +37,25 @@ const registerSchema = z.object({
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
-
 export default function RegisterPage() {
     const router = useRouter();
-    const { user, setUser } = useAuthStore();
+    const { user, setUser, currentCompany, refreshCompany } = useAuthStore();
+
+    useEffect(() => {
+        // Fetch company info for the logo
+        if (!currentCompany) {
+            refreshCompany();
+        }
+    }, [currentCompany, refreshCompany]);
+
+    const companyLogo = currentCompany?.logo_url ? getAssetUrl(currentCompany.logo_url) : null;
+
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem("auth_token");
         if (user || token) {
-            router.replace("/dashboard");
+            window.location.href = "/dashboard";
         }
     }, [user, router]);
 
@@ -62,7 +75,7 @@ export default function RegisterPage() {
             const response = await AuthService.register(data);
             setUser(response.user);
             toast.success("Account created successfully!");
-            router.replace("/dashboard");
+            window.location.href = "/dashboard";
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Something went wrong");
         } finally {
@@ -71,22 +84,28 @@ export default function RegisterPage() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col justify-center items-center p-4 sm:p-8 bg-zinc-50 dark:bg-zinc-950 transition-colors duration-500 relative overflow-hidden">
-            {/* Background Decorations */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 blur-[100px] pointer-events-none" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 dark:bg-purple-500/20 blur-[100px] pointer-events-none" />
-
-            <div className="w-full max-w-md z-10">
-                <div className="flex flex-col items-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg mb-4">
-                        <Fingerprint className="text-white w-8 h-8" />
+        <>
+            <div className="w-full max-w-md my-8">
+            <div className="flex flex-col items-center mb-8">
+                    <div className="relative w-24 h-24 mb-4 drop-shadow-2xl group transition-transform hover:scale-105 duration-300">
+                        <div className="absolute inset-0 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-inner" />
+                        <Image
+                            src={companyLogo || logoImg}
+                            alt={currentCompany?.name || "Hurpori Logo"}
+                            fill
+                            className="object-contain p-2 relative z-20"
+                            priority
+                            unoptimized={!!companyLogo}
+                        />
                     </div>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
-                        Smart POS Software
-                    </h1>
-                    <p className="text-zinc-500 dark:text-zinc-400 mt-2 text-center">
-                        Modern SME Accounting System
-                    </p>
+                    <div className="bg-black/30 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/20 shadow-xl text-center">
+                        <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-amber-400 via-indigo-400 to-pink-400 bg-clip-text text-transparent drop-shadow-md">
+                            Hurpori POS Software
+                        </h1>
+                        <p className="text-zinc-100 mt-1 font-medium text-sm max-w-[280px]">
+                            Tailored Technology for the Modern Boutique
+                        </p>
+                    </div>
                 </div>
 
                 <Card className="border-0 shadow-2xl bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl transition-all duration-300">
@@ -177,8 +196,8 @@ export default function RegisterPage() {
             </div>
 
             <div className="mt-8 text-center text-sm text-zinc-500 dark:text-zinc-400 z-10">
-                &copy; {new Date().getFullYear()} Smart POS Software. All rights reserved.
+                &copy; {new Date().getFullYear()} Hurpori POS Software. All rights reserved.
             </div>
-        </div>
+        </>
     );
 }

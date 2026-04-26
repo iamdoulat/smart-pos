@@ -338,7 +338,7 @@ export default function DashboardLayout({
                         {!isCollapsed && (
                             <div className="flex flex-col min-w-0">
                                 <span className="text-lg font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight truncate leading-none">
-                                    {currentCompany?.name || "Smart POS Software"}
+                                    {currentCompany?.name || "Hurpori POS Software"}
                                 </span>
                             </div>
                         )}

@@ -106,7 +106,7 @@ function SummaryCard({ type, count, isSelected, onClick }: { type: string; count
         <button
             onClick={onClick}
             className={cn(
-                "w-full text-left rounded-[2rem] border shadow-xl p-6 flex flex-col gap-4 hover:scale-[1.02] active:scale-95 transition-all group cursor-pointer relative overflow-hidden",
+                "w-full text-left rounded-xl border shadow-xl p-6 flex flex-col gap-4 hover:scale-[1.02] active:scale-95 transition-all group cursor-pointer relative overflow-hidden",
                 isSelected
                     ? "ring-4 ring-indigo-500/20 border-white/50"
                     : "border-transparent",
@@ -120,7 +120,7 @@ function SummaryCard({ type, count, isSelected, onClick }: { type: string; count
                 <div className="space-y-1">
                     <p className="text-[10px] text-white/70 font-black uppercase tracking-[0.2em]">{type}</p>
                     <h3 className="text-3xl font-black text-white tracking-tighter">
-                        {count} <span className="text-xs text-white/60 font-black uppercase tracking-widest italic ml-1">Items</span>
+                        {count} <span className="text-xs text-white/60 font-black uppercase tracking-widest ml-1">Items</span>
                     </h3>
                 </div>
                 <div className={cn("h-10 w-10 rounded-xl flex items-center justify-center shrink-0 shadow-lg backdrop-blur-md", cfg.iconBg, cfg.iconText)}>
@@ -161,25 +161,24 @@ function NewAccountDialog({ open, onClose, onCreated, companyId }: { open: boole
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-[2rem] p-0 overflow-hidden max-w-lg">
-                <div className="h-1.5 bg-gradient-to-r from-indigo-500 via-blue-600 to-indigo-400" />
+            <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-xl p-0 overflow-hidden max-w-lg">
                 <div className="p-8 space-y-8">
                     <DialogHeader>
-                        <DialogTitle className="text-2xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tighter uppercase">New Account</DialogTitle>
+                        <DialogTitle className="text-2xl font-black text-zinc-900 dark:text-zinc-100 tracking-tighter uppercase">New Account</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-3">
                                 <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Account Code</Label>
-                                <Input value={form.code} onChange={e => setForm({ ...form, code: e.target.value })} placeholder="e.g. 1010" required className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 font-mono text-zinc-900 dark:text-zinc-100" />
+                                <Input value={form.code} onChange={e => setForm({ ...form, code: e.target.value })} placeholder="e.g. 1010" required className="h-14 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 font-mono text-zinc-900 dark:text-zinc-100" />
                             </div>
                             <div className="space-y-3">
                                 <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Type</Label>
                                 <Select value={form.type} onValueChange={v => setForm({ ...form, type: v })}>
-                                    <SelectTrigger className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
+                                    <SelectTrigger className="h-14 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2">
+                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-xl p-2">
                                         {ACCOUNT_TYPES.map(t => (
                                             <SelectItem key={t} value={t} className="rounded-xl h-10 font-bold capitalize focus:bg-indigo-600 focus:text-white">{t}</SelectItem>
                                         ))}
@@ -189,11 +188,11 @@ function NewAccountDialog({ open, onClose, onCreated, companyId }: { open: boole
                         </div>
                         <div className="space-y-3">
                             <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Account Name</Label>
-                            <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Cash and Cash Equivalents" required className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium" />
+                            <Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Cash and Cash Equivalents" required className="h-14 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium" />
                         </div>
                         <DialogFooter className="gap-4 pt-2">
-                            <Button type="button" variant="ghost" onClick={onClose} className="rounded-2xl h-12 px-8 font-black text-xs uppercase tracking-[0.15em] text-zinc-500">Cancel</Button>
-                            <Button type="submit" disabled={loading} className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-full h-12 px-8 font-black uppercase italic tracking-tight shadow-lg shadow-indigo-500/20 flex items-center gap-2">
+                            <Button type="button" variant="ghost" onClick={onClose} className="rounded-xl h-12 px-8 font-black text-xs uppercase tracking-[0.15em] text-zinc-500">Cancel</Button>
+                            <Button type="submit" disabled={loading} className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-xl h-12 px-8 font-black uppercase tracking-tighter shadow-lg shadow-indigo-500/20 flex items-center gap-2">
                                 {loading ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} strokeWidth={3} />}
                                 {loading ? "Creating..." : "Create Account"}
                             </Button>
@@ -281,7 +280,7 @@ export default function ChartOfAccountsPage() {
                         <BookOpen size={24} />
                     </div>
                     <div>
-                        <h2 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 bg-clip-text text-transparent tracking-tighter uppercase italic leading-none mb-1">
+                        <h2 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 bg-clip-text text-transparent tracking-tighter uppercase leading-none mb-1">
                             Chart of Accounts
                         </h2>
                         <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
@@ -296,12 +295,12 @@ export default function ChartOfAccountsPage() {
                             placeholder="Search accounts..."
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
-                            className="h-12 w-64 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 pl-10 focus:ring-emerald-500/20 focus:border-emerald-500/50 transition-all font-medium text-sm"
+                            className="pl-12 h-12 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-full shadow-sm focus:ring-2 focus:ring-emerald-500 transition-all font-medium text-sm"
                         />
                     </div>
                     <Button
                         onClick={() => setShowNewDialog(true)}
-                        className="bg-gradient-to-r from-emerald-500 via-teal-500 to-teal-400 text-white rounded-xl px-6 h-12 shadow-lg shadow-emerald-500/25 font-black uppercase italic tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0 whitespace-nowrap text-sm gap-2"
+                        className="bg-gradient-to-r from-emerald-500 via-teal-500 to-teal-400 text-white rounded-xl px-6 h-12 shadow-lg shadow-emerald-500/25 font-black uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0 whitespace-nowrap text-sm gap-2"
                     >
                         <Plus size={18} strokeWidth={3} /> New Account
                     </Button>
@@ -323,9 +322,8 @@ export default function ChartOfAccountsPage() {
 
 
             {/* ── Table ── */}
-            <div className="bg-white dark:bg-zinc-900/50 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden relative">
-                <div className="h-1.5 absolute top-0 left-0 right-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400" />
-                <div className="overflow-x-auto mt-1.5">
+            <div className="bg-white dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden relative">
+                <div className="overflow-x-auto">
                     <Table>
                         <TableHeader className="bg-zinc-50 dark:bg-zinc-900/80">
                             <TableRow className="hover:bg-transparent border-zinc-100 dark:border-zinc-800">
@@ -428,7 +426,7 @@ export default function ChartOfAccountsPage() {
                                                 <Button
                                                     onClick={handleInitializeCOA}
                                                     disabled={initializing}
-                                                    className="rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black h-14 px-10 shadow-lg shadow-emerald-500/20 uppercase italic tracking-tight gap-3"
+                                                    className="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black h-14 px-10 shadow-lg shadow-emerald-500/20 uppercase tracking-tight gap-3"
                                                 >
                                                     {initializing ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} />}
                                                     {initializing ? "Initializing..." : "Initialize COA"}

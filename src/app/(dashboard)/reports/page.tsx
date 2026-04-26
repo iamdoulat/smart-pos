@@ -42,60 +42,51 @@ import { toast } from "sonner";
 // ── Metric Card ─────────────────────────────────────────────
 function MetricCard({ title, value, desc, icon: Icon, trend, trendInfo, type, index }: any) {
     const configs: Record<string, any> = {
-        revenue: {
-            iconBg: "bg-emerald-50 dark:bg-emerald-900/20",
-            iconText: "text-emerald-500",
-            gradient: "from-emerald-500 to-teal-500",
-            trendColor: "text-emerald-500",
-        },
-        expense: {
-            iconBg: "bg-rose-50 dark:bg-rose-900/20",
-            iconText: "text-rose-500",
-            gradient: "from-rose-500 to-pink-500",
-            trendColor: "text-rose-500",
-        },
-        profit: {
-            iconBg: "bg-indigo-50 dark:bg-indigo-900/20",
-            iconText: "text-indigo-500",
-            gradient: "from-indigo-500 to-blue-500",
-            trendColor: "text-indigo-500",
-        },
-        transactions: {
-            iconBg: "bg-amber-50 dark:bg-amber-900/20",
-            iconText: "text-amber-500",
-            gradient: "from-amber-400 to-orange-500",
-            trendColor: "text-amber-500",
-        },
+        revenue: { color: "indigo" },
+        expense: { color: "rose" },
+        profit: { color: "emerald" },
+        transactions: { color: "amber" },
+    };
+
+    const gradientClasses: any = {
+        indigo: "bg-gradient-to-r from-[#2B5BFF] to-[#5138EE]",
+        emerald: "bg-gradient-to-r from-[#00D09E] to-[#019DA3]",
+        amber: "bg-gradient-to-r from-[#FF8800] to-[#FF3B3B]",
+        purple: "bg-gradient-to-r from-[#9747FF] to-[#6A0DAD]",
+        rose: "bg-gradient-to-r from-[#FF3B3B] to-[#D91B1B]",
     };
 
     const cfg = configs[type] || configs.revenue;
+    const colorClass = gradientClasses[cfg.color] || gradientClasses.indigo;
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1, duration: 0.5 }}
+            className={cn("rounded-xl overflow-hidden text-white transition-all duration-300 shadow-xl hover:-translate-y-1 relative group w-full", colorClass)}
         >
-            <Card className="bg-white dark:bg-zinc-900/60 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-lg p-6 flex flex-col gap-4 hover:shadow-xl transition-all group overflow-hidden relative">
-                <div className={cn("h-1.5 absolute top-0 left-0 right-0 bg-gradient-to-r", cfg.gradient, "opacity-40")} />
-                <div className="flex items-center gap-4">
-                    <div className={cn("h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500", cfg.iconBg, cfg.iconText)}>
-                        <Icon size={24} strokeWidth={2.5} />
+            <div className="p-5 flex flex-col justify-center h-[120px]">
+                <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                        <p className="text-[15px] uppercase font-bold tracking-wider text-white/90 drop-shadow-sm truncate">{title}</p>
+                        <h3 className="text-3xl font-black tracking-tight text-white drop-shadow-md truncate">{value}</h3>
                     </div>
-                    <div className="min-w-0">
-                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-black uppercase tracking-[0.2em] mb-1">{title}</p>
-                        <p className={cn("text-2xl font-black italic tracking-tighter", cfg.iconText)}>{value}</p>
+                    <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center mt-1 shadow-inner border border-white/10">
+                        <Icon size={16} className="text-white drop-shadow-sm" strokeWidth={2.5} />
                     </div>
                 </div>
-                <div className="flex items-center justify-between gap-2 mt-2">
-                    <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-tight truncate">{desc}</p>
-                    {trend && (
-                        <div className={cn("flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-zinc-50 dark:bg-zinc-800", cfg.trendColor)}>
-                            {trend} {trendInfo}
-                        </div>
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-white/90 mt-2">
+                    {trend === '+' ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-90 shrink-0"><path d="M7 7h10v10" /><path d="M7 17 17 7" /></svg>
+                    ) : trend === '-' ? (
+                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-90 shrink-0"><path d="M7 17h10V7" /><path d="M7 7l10 10" /></svg>
+                    ) : (
+                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-90 shrink-0"><path d="M7 7h10v10" /><path d="M7 17 17 7" /></svg>
                     )}
+                    <span className="truncate">{trendInfo} • {desc}</span>
                 </div>
-            </Card>
+            </div>
         </motion.div>
     );
 }
@@ -108,20 +99,19 @@ function ExportCard({ title, desc, type, url, icon: Icon, gradient, index }: any
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 + index * 0.1, duration: 0.6 }}
         >
-            <Card className="bg-white dark:bg-zinc-900/60 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-lg p-8 group hover:shadow-2xl transition-all relative overflow-hidden">
-                <div className={cn("h-full w-2 absolute left-0 top-0 bg-gradient-to-b", gradient)} />
+            <Card className="bg-white dark:bg-zinc-900/60 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-lg p-8 group hover:shadow-2xl transition-all relative overflow-hidden">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
                     <div className="flex gap-5 items-center">
-                        <div className={cn("h-16 w-16 rounded-[1.5rem] flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform", gradient, "text-white")}>
+                        <div className={cn("h-16 w-16 rounded-xl flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform", gradient, "text-white")}>
                             <Icon size={32} strokeWidth={1.5} />
                         </div>
                         <div className="space-y-1">
-                            <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tight uppercase leading-none">{title}</h4>
+                            <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight uppercase leading-none">{title}</h4>
                             <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-[300px]">{desc}</p>
                         </div>
                     </div>
                     <a href={url} target="_blank" rel="noreferrer" className="w-full sm:w-auto">
-                        <Button className={cn("w-full sm:w-auto h-12 rounded-full px-8 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-black uppercase italic tracking-tighter transition-all hover:scale-105 active:scale-95 border-0 gap-2")}>
+                        <Button className={cn("w-full sm:w-auto h-12 rounded-full px-8 bg-gradient-to-r from-orange-400 to-indigo-500 text-white font-black text-base shadow-[0_8px_20px_-6px_rgba(251,146,60,0.5)] transition-all hover:scale-105 active:scale-95 border-0 gap-2")}>
                             <Download size={18} strokeWidth={3} /> Export {type}
                         </Button>
                     </a>
@@ -139,25 +129,24 @@ function AIForecastCard({ content }: { content: string }) {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
         >
-            <Card className="bg-white dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800 rounded-[3rem] shadow-2xl relative overflow-hidden group">
+            <Card className="bg-white dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800 rounded-xl shadow-2xl relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-blue-500/5 pointer-events-none" />
-                <div className="h-1.5 absolute top-0 left-0 right-0 bg-gradient-to-r from-indigo-500 via-blue-600 to-indigo-400" />
 
                 <CardContent className="p-8 md:p-12 space-y-8 relative z-10">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4 text-indigo-500">
-                            <div className="h-10 w-10 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center">
+                            <div className="h-10 w-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center">
                                 <Sparkles size={20} className="animate-pulse" />
                             </div>
-                            <h3 className="text-xl font-black tracking-tighter uppercase italic">AI Financial Insights</h3>
+                            <h3 className="text-xl font-black tracking-tighter uppercase">AI Financial Insights</h3>
                         </div>
                         <Badge variant="outline" className="rounded-full bg-indigo-500/10 border-indigo-500/20 text-indigo-500 text-[10px] font-black uppercase tracking-widest px-4 py-1.5">
                             Predictive Analysis
                         </Badge>
                     </div>
 
-                    <div className="p-8 rounded-[2rem] bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-100 dark:border-zinc-800 relative">
-                        <p className="text-lg md:text-xl text-zinc-700 dark:text-zinc-300 font-medium leading-relaxed italic relative">
+                    <div className="p-8 rounded-xl bg-zinc-50 dark:bg-zinc-950/40 border border-zinc-100 dark:border-zinc-800 relative">
+                        <p className="text-lg md:text-xl text-zinc-700 dark:text-zinc-300 font-medium leading-relaxed relative">
                             <span className="text-5xl text-indigo-500/20 absolute -top-4 -left-4 font-serif">“</span>
                             {content}
                             <span className="text-5xl text-indigo-500/20 absolute -bottom-8 -right-4 font-serif">”</span>
@@ -195,7 +184,17 @@ export default function ReportsPage() {
     const [selectedVendorId, setSelectedVendorId] = useState<string>("");
     const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
     const [exporting, setExporting] = useState(false);
+    const [dateRange, setDateRange] = useState<string>("30");
     const companyId = currentCompany?.id || 1;
+
+    const DATE_RANGE_OPTIONS = [
+        { value: "7", label: "Last 7 Days" },
+        { value: "30", label: "Last 30 Days" },
+        { value: "60", label: "Last 60 Days" },
+        { value: "90", label: "Last 3 Months" },
+        { value: "180", label: "Last 6 Months" },
+        { value: "365", label: "Last 12 Months" },
+    ];
 
     const loadSummary = useCallback(async () => {
         if (!currentCompany) return;
@@ -241,11 +240,11 @@ export default function ReportsPage() {
             {/* ── Header ── */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 transform rotate-3 hover:rotate-0 transition-transform">
+                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-500 via-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 transform rotate-3 hover:rotate-0 transition-transform">
                         <BarChart3 size={24} />
                     </div>
                     <div>
-                        <h2 className="text-2xl md:text-4xl font-black bg-gradient-to-r from-indigo-500 via-blue-600 to-indigo-400 bg-clip-text text-transparent tracking-tighter uppercase italic leading-none mb-2">
+                        <h2 className="text-2xl md:text-4xl font-black bg-gradient-to-r from-indigo-500 via-blue-600 to-indigo-400 bg-clip-text text-transparent tracking-tighter uppercase leading-none mb-2">
                             Financial Intelligence
                         </h2>
                         <p className="text-xs md:text-base text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
@@ -254,12 +253,26 @@ export default function ReportsPage() {
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Button variant="ghost" className="h-14 rounded-full px-6 border border-zinc-200 dark:border-zinc-700 font-black text-[10px] uppercase tracking-widest text-zinc-500 hover:text-indigo-600 transition-all gap-2">
-                        <Calendar size={16} /> Last 30 Days
-                    </Button>
+                    <div className="relative">
+                        <Select value={dateRange} onValueChange={setDateRange}>
+                            <SelectTrigger className="h-14 rounded-xl px-6 border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900/50 font-black text-[10px] uppercase tracking-widest text-zinc-600 dark:text-zinc-300 hover:border-indigo-400 transition-all gap-3 min-w-[200px]">
+                                <div className="flex items-center gap-2">
+                                    <Calendar size={16} className="text-zinc-400" />
+                                    <SelectValue />
+                                </div>
+                            </SelectTrigger>
+                            <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-xl p-2">
+                                {DATE_RANGE_OPTIONS.map(opt => (
+                                    <SelectItem key={opt.value} value={opt.value} className="rounded-xl h-10 font-black text-[10px] uppercase tracking-widest focus:bg-indigo-600 focus:text-white">
+                                        {opt.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                     <Button
                         onClick={() => loadSummary()}
-                        className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-full w-14 h-14 shadow-md transition-all hover:scale-105 active:scale-95 border-0"
+                        className="bg-gradient-to-r from-orange-400 to-indigo-500 text-white rounded-xl w-14 h-14 shadow-[0_8px_20px_-6px_rgba(251,146,60,0.5)] transition-all hover:scale-105 active:scale-95 border-0"
                     >
                         <RefreshCw size={20} strokeWidth={2.5} className={loading ? "animate-spin" : ""} />
                     </Button>
@@ -338,15 +351,14 @@ export default function ReportsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
             >
-                <Card className="bg-white dark:bg-zinc-900/60 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-lg p-8 group hover:shadow-2xl transition-all relative overflow-hidden">
-                    <div className="h-full w-2 absolute left-0 top-0 bg-gradient-to-b from-indigo-500 to-purple-600" />
+                <Card className="bg-white dark:bg-zinc-900/60 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-lg p-8 group hover:shadow-2xl transition-all relative overflow-hidden">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                         <div className="flex gap-5 items-center">
-                            <div className="h-16 w-16 rounded-[1.5rem] bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg text-white">
+                            <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg text-white">
                                 <Users size={32} strokeWidth={1.5} />
                             </div>
                             <div className="space-y-1">
-                                <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tight uppercase leading-none">Supplier Wise Report</h4>
+                                <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight uppercase leading-none">Supplier Wise Report</h4>
                                 <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-[350px]">
                                     Detailed purchase analysis including CAD, GST, Duties and Shipping charges for specific suppliers.
                                 </p>
@@ -356,10 +368,10 @@ export default function ReportsPage() {
                         <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                             <div className="w-full sm:w-64">
                                 <Select value={selectedVendorId} onValueChange={setSelectedVendorId}>
-                                    <SelectTrigger className="h-12 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
+                                    <SelectTrigger className="h-12 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
                                         <SelectValue placeholder="Select Supplier" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2 max-h-64">
+                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-xl p-2 max-h-64">
                                         {vendors.map(v => (
                                             <SelectItem key={v.id} value={v.id.toString()} className="rounded-xl h-10 font-bold focus:bg-indigo-600 focus:text-white">
                                                 {v.name}
@@ -374,7 +386,7 @@ export default function ReportsPage() {
                                     if (!selectedVendorId) return;
                                     window.open(ReportService.exportSupplierPdfUrl(companyId, parseInt(selectedVendorId)), '_blank');
                                 }}
-                                className="w-full sm:w-auto h-12 rounded-full px-8 bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase italic tracking-tighter transition-all hover:scale-105 active:scale-95 border-0 gap-2 disabled:opacity-50 disabled:grayscale"
+                                className="w-full sm:w-auto h-12 rounded-full px-8 bg-gradient-to-r from-orange-400 to-indigo-500 text-white font-black text-base shadow-[0_8px_20px_-6px_rgba(251,146,60,0.5)] transition-all hover:scale-105 active:scale-95 border-0 gap-2 disabled:opacity-50 disabled:grayscale"
                             >
                                 <Download size={18} strokeWidth={3} /> Export PDF
                             </Button>
@@ -389,15 +401,14 @@ export default function ReportsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6, duration: 0.6 }}
             >
-                <Card className="bg-white dark:bg-zinc-900/60 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-lg p-8 group hover:shadow-2xl transition-all relative overflow-hidden">
-                    <div className="h-full w-2 absolute left-0 top-0 bg-gradient-to-b from-amber-500 to-orange-600" />
+                <Card className="bg-white dark:bg-zinc-900/60 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-lg p-8 group hover:shadow-2xl transition-all relative overflow-hidden">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                         <div className="flex gap-5 items-center">
-                            <div className="h-16 w-16 rounded-[1.5rem] bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg text-white">
+                            <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg text-white">
                                 <BarChart3 size={32} strokeWidth={1.5} />
                             </div>
                             <div className="space-y-1">
-                                <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tight uppercase leading-none">Yearly Financial Summary</h4>
+                                <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight uppercase leading-none">Yearly Financial Summary</h4>
                                 <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-[350px]">
                                     Comprehensive year-end analysis of Purchases, Sales, and Inventory performance. 
                                 </p>
@@ -407,10 +418,10 @@ export default function ReportsPage() {
                         <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                             <div className="w-full sm:w-48">
                                 <Select value={selectedYear} onValueChange={setSelectedYear}>
-                                    <SelectTrigger className="h-12 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
+                                    <SelectTrigger className="h-12 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
                                         <SelectValue placeholder="Select Year" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2">
+                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-xl p-2">
                                         {[2023, 2024, 2025, 2026].map(year => (
                                             <SelectItem key={year} value={year.toString()} className="rounded-xl h-10 font-bold focus:bg-amber-500 focus:text-white">
                                                 Year {year}
@@ -424,7 +435,7 @@ export default function ReportsPage() {
                                 onClick={() => {
                                     window.open(ReportService.exportYearlyPdfUrl(companyId, parseInt(selectedYear)), '_blank');
                                 }}
-                                className="w-full sm:w-auto h-12 rounded-full px-8 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-black uppercase italic tracking-tighter transition-all hover:scale-105 active:scale-95 border-0 gap-2"
+                                className="w-full sm:w-auto h-12 rounded-full px-8 bg-gradient-to-r from-orange-400 to-indigo-500 text-white font-black text-base shadow-[0_8px_20px_-6px_rgba(251,146,60,0.5)] transition-all hover:scale-105 active:scale-95 border-0 gap-2"
                             >
                                 <Download size={18} strokeWidth={3} /> Export Yearly PDF
                             </Button>
@@ -439,15 +450,14 @@ export default function ReportsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7, duration: 0.6 }}
             >
-                <Card className="bg-white dark:bg-zinc-900/60 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-lg p-8 group hover:shadow-2xl transition-all relative overflow-hidden">
-                    <div className="h-full w-2 absolute left-0 top-0 bg-gradient-to-b from-rose-500 to-pink-600" />
+                <Card className="bg-white dark:bg-zinc-900/60 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-lg p-8 group hover:shadow-2xl transition-all relative overflow-hidden">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                         <div className="flex gap-5 items-center">
-                            <div className="h-16 w-16 rounded-[1.5rem] bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg text-white">
+                            <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg text-white">
                                 <Wallet size={32} strokeWidth={1.5} />
                             </div>
                             <div className="space-y-1">
-                                <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tight uppercase leading-none">Yearly Expenses Record</h4>
+                                <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight uppercase leading-none">Yearly Expenses Record</h4>
                                 <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-[350px]">
                                     Categorized expense analysis with store-wise grouping and total cost consolidation.
                                 </p>
@@ -457,10 +467,10 @@ export default function ReportsPage() {
                         <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                             <div className="w-full sm:w-48">
                                 <Select value={selectedYear} onValueChange={setSelectedYear}>
-                                    <SelectTrigger className="h-12 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
+                                    <SelectTrigger className="h-12 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
                                         <SelectValue placeholder="Select Year" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2">
+                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-xl p-2">
                                         {[2023, 2024, 2025, 2026].map(year => (
                                             <SelectItem key={year} value={year.toString()} className="rounded-xl h-10 font-bold focus:bg-rose-500 focus:text-white">
                                                 Year {year}
@@ -474,7 +484,7 @@ export default function ReportsPage() {
                                 onClick={() => {
                                     window.open(ReportService.exportExpensesPdfUrl(companyId, parseInt(selectedYear)), '_blank');
                                 }}
-                                className="w-full sm:w-auto h-12 rounded-full px-8 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-black uppercase italic tracking-tighter transition-all hover:scale-105 active:scale-95 border-0 gap-2"
+                                className="w-full sm:w-auto h-12 rounded-full px-8 bg-gradient-to-r from-orange-400 to-indigo-500 text-white font-black text-base shadow-[0_8px_20px_-6px_rgba(251,146,60,0.5)] transition-all hover:scale-105 active:scale-95 border-0 gap-2"
                             >
                                 <Download size={18} strokeWidth={3} /> Export Expenses PDF
                             </Button>
@@ -489,15 +499,14 @@ export default function ReportsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8, duration: 0.6 }}
             >
-                <Card className="bg-white dark:bg-zinc-900/60 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-lg p-8 group hover:shadow-2xl transition-all relative overflow-hidden">
-                    <div className="h-full w-2 absolute left-0 top-0 bg-gradient-to-b from-blue-500 to-indigo-600" />
+                <Card className="bg-white dark:bg-zinc-900/60 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-lg p-8 group hover:shadow-2xl transition-all relative overflow-hidden">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                         <div className="flex gap-5 items-center">
-                            <div className="h-16 w-16 rounded-[1.5rem] bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg text-white">
+                            <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg text-white">
                                 <Building2 size={32} strokeWidth={1.5} />
                             </div>
                             <div className="space-y-1">
-                                <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tight uppercase leading-none">Bank Statement Summary</h4>
+                                <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight uppercase leading-none">Bank Statement Summary</h4>
                                 <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-[350px]">
                                     Year-end snapshot of income, expenses, and net balances across all company accounts.
                                 </p>
@@ -507,10 +516,10 @@ export default function ReportsPage() {
                         <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                             <div className="w-full sm:w-48">
                                 <Select value={selectedYear} onValueChange={setSelectedYear}>
-                                    <SelectTrigger className="h-12 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
+                                    <SelectTrigger className="h-12 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
                                         <SelectValue placeholder="Select Year" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2">
+                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-xl p-2">
                                         {[2023, 2024, 2025, 2026].map(year => (
                                             <SelectItem key={year} value={year.toString()} className="rounded-xl h-10 font-bold focus:bg-blue-500 focus:text-white">
                                                 Year {year}
@@ -524,7 +533,7 @@ export default function ReportsPage() {
                                 onClick={() => {
                                     window.open(ReportService.exportBankPdfUrl(companyId, parseInt(selectedYear)), '_blank');
                                 }}
-                                className="w-full sm:w-auto h-12 rounded-full px-8 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-black uppercase italic tracking-tighter transition-all hover:scale-105 active:scale-95 border-0 gap-2"
+                                className="w-full sm:w-auto h-12 rounded-full px-8 bg-gradient-to-r from-orange-400 to-indigo-500 text-white font-black text-base shadow-[0_8px_20px_-6px_rgba(251,146,60,0.5)] transition-all hover:scale-105 active:scale-95 border-0 gap-2"
                             >
                                 <Download size={18} strokeWidth={3} /> Export Bank PDF
                             </Button>

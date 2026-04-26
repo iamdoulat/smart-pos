@@ -352,7 +352,7 @@ export default function EditSalePage() {
             <div className="flex h-[60vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="h-12 w-12 animate-spin text-indigo-500" />
-                    <p className="text-zinc-500 font-bold italic tracking-widest text-sm uppercase">Loading Invoice...</p>
+                    <p className="text-zinc-500 font-bold tracking-widest text-sm uppercase">Loading Invoice...</p>
                 </div>
             </div>
         );
@@ -361,42 +361,44 @@ export default function EditSalePage() {
     return (
         <div className="space-y-6 max-w-[1400px] mx-auto pb-20">
             {/* Header */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div className="flex items-center gap-3 md:gap-4">
                     <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => router.back()}
-                        className="rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-800"
+                        className="rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-800 h-10 w-10 md:h-12 md:w-12"
                     >
                         <ArrowLeft size={20} />
                     </Button>
                     <div>
                         <div className="flex items-center gap-3">
-                            <h2 className="text-3xl font-black tracking-tighter bg-gradient-to-r from-violet-500 via-indigo-600 to-purple-500 bg-clip-text text-transparent">
-                                EDIT INVOICE
+                            <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase leading-tight mb-1">
+                                Edit Invoice
                             </h2>
                             {sale?.sales_code && (
-                                <span className="text-xs font-black uppercase tracking-widest bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 px-4 py-1.5 rounded-full border border-indigo-100 dark:border-indigo-900">
+                                <span className="text-[10px] font-black uppercase tracking-widest bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 px-4 py-1.5 rounded-xl border border-indigo-100 dark:border-indigo-900">
                                     {sale.sales_code}
                                 </span>
                             )}
                         </div>
-                        <p className="text-sm font-medium text-zinc-500 italic">Update the sale record and inventory will be adjusted automatically.</p>
+                        <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
+                            Update the sale record and inventory will be adjusted automatically.
+                        </p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
                     <Button
                         variant="outline"
                         onClick={() => router.back()}
-                        className="rounded-full border-zinc-200 dark:border-zinc-800 font-bold text-xs uppercase tracking-widest px-6 h-11"
+                        className="rounded-full border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest px-6 h-12"
                     >
                         Cancel
                     </Button>
                     <Button
                         form="edit-invoice-form"
                         disabled={loading}
-                        className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold text-xs uppercase tracking-widest px-8 shadow-lg shadow-violet-500/25 border-0 h-11"
+                        className="rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-black text-[10px] uppercase tracking-widest px-8 shadow-xl shadow-indigo-500/20 border-0 h-12 transition-all hover:scale-[1.02] active:scale-95"
                     >
                         {loading ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save className="mr-2" size={18} />}
                         Update Invoice
@@ -408,11 +410,11 @@ export default function EditSalePage() {
                 {/* Main Form Area */}
                 <div className="xl:col-span-3 space-y-6">
                     {/* Basic Info */}
-                    <Card className="border-0 bg-white dark:bg-zinc-900 shadow-2xl shadow-violet-500/5 rounded-3xl overflow-hidden">
+                    <Card className="border-0 bg-white dark:bg-zinc-900 shadow-2xl shadow-violet-500/5 rounded-xl overflow-hidden">
                         <CardContent className="p-8">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Warehouse*</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Warehouse*</Label>
                                     <Select
                                         value={formData.warehouse_id}
                                         onValueChange={(v) => setFormData(prev => ({ ...prev, warehouse_id: v }))}
@@ -430,9 +432,9 @@ export default function EditSalePage() {
 
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Customer Name*</Label>
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Customer Name*</Label>
                                         {selectedCustomer && (
-                                            <span className="text-[10px] font-bold text-red-500 italic">
+                                            <span className="text-[10px] font-black text-red-500 uppercase tracking-tight">
                                                 (Previous Due: ${Number(selectedCustomer.previous_due || 0).toFixed(2)})
                                             </span>
                                         )}
@@ -461,7 +463,7 @@ export default function EditSalePage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Customer Email</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Customer Email</Label>
                                     <div className="relative">
                                         <Input
                                             type="email"
@@ -475,7 +477,7 @@ export default function EditSalePage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Customer Mobile</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Customer Mobile</Label>
                                     <div className="relative">
                                         <Input
                                             type="text"
@@ -489,7 +491,7 @@ export default function EditSalePage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Sales Date*</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Sales Date*</Label>
                                     <div className="relative">
                                         <Input
                                             type="date"
@@ -502,7 +504,7 @@ export default function EditSalePage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Due Date</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Due Date</Label>
                                     <div className="relative">
                                         <Input
                                             type="date"
@@ -515,7 +517,7 @@ export default function EditSalePage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Reference No</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Reference No</Label>
                                     <Input
                                         placeholder="Optional reference number"
                                         value={formData.reference_no}
@@ -525,7 +527,7 @@ export default function EditSalePage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Status</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Status</Label>
                                     <Select
                                         value={formData.status}
                                         onValueChange={(v: any) => setFormData(prev => ({ ...prev, status: v }))}
@@ -545,7 +547,7 @@ export default function EditSalePage() {
                     </Card>
 
                     {/* Item Search & Table */}
-                    <Card className="border-0 bg-white dark:bg-zinc-900 shadow-2xl shadow-violet-500/5 rounded-3xl overflow-hidden">
+                    <Card className="border-0 bg-white dark:bg-zinc-900 shadow-2xl shadow-violet-500/5 rounded-xl overflow-hidden">
                         <CardContent className="p-0">
                             <div className="p-8 pb-4">
                                 <div className="relative group">
@@ -553,7 +555,7 @@ export default function EditSalePage() {
                                         placeholder="Scan barcode or search items by name, code..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="h-14 pl-14 pr-14 bg-zinc-50 dark:bg-zinc-800/50 border-zinc-100 dark:border-zinc-800 rounded-2xl focus:ring-4 focus:ring-violet-500/10 transition-all font-medium text-lg placeholder:text-zinc-400 italic"
+                                        className="h-14 pl-14 pr-14 bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-lg placeholder:text-zinc-400"
                                     />
                                     <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-violet-500 transition-colors" size={22} />
                                     <QrCode className="absolute right-6 top-1/2 -translate-y-1/2 text-zinc-400 cursor-pointer hover:text-violet-500 transition-colors" size={22} />
@@ -593,14 +595,14 @@ export default function EditSalePage() {
 
                             <div className="overflow-x-auto min-h-[300px]">
                                 <Table>
-                                    <TableHeader>
-                                        <TableRow className="border-zinc-50 dark:border-zinc-800 hover:bg-transparent">
-                                            <TableHead className="pl-8 text-[10px] font-black uppercase tracking-widest text-zinc-400 h-14">Item Name</TableHead>
-                                            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 h-14 text-center">Qty</TableHead>
-                                            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 h-14 text-right">Unit Price</TableHead>
-                                            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 h-14 text-right">Discount</TableHead>
-                                            <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 h-14 text-right">Tax</TableHead>
-                                            <TableHead className="pr-8 text-[10px] font-black uppercase tracking-widest text-zinc-400 h-14 text-right">Total</TableHead>
+                                    <TableHeader className="bg-zinc-50 dark:bg-zinc-900">
+                                        <TableRow className="border-b border-zinc-100 dark:border-zinc-800 hover:bg-transparent">
+                                            <TableHead className="pl-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Item Name</TableHead>
+                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-center">Qty</TableHead>
+                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Unit Price</TableHead>
+                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Discount</TableHead>
+                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Tax</TableHead>
+                                            <TableHead className="pr-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Total</TableHead>
                                             <TableHead className="w-16"></TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -655,9 +657,9 @@ export default function EditSalePage() {
                                         {items.length === 0 && (
                                             <TableRow>
                                                 <TableCell colSpan={7} className="h-40 text-center">
-                                                    <div className="flex flex-col items-center gap-3 text-zinc-400 italic">
+                                                    <div className="flex flex-col items-center gap-3 text-zinc-400">
                                                         <ShoppingCart size={32} className="opacity-20" />
-                                                        <span>Search and add products to update the invoice.</span>
+                                                        <span className="font-bold uppercase tracking-widest text-xs">Search and add products to update the invoice.</span>
                                                     </div>
                                                 </TableCell>
                                             </TableRow>
@@ -673,14 +675,14 @@ export default function EditSalePage() {
                         <Label className="text-sm font-black text-zinc-500 uppercase tracking-widest pl-2">Previous Payments Information :</Label>
                         <Card className="border-0 bg-white dark:bg-zinc-900 shadow-xl shadow-black/5 rounded-2xl overflow-hidden">
                             <Table>
-                                <TableHeader className="bg-zinc-100 dark:bg-zinc-800/50">
-                                    <TableRow className="hover:bg-transparent border-0">
-                                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 w-12 text-center">#</TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Date</TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Payment Type</TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Payment Note</TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 text-right">Payment</TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-500 text-center">Action</TableHead>
+                                <TableHeader className="bg-zinc-50 dark:bg-zinc-900">
+                                    <TableRow className="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800">
+                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white w-12 text-center uppercase tracking-widest">#</TableHead>
+                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Date</TableHead>
+                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Payment Type</TableHead>
+                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Payment Note</TableHead>
+                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white text-right uppercase tracking-widest">Payment</TableHead>
+                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white text-center uppercase tracking-widest">Action</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -701,7 +703,7 @@ export default function EditSalePage() {
                                         ))
                                     ) : (
                                         <TableRow className="hover:bg-transparent border-0">
-                                            <TableCell colSpan={6} className="h-16 text-center text-sm font-bold text-zinc-400 italic">
+                                            <TableCell colSpan={6} className="h-16 text-center text-sm font-black text-zinc-400 uppercase tracking-widest">
                                                 Payments Pending!!
                                             </TableCell>
                                         </TableRow>
@@ -728,7 +730,7 @@ export default function EditSalePage() {
                     {/* Payment Section */}
                     <div className="space-y-4">
                         <div className="space-y-4">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Payment Status</Label>
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Payment Status</Label>
                             <div className="flex gap-4">
                                 <Button
                                     type="button"
@@ -772,8 +774,8 @@ export default function EditSalePage() {
                             </div>
                         </div>
 
-                        <Label className="text-lg font-black text-violet-600 block pt-4">Payment :</Label>
-                        <div className="text-xs font-bold text-zinc-500 mb-2">Advance : 0.00</div>
+                        <Label className="text-lg font-black text-violet-600 block pt-4">Payment</Label>
+                        <div className="text-xs font-bold text-zinc-500 mb-2">Advance: 0.00</div>
 
                         <div className="flex items-center gap-2 mb-4">
                             <input type="checkbox" id="adjust-advance" className="h-4 w-4 rounded border-zinc-300 text-violet-600 focus:ring-violet-500" />
@@ -782,7 +784,7 @@ export default function EditSalePage() {
 
                         <div className="bg-zinc-100 dark:bg-zinc-800/40 rounded-2xl p-8 grid grid-cols-1 md:grid-cols-3 gap-8 border border-zinc-200/50 dark:border-zinc-800">
                             <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Amount</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Amount</Label>
                                 <div className="relative">
                                     <Input
                                         id="paid-amount-input"

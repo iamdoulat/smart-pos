@@ -122,8 +122,9 @@ function ProfileTab() {
         }
 
         try {
-            const updated = await AuthService.updateProfile(formData);
-            setUser(updated);
+            const response = await AuthService.updateProfile(formData);
+            const updatedUser = response.user || response;
+            setUser(updatedUser);
             toast.success("Profile updated successfully!");
             setPreview(null);
         } catch (err: any) {
@@ -139,6 +140,11 @@ function ProfileTab() {
         : "??";
 
     const avatarUrl = preview || (user?.avatar_url ? getAssetUrl(user.avatar_url) : null);
+    console.log("Avatar Debug:", { 
+        raw: user?.avatar_url, 
+        processed: avatarUrl,
+        preview: !!preview 
+    });
 
     return (
         <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm rounded-2xl overflow-hidden">

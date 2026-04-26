@@ -103,10 +103,8 @@ function ShipmentCard({ shipment, index, onDelete, onEdit }: { shipment: any; in
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.07, duration: 0.4 }}
-            className="group bg-white dark:bg-zinc-900/60 rounded-[2.5rem] border border-zinc-100 dark:border-zinc-800 shadow-lg hover:shadow-2xl transition-all overflow-hidden relative"
+            className="group bg-white dark:bg-zinc-900/60 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-lg hover:shadow-2xl transition-all overflow-hidden relative"
         >
-            {/* Gradient accent bar */}
-            <div className={cn("h-1.5 absolute top-0 left-0 right-0 bg-gradient-to-r", cfg.gradientFrom, cfg.gradientTo)} />
 
             {/* Watermark */}
             <div className="absolute top-6 right-6 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -126,7 +124,7 @@ function ShipmentCard({ shipment, index, onDelete, onEdit }: { shipment: any; in
 
                 {/* Info */}
                 <div>
-                    <h3 className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight italic leading-tight">
+                    <h3 className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight uppercase leading-tight">
                         {shipment.container_number}
                     </h3>
                     <div className="flex items-center gap-2 mt-2">
@@ -141,18 +139,18 @@ function ShipmentCard({ shipment, index, onDelete, onEdit }: { shipment: any; in
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
                     <div>
                         <p className="text-[9px] text-zinc-400 font-black uppercase tracking-[0.2em] mb-1">Shipping</p>
-                        <p className="text-lg font-black text-zinc-800 dark:text-zinc-200 italic">${shippingCost.toFixed(2)}</p>
+                        <p className="text-lg font-black text-zinc-800 dark:text-zinc-200">${shippingCost.toFixed(2)}</p>
                     </div>
                     <div>
                         <p className="text-[9px] text-zinc-400 font-black uppercase tracking-[0.2em] mb-1">Duties</p>
-                        <p className="text-lg font-black text-zinc-800 dark:text-zinc-200 italic">${dutyCost.toFixed(2)}</p>
+                        <p className="text-lg font-black text-zinc-800 dark:text-zinc-200">${dutyCost.toFixed(2)}</p>
                     </div>
                 </div>
 
                 {/* Total */}
                 <div className={cn("px-5 py-4 rounded-2xl flex items-center justify-between", cfg.iconBg)}>
                     <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Total Landed Cost</p>
-                    <p className={cn("text-lg font-black italic", cfg.iconText)}>${totalLandedCost.toFixed(2)}</p>
+                    <p className={cn("text-lg font-black", cfg.iconText)}>${totalLandedCost.toFixed(2)}</p>
                 </div>
 
                 {/* Actions */}
@@ -161,7 +159,7 @@ function ShipmentCard({ shipment, index, onDelete, onEdit }: { shipment: any; in
                         variant="ghost"
                         size="sm"
                         onClick={() => onEdit(shipment)}
-                        className="flex-1 rounded-2xl h-10 bg-zinc-50 dark:bg-zinc-800 text-zinc-500 hover:text-indigo-600 border border-zinc-100 dark:border-zinc-700 text-xs font-black uppercase tracking-widest gap-2"
+                        className="flex-1 rounded-xl h-10 bg-zinc-50 dark:bg-zinc-800 text-zinc-500 hover:text-indigo-600 border border-zinc-100 dark:border-zinc-700 text-xs font-black uppercase tracking-widest gap-2"
                     >
                         Edit Details <Pencil size={14} />
                     </Button>
@@ -169,7 +167,7 @@ function ShipmentCard({ shipment, index, onDelete, onEdit }: { shipment: any; in
                         variant="ghost"
                         size="icon"
                         onClick={() => onDelete(shipment.id)}
-                        className="h-10 w-10 rounded-2xl bg-zinc-50 dark:bg-zinc-800 text-zinc-400 hover:text-rose-600 border border-zinc-100 dark:border-zinc-700"
+                        className="h-10 w-10 rounded-xl bg-zinc-50 dark:bg-zinc-800 text-zinc-400 hover:text-rose-600 border border-zinc-100 dark:border-zinc-700"
                     >
                         <Trash2 size={15} />
                     </Button>
@@ -184,20 +182,38 @@ function StatCard({ label, value, icon: Icon, iconBg, iconText, gradientFrom, gr
     label: string; value: string; icon: React.ElementType;
     iconBg: string; iconText: string; gradientFrom: string; gradientTo: string; description: string;
 }) {
+    let color = "indigo";
+    if (gradientFrom.includes("emerald")) color = "emerald";
+    else if (gradientFrom.includes("amber")) color = "amber";
+    else if (gradientFrom.includes("rose")) color = "rose";
+    else if (gradientFrom.includes("purple") || gradientFrom.includes("violet")) color = "purple";
+    
+    const gradientClasses: any = {
+        indigo: "bg-gradient-to-r from-[#2B5BFF] to-[#5138EE]",
+        emerald: "bg-gradient-to-r from-[#00D09E] to-[#019DA3]",
+        amber: "bg-gradient-to-r from-[#FF8800] to-[#FF3B3B]",
+        purple: "bg-gradient-to-r from-[#9747FF] to-[#6A0DAD]",
+        rose: "bg-gradient-to-r from-[#FF3B3B] to-[#D91B1B]",
+    };
+
     return (
-        <Card className="bg-white dark:bg-zinc-900/60 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-lg p-6 flex flex-col gap-4 hover:shadow-xl transition-all group">
-            <div className="flex items-center gap-4">
-                <div className={cn("h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500", iconBg, iconText)}>
-                    <Icon size={24} />
+        <div className={cn("rounded-xl overflow-hidden text-white transition-all duration-300 shadow-xl hover:-translate-y-1 relative group w-full", gradientClasses[color] || gradientClasses.indigo)}>
+            <div className="p-5 flex flex-col justify-center h-[120px]">
+                <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                        <p className="text-[15px] uppercase font-bold tracking-wider text-white/90 drop-shadow-sm truncate">{label}</p>
+                        <h3 className="text-3xl font-black tracking-tight text-white drop-shadow-md truncate">{value}</h3>
+                    </div>
+                    <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center mt-1 shadow-inner border border-white/10">
+                        <Icon size={16} className="text-white drop-shadow-sm" strokeWidth={2.5} />
+                    </div>
                 </div>
-                <div className="min-w-0">
-                    <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-black uppercase tracking-widest mb-1 truncate">{label}</p>
-                    <p className={cn("text-xl font-black truncate", iconText)}>{value}</p>
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-white/90 mt-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-90 shrink-0"><path d="M7 7h10v10" /><path d="M7 17 17 7" /></svg>
+                    <span className="truncate">{description}</span>
                 </div>
             </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed">{description}</p>
-            <div className={cn("h-1 w-full rounded-full bg-gradient-to-r opacity-30 group-hover:opacity-60 transition-opacity", gradientFrom, gradientTo)} />
-        </Card>
+        </div>
     );
 }
 
@@ -299,11 +315,10 @@ function ShipmentDialog({ open, onClose, onSuccess, companyId, shipment }: { ope
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-[2.5rem] p-0 overflow-hidden max-w-2xl">
-                <div className="h-1.5 bg-gradient-to-r from-indigo-500 via-blue-600 to-violet-500" />
+            <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-xl p-0 overflow-hidden max-w-2xl">
                 <div className="p-8 md:p-10 space-y-8 max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle className="text-3xl font-black text-zinc-900 dark:text-zinc-100 italic tracking-tighter uppercase leading-none">
+                        <DialogTitle className="text-3xl font-black text-zinc-900 dark:text-zinc-100 tracking-tighter uppercase leading-none">
                             {shipment ? "Edit Shipment" : "New Shipment"}
                         </DialogTitle>
                     </DialogHeader>
@@ -320,7 +335,7 @@ function ShipmentDialog({ open, onClose, onSuccess, companyId, shipment }: { ope
                                     onChange={e => setForm({ ...form, container_number: e.target.value })}
                                     placeholder="e.g. MSCU7654321"
                                     required
-                                    className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono tracking-widest text-lg"
+                                    className="h-14 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono tracking-widest text-lg"
                                 />
                             </div>
                             <div className="space-y-3">
@@ -328,10 +343,10 @@ function ShipmentDialog({ open, onClose, onSuccess, companyId, shipment }: { ope
                                     <User size={12} /> Supplier
                                 </Label>
                                 <Select value={form.supplier_id} onValueChange={v => setForm({ ...form, supplier_id: v })}>
-                                    <SelectTrigger className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
+                                    <SelectTrigger className="h-14 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold px-4">
                                         <SelectValue placeholder="Select Supplier" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2">
+                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-xl p-2">
                                         {vendors.map(v => (
                                             <SelectItem key={v.id} value={v.id.toString()} className="rounded-xl h-10 font-bold focus:bg-indigo-600 focus:text-white">
                                                 {v.name}
@@ -352,7 +367,7 @@ function ShipmentDialog({ open, onClose, onSuccess, companyId, shipment }: { ope
                                     type="date"
                                     value={form.bill_date}
                                     onChange={e => setForm({ ...form, bill_date: e.target.value })}
-                                    className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold"
+                                    className="h-14 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold"
                                 />
                             </div>
                             <div className="space-y-3 md:col-span-1">
@@ -363,7 +378,7 @@ function ShipmentDialog({ open, onClose, onSuccess, companyId, shipment }: { ope
                                     value={form.way_bill_no}
                                     onChange={e => setForm({ ...form, way_bill_no: e.target.value })}
                                     placeholder="WBN-99228"
-                                    className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold"
+                                    className="h-14 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold"
                                 />
                             </div>
                             <div className="space-y-3 md:col-span-1">
@@ -375,7 +390,7 @@ function ShipmentDialog({ open, onClose, onSuccess, companyId, shipment }: { ope
                                     value={form.quantity}
                                     onChange={e => setForm({ ...form, quantity: e.target.value })}
                                     placeholder="0"
-                                    className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold"
+                                    className="h-14 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold"
                                 />
                             </div>
                         </div>
@@ -405,10 +420,10 @@ function ShipmentDialog({ open, onClose, onSuccess, companyId, shipment }: { ope
                             <div className="space-y-3">
                                 <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Status</Label>
                                 <Select value={form.status} onValueChange={v => setForm({ ...form, status: v })}>
-                                    <SelectTrigger className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 font-bold">
+                                    <SelectTrigger className="h-14 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 font-bold">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2">
+                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-xl p-2">
                                         {ALL_STATUSES.map(s => (
                                             <SelectItem key={s} value={s} className="rounded-xl h-10 font-bold capitalize focus:bg-indigo-600 focus:text-white">{s}</SelectItem>
                                         ))}
@@ -418,10 +433,10 @@ function ShipmentDialog({ open, onClose, onSuccess, companyId, shipment }: { ope
                             <div className="space-y-3">
                                 <Label className="text-zinc-500 font-black text-[10px] uppercase tracking-[0.2em]">Distribution</Label>
                                 <Select value={form.distribution_method} onValueChange={v => setForm({ ...form, distribution_method: v })}>
-                                    <SelectTrigger className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 font-bold">
+                                    <SelectTrigger className="h-14 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 font-bold">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-2xl p-2">
+                                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-xl p-2">
                                         <SelectItem value="value" className="rounded-xl h-10 font-bold focus:bg-indigo-600 focus:text-white">By Value</SelectItem>
                                         <SelectItem value="quantity" className="rounded-xl h-10 font-bold focus:bg-indigo-600 focus:text-white">By Quantity</SelectItem>
                                         <SelectItem value="weight" className="rounded-xl h-10 font-bold focus:bg-indigo-600 focus:text-white">By Weight</SelectItem>
@@ -438,15 +453,15 @@ function ShipmentDialog({ open, onClose, onSuccess, companyId, shipment }: { ope
                                 value={form.remarks}
                                 onChange={e => setForm({ ...form, remarks: e.target.value })}
                                 placeholder="Additional details..."
-                                className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium"
+                                className="h-14 rounded-xl bg-zinc-50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium"
                             />
                         </div>
 
                         <DialogFooter className="gap-4 pt-4">
-                            <Button type="button" variant="ghost" onClick={onClose} className="rounded-2xl h-14 px-8 font-black text-xs uppercase tracking-[0.15em] text-zinc-500">Cancel</Button>
-                            <Button type="submit" disabled={loading} className="flex-1 bg-gradient-to-r from-indigo-500 via-blue-600 to-violet-500 text-white rounded-full h-14 px-8 font-black uppercase italic tracking-tight shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-3">
+                            <Button type="button" variant="ghost" onClick={onClose} className="rounded-xl h-14 px-8 font-black text-xs uppercase tracking-[0.15em] text-zinc-500">Cancel</Button>
+                            <Button type="submit" disabled={loading} className="flex-1 bg-gradient-to-r from-orange-400 to-indigo-500 text-white rounded-full h-14 px-8 font-black text-lg shadow-[0_8px_20px_-6px_rgba(251,146,60,0.5)] transition-all hover:scale-[1.02] active:scale-95 border-0 flex items-center justify-center gap-2">
                                 {loading ? <Loader2 size={20} className="animate-spin" /> : shipment ? <Pencil size={18} strokeWidth={3} /> : <Plus size={20} strokeWidth={3} />}
-                                {loading ? "Saving..." : shipment ? "Update Shipment" : "Create Shipment"}
+                                {loading ? "Saving..." : shipment ? "Update Shipment" : "Add Shipment"}
                             </Button>
                         </DialogFooter>
                     </form>
@@ -522,7 +537,7 @@ export default function ImportsPage() {
                         <Container size={24} />
                     </div>
                     <div>
-                        <h2 className="text-2xl md:text-4xl font-black bg-gradient-to-r from-indigo-500 via-blue-600 to-violet-500 bg-clip-text text-transparent tracking-tighter uppercase italic leading-none mb-2">
+                        <h2 className="text-2xl md:text-4xl font-black bg-gradient-to-r from-indigo-500 via-blue-600 to-violet-500 bg-clip-text text-transparent tracking-tighter uppercase leading-none mb-2">
                             Import &amp; Shipping
                         </h2>
                         <p className="text-xs md:text-base text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
@@ -532,9 +547,9 @@ export default function ImportsPage() {
                 </div>
                 <Button
                     onClick={() => setShowNewDialog(true)}
-                    className="bg-gradient-to-r from-indigo-500 via-blue-600 to-violet-500 text-white rounded-full px-8 h-14 shadow-lg shadow-indigo-500/25 font-black uppercase italic tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0 whitespace-nowrap text-base gap-3"
+                    className="bg-gradient-to-r from-orange-400 to-indigo-500 text-white rounded-full px-8 h-14 font-black text-lg shadow-[0_8px_20px_-6px_rgba(251,146,60,0.5)] transition-all hover:scale-[1.02] active:scale-95 border-0 whitespace-nowrap gap-2"
                 >
-                    <Plus size={20} strokeWidth={3} /> New Shipment
+                    <Plus size={20} strokeWidth={3} /> Add Shipment
                 </Button>
             </div>
 
@@ -574,7 +589,7 @@ export default function ImportsPage() {
 
             {/* ── Search & Status Filter ── */}
             <div className="flex flex-col md:flex-row items-center gap-4">
-                <div className="flex-1 flex items-center gap-4 bg-white dark:bg-zinc-900/50 p-2 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all w-full">
+                <div className="flex-1 flex items-center gap-4 bg-white dark:bg-zinc-900/50 p-2 rounded-full border border-zinc-200 dark:border-zinc-800 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all w-full">
                     <div className="relative flex-1">
                         <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-400" size={20} />
                         <Input
@@ -630,9 +645,8 @@ export default function ImportsPage() {
                     </AnimatePresence>
                 </div>
             ) : (
-                <div className="bg-white dark:bg-zinc-900/50 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-xl relative overflow-hidden">
-                    <div className="h-1.5 absolute top-0 left-0 right-0 bg-gradient-to-r from-indigo-500 via-blue-600 to-violet-500" />
-                    <div className="flex flex-col items-center gap-6 py-24 mt-1.5">
+                <div className="bg-white dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xl relative overflow-hidden">
+                    <div className="flex flex-col items-center gap-6 py-24">
                         <div className="h-20 w-20 rounded-3xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
                             <Ship size={40} className="text-indigo-400" />
                         </div>
@@ -649,9 +663,9 @@ export default function ImportsPage() {
                         {shipments.length === 0 && (
                             <Button
                                 onClick={() => setShowNewDialog(true)}
-                                className="rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-black h-14 px-10 shadow-lg shadow-indigo-500/20 uppercase italic tracking-tight gap-3"
+                                className="bg-gradient-to-r from-orange-400 to-indigo-500 text-white rounded-full px-10 h-14 font-black text-lg shadow-[0_8px_20px_-6px_rgba(251,146,60,0.5)] transition-all hover:scale-[1.02] active:scale-95 border-0 gap-2"
                             >
-                                <Plus size={18} strokeWidth={3} /> Create First Shipment
+                                <Plus size={20} strokeWidth={3} /> Add First Shipment
                             </Button>
                         )}
                     </div>

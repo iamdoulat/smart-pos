@@ -19,7 +19,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Loader2, Fingerprint, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
+import Image from "next/image";
 
 const resetPasswordSchema = z.object({
     password: z.string().min(8, { message: "Password must be at least 8 characters" }),
@@ -74,20 +75,37 @@ function ResetPasswordForm() {
 
     return (
         <div className="min-h-screen flex flex-col justify-center items-center p-4 sm:p-8 bg-zinc-50 dark:bg-zinc-950 transition-colors duration-500 relative overflow-hidden">
+            {/* Background Image */}
+            <div className="absolute inset-0 z-0 pointer-events-none">
+                <Image
+                    src="/images/auth-bg.png"
+                    alt="Background"
+                    fill
+                    className="object-cover opacity-30 dark:opacity-40 blur-[1px]"
+                    priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-50 via-zinc-50/20 to-transparent dark:from-zinc-950 dark:via-zinc-950/20 dark:to-transparent" />
+            </div>
+
             {/* Background Decorations */}
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 blur-[100px] pointer-events-none" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 dark:bg-purple-500/20 blur-[100px] pointer-events-none" />
 
-            <div className="w-full max-w-md z-10">
+            <div className="w-full max-w-md z-10 relative">
                 <div className="flex flex-col items-center mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg mb-4">
-                        <Fingerprint className="text-white w-8 h-8" />
+                    <div className="relative w-20 h-20 mb-4 drop-shadow-2xl">
+                        <Image
+                            src="/images/logo.png"
+                            alt="Hurpori Logo"
+                            fill
+                            className="object-contain"
+                        />
                     </div>
                     <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
-                        Smart POS Software
+                        Hurpori POS Software
                     </h1>
-                    <p className="text-zinc-500 dark:text-zinc-400 mt-2 text-center">
-                        Modern SME Accounting System
+                    <p className="text-zinc-500 dark:text-zinc-400 mt-2 text-center max-w-[280px]">
+                        Tailored Technology for the Modern Boutique
                     </p>
                 </div>
 
@@ -184,7 +202,7 @@ function ResetPasswordForm() {
             </div>
 
             <div className="mt-8 text-center text-sm text-zinc-500 dark:text-zinc-400 z-10">
-                &copy; {new Date().getFullYear()} Smart POS Software. All rights reserved.
+                &copy; {new Date().getFullYear()} Hurpori POS Software. All rights reserved.
             </div>
         </div>
     );

@@ -135,10 +135,10 @@ export default function DashboardPage() {
             {/* Main Upper Row */}
             <div className="grid gap-6 lg:grid-cols-7">
                 {/* Financial Performance - Wide Left */}
-                <Card className="lg:col-span-4 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm rounded-xl overflow-hidden">
+                <Card className="lg:col-span-4 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xl rounded-xl overflow-hidden">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <div className="space-y-1">
-                            <CardTitle className="text-xl font-bold text-zinc-800 dark:text-zinc-100 italic">Financial Performance</CardTitle>
+                            <CardTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Financial Performance</CardTitle>
                             <p className="text-xs text-zinc-500 font-medium">Monthly growth & revenue analysis</p>
                         </div>
                         <button className="text-[10px] font-bold px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900/50 flex items-center gap-1.5 hover:bg-zinc-100 transition-all uppercase tracking-tight">
@@ -172,14 +172,14 @@ export default function DashboardPage() {
                 </Card>
 
                 {/* Cash Flow Analytics - Navy Hero */}
-                <Card className="lg:col-span-3 border-0 bg-[#052c4c] shadow-lg rounded-xl overflow-hidden relative">
+                <Card className="lg:col-span-3 border-0 bg-[#052c4c] shadow-xl rounded-xl overflow-hidden relative">
                     <CardHeader className="pb-0 pt-6 px-6">
-                        <CardTitle className="text-xl font-bold text-white italic">Cash Flow Analytics</CardTitle>
+                        <CardTitle className="text-lg font-semibold text-white">Cash Flow Analytics</CardTitle>
                         <p className="text-xs text-white/50 font-medium">Expert-grade liquidity monitoring</p>
                     </CardHeader>
                     <CardContent className="px-6 pb-6 pt-10 flex flex-col h-[300px]">
                         <div className="flex items-baseline gap-2 mb-1">
-                            <span className="text-4xl font-black text-white italic tracking-tighter">
+                            <span className="text-4xl font-bold text-white tracking-tight">
                                 ${parseFloat(summary?.net_profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                             </span>
                             <span className="text-xs font-bold text-emerald-400">+2.4% vs last period</span>
@@ -213,9 +213,9 @@ export default function DashboardPage() {
             {/* Bottom Row */}
             <div className="grid gap-6 lg:grid-cols-3">
                 {/* Recent Sales History */}
-                <Card className="lg:col-span-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm rounded-xl overflow-hidden">
+                <Card className="lg:col-span-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xl rounded-xl overflow-hidden">
                     <CardHeader className="flex flex-row items-center justify-between pb-4 pt-6 px-6">
-                        <CardTitle className="text-lg font-black text-zinc-900 dark:text-zinc-100 italic tracking-tight uppercase">Recent Sales History</CardTitle>
+                        <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-100 tracking-tight uppercase">Recent Sales History</CardTitle>
                         <button className="text-[10px] font-bold text-indigo-500 hover:text-indigo-600 flex items-center gap-1 uppercase tracking-widest transition-all">
                             View All
                             <ArrowUpRight size={14} className="mb-0.5" />
@@ -225,17 +225,17 @@ export default function DashboardPage() {
                         <Table>
                             <TableHeader className="bg-zinc-50 dark:bg-zinc-900/50">
                                 <TableRow className="hover:bg-transparent border-t border-zinc-100 dark:border-zinc-800">
-                                    <TableHead className="font-bold text-[10px] uppercase tracking-widest text-zinc-400 pl-6 h-10">Info</TableHead>
-                                    <TableHead className="font-bold text-[10px] uppercase tracking-widest text-zinc-400 h-10">Customer</TableHead>
-                                    <TableHead className="font-bold text-[10px] uppercase tracking-widest text-zinc-400 h-10 text-right">Amount (CAD)</TableHead>
-                                    <TableHead className="font-bold text-[10px] uppercase tracking-widest text-zinc-400 h-10 text-center pr-6">Status</TableHead>
+                                    <TableHead className="font-black text-[10px] uppercase tracking-widest text-black dark:text-white pl-6 h-10">Info</TableHead>
+                                    <TableHead className="font-black text-[10px] uppercase tracking-widest text-black dark:text-white h-10">Customer</TableHead>
+                                    <TableHead className="font-black text-[10px] uppercase tracking-widest text-black dark:text-white h-10 text-right">Amount (CAD)</TableHead>
+                                    <TableHead className="font-black text-[10px] uppercase tracking-widest text-black dark:text-white h-10 text-center pr-6">Status</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {sales.map((sale) => (
                                     <TableRow key={sale.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/50 border-zinc-100 dark:border-zinc-800 h-16 group transition-colors">
                                         <TableCell className="pl-6">
-                                            <span className="font-black text-xs text-indigo-500 italic uppercase">
+                                            <span className="font-bold text-[10px] text-indigo-500 uppercase">
                                                 #TXN-{sale.sales_code.split('-').pop()}
                                             </span>
                                         </TableCell>
@@ -250,7 +250,7 @@ export default function DashboardPage() {
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            <span className="text-xs font-black text-zinc-800 dark:text-zinc-100">
+                                            <span className="text-xs font-bold text-zinc-800 dark:text-zinc-100">
                                                 ${parseFloat(sale.grand_total.toString()).toFixed(2)}
                                             </span>
                                         </TableCell>
@@ -267,15 +267,15 @@ export default function DashboardPage() {
                 </Card>
 
                 {/* Top Products */}
-                <Card className="lg:col-span-1 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm rounded-xl overflow-hidden flex flex-col">
+                <Card className="lg:col-span-1 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xl rounded-xl overflow-hidden flex flex-col">
                     <CardHeader className="pb-2 pt-6 px-6">
-                        <CardTitle className="text-lg font-black text-zinc-900 dark:text-zinc-100 italic tracking-tight uppercase">Top Products</CardTitle>
+                        <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-100 tracking-tight uppercase">Top Products</CardTitle>
                     </CardHeader>
                     <CardContent className="flex-1 flex flex-col px-6 pb-6">
                         {/* Donut Chart with Center Label */}
                         <div className="relative h-[220px] w-full flex items-center justify-center mb-6 mt-2">
                             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mb-1">
-                                <span className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tighter italic">
+                                <span className="text-xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
                                     ${totalTopProductsValue >= 1000 ? `${(totalTopProductsValue / 1000).toFixed(1)}k` : totalTopProductsValue.toFixed(0)}
                                 </span>
                                 <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest leading-none">Total Sales</span>
@@ -316,7 +316,7 @@ export default function DashboardPage() {
                                             <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }} />
                                             <span className="font-bold text-zinc-500 dark:text-zinc-400 truncate max-w-[120px]">{product.name}</span>
                                         </div>
-                                        <span className="font-black text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 px-1.5 py-0.5 rounded italic">{percentage}%</span>
+                                        <span className="font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 px-1.5 py-0.5 rounded">{percentage}%</span>
                                     </div>
                                 );
                             })}
@@ -334,7 +334,7 @@ function PaymentStatusBadge({ status }: { status?: string }) {
     if (s === "paid") {
         return (
             <div className="px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800">
-                <span className="text-[10px] font-black text-emerald-600 uppercase italic">Paid</span>
+                <span className="text-[10px] font-bold text-emerald-600 uppercase">Paid</span>
             </div>
         );
     }
@@ -342,14 +342,14 @@ function PaymentStatusBadge({ status }: { status?: string }) {
     if (s === "partial") {
         return (
             <div className="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800">
-                <span className="text-[10px] font-black text-indigo-500 uppercase italic">Partial</span>
+                <span className="text-[10px] font-bold text-indigo-500 uppercase">Partial</span>
             </div>
         );
     }
 
     return (
         <div className="px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800">
-            <span className="text-[10px] font-black text-rose-500 uppercase italic">Unpaid</span>
+            <span className="text-[10px] font-bold text-rose-500 uppercase">Unpaid</span>
         </div>
     );
 }
@@ -357,16 +357,16 @@ function PaymentStatusBadge({ status }: { status?: string }) {
 function StatCard({ title, value, change, trend, icon: Icon, gradient }: any) {
     return (
         <div className={cn(
-            "relative overflow-hidden rounded-xl p-5 bg-gradient-to-br shadow-sm transition-all duration-200 hover:scale-[1.01] cursor-default",
+            "relative overflow-hidden rounded-xl p-5 bg-gradient-to-br shadow-xl transition-all duration-200 hover:scale-[1.01] cursor-default",
             gradient
         )}>
             <div className="absolute inset-0 bg-white/5 rounded-xl" />
             <div className="relative z-10 flex items-start justify-between">
                 <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/70 mb-2 italic">
+                    <p className="text-[15px] font-black uppercase tracking-wider text-white/90 mb-2">
                         {title}
                     </p>
-                    <p className="text-2xl font-black text-white leading-none mb-3 italic tracking-tighter">
+                    <p className="text-2xl font-bold text-white leading-none mb-3 tracking-tight">
                         {value}
                     </p>
                     <p className="flex items-center gap-1 text-[10px] text-white/80 font-bold uppercase">

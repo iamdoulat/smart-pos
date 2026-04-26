@@ -37,6 +37,15 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from "lucide-react";
 
 /* ─── Types & Extended Interface ─────────────────────────────────────────── */
 interface ExtendedCategory extends Category {
@@ -157,7 +166,7 @@ export default function CategoriesPage() {
                         <List size={22} />
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase italic leading-none mb-1">
+                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase leading-none mb-1">
                             Categories List
                         </h2>
                         <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
@@ -186,40 +195,40 @@ export default function CategoriesPage() {
             </div>
 
             {/* ── Table ── */}
-            <div className="bg-white dark:bg-zinc-900/50 rounded-[1.5rem] border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden relative">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-[#E9EDF2] dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 font-bold border-b border-zinc-200 dark:border-zinc-700">
-                            <tr>
-                                <th className="px-6 py-4 uppercase tracking-wider text-xs">Category Name</th>
-                                <th className="px-6 py-4 uppercase tracking-wider text-xs">Description</th>
-                                <th className="px-6 py-4 uppercase tracking-wider text-xs">Status</th>
-                                <th className="px-6 py-4 text-left uppercase tracking-wider text-xs w-[120px]">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <div className="bg-white dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden relative">
+                <div className="mt-2">
+                    <Table>
+                        <TableHeader className="bg-zinc-50 dark:bg-zinc-900/50">
+                            <TableRow className="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800">
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Category Name</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Description</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Status</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-left w-[120px]">Action</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                             {loading ? (
-                                <tr>
-                                    <td colSpan={4} className="px-6 py-20 text-center">
+                                <TableRow>
+                                    <TableCell colSpan={4} className="px-6 py-20 text-center">
                                         <Loader2 className="h-8 w-8 animate-spin mx-auto text-purple-500" />
-                                    </td>
-                                </tr>
+                                    </TableCell>
+                                </TableRow>
                             ) : filtered.length === 0 ? (
-                                <tr>
-                                    <td colSpan={4} className="px-6 py-20 text-center text-zinc-400 font-medium italic">
+                                <TableRow>
+                                    <TableCell colSpan={4} className="px-6 py-20 text-center text-zinc-400 font-medium">
                                         No categories found. Adding one might help!
-                                    </td>
-                                </tr>
+                                    </TableCell>
+                                </TableRow>
                             ) : (
                                 paginated.map((c) => (
-                                    <tr key={c.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
-                                        <td className="px-6 py-4 font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-tight">
+                                    <TableRow key={c.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors border-zinc-100 dark:border-zinc-800">
+                                        <TableCell className="px-6 py-4 font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-tight">
                                             {c.name}
-                                        </td>
-                                        <td className="px-6 py-4 text-zinc-500 dark:text-zinc-400 font-medium">
+                                        </TableCell>
+                                        <TableCell className="px-6 py-4 text-zinc-500 dark:text-zinc-400 font-medium">
                                             {c.description || "-"}
-                                        </td>
-                                        <td className="px-6 py-4">
+                                        </TableCell>
+                                        <TableCell className="px-6 py-4">
                                             <span className={cn(
                                                 "px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-wider",
                                                 c.status === "Active"
@@ -228,11 +237,11 @@ export default function CategoriesPage() {
                                             )}>
                                                 {c.status}
                                             </span>
-                                        </td>
-                                        <td className="px-6 py-4">
+                                        </TableCell>
+                                        <TableCell className="px-6 py-4">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="default" className="bg-[#4192B3] hover:bg-[#367a96] text-white rounded-md h-9 px-4 flex items-center gap-2 font-bold text-xs uppercase italic border-0">
+                                                    <Button variant="default" className="bg-[#4192B3] hover:bg-[#367a96] text-white rounded-md h-9 px-4 flex items-center gap-2 font-bold text-xs uppercase border-0">
                                                         Action <ChevronDown size={14} />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -246,10 +255,10 @@ export default function CategoriesPage() {
                                                                 <Trash2 size={14} /> Delete
                                                             </div>
                                                         </AlertDialogTrigger>
-                                                        <AlertDialogContent className="rounded-[2.5rem] border-0 shadow-2xl p-0 overflow-hidden">
+                                                        <AlertDialogContent className="rounded-xl border-0 shadow-2xl p-0 overflow-hidden">
                                                             <div className="bg-red-500 p-8 text-white">
                                                                 <div className="h-14 w-14 rounded-2xl bg-white/20 flex items-center justify-center mb-4"><Trash2 size={28} /></div>
-                                                                <AlertDialogTitle className="text-2xl font-black italic tracking-tighter uppercase leading-none">Delete Category?</AlertDialogTitle>
+                                                                <AlertDialogTitle className="text-2xl font-black tracking-tighter uppercase leading-none">Delete Category?</AlertDialogTitle>
                                                                 <AlertDialogDescription className="text-red-50 mt-2 font-medium">Permanently remove <span className="font-bold underline">{c.name}</span>.</AlertDialogDescription>
                                                             </div>
                                                             <AlertDialogFooter className="p-6 bg-white dark:bg-zinc-950 gap-3">
@@ -260,12 +269,12 @@ export default function CategoriesPage() {
                                                     </AlertDialog>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                    </TableRow>
                                 ))
                             )}
-                        </tbody>
-                    </table>
+                        </TableBody>
+                    </Table>
                 </div>
 
                 {/* Footer Pagination */}
@@ -275,33 +284,32 @@ export default function CategoriesPage() {
                             Showing {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filtered.length)} of {filtered.length} Categories
                         </span>
 
-                        <div className="flex items-center gap-2 order-1 sm:order-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
+                        <div className="flex items-center gap-3 order-1 sm:order-2">
+                            <button
                                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                                 disabled={currentPage === 1}
-                                className="rounded-full h-9 px-4 border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest hover:bg-white dark:hover:bg-zinc-800"
+                                className="h-10 w-10 rounded-xl flex items-center justify-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
                             >
-                                <ChevronLeft size={14} className="mr-1" /> PREV
-                            </Button>
+                                <ChevronLeftIcon size={18} />
+                            </button>
 
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-2">
                                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                                     let pageNum = i + 1;
                                     if (totalPages > 5 && currentPage > 3) {
                                         pageNum = Math.min(currentPage - 2 + i, totalPages - 4 + i);
                                     }
 
+                                    const isActive = currentPage === pageNum;
                                     return (
                                         <button
                                             key={pageNum}
                                             onClick={() => setCurrentPage(pageNum)}
                                             className={cn(
-                                                "h-8 w-8 rounded-full text-[10px] font-black transition-all",
-                                                currentPage === pageNum
-                                                    ? "bg-purple-600 text-white shadow-lg shadow-purple-500/30"
-                                                    : "text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                                "h-10 w-10 rounded-xl text-xs font-black transition-all flex items-center justify-center",
+                                                isActive
+                                                    ? "bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white shadow-lg shadow-indigo-500/30"
+                                                    : "bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-300 dark:hover:border-zinc-700"
                                             )}
                                         >
                                             {pageNum}
@@ -310,15 +318,13 @@ export default function CategoriesPage() {
                                 })}
                             </div>
 
-                            <Button
-                                variant="outline"
-                                size="sm"
+                            <button
                                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                                 disabled={currentPage === totalPages}
-                                className="rounded-full h-9 px-4 border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest hover:bg-white dark:hover:bg-zinc-800"
+                                className="h-10 w-10 rounded-xl flex items-center justify-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
                             >
-                                NEXT <ChevronRight size={14} className="ml-1" />
-                            </Button>
+                                <ChevronRightIcon size={18} />
+                            </button>
                         </div>
                     </div>
                 )}
@@ -332,7 +338,7 @@ export default function CategoriesPage() {
                         <div className="h-1.5 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500" />
                         <div className="p-8 space-y-8 flex-1">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-2xl font-black italic tracking-tighter uppercase leading-none bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">
+                                <h3 className="text-2xl font-black tracking-tighter uppercase leading-none bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">
                                     {editingId ? "Edit Category" : "New Category"}
                                 </h3>
                                 <button onClick={() => setDrawerOpen(false)} className="h-8 w-8 rounded-full hover:bg-zinc-100 flex items-center justify-center text-zinc-400"><X size={20} /></button>
@@ -340,7 +346,7 @@ export default function CategoriesPage() {
 
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-zinc-400 uppercase tracking-widest leading-none">Category Name</label>
+                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">Category Name</label>
                                     <Input
                                         placeholder="e.g. SEWING MACHINE"
                                         value={form.name}
@@ -349,7 +355,7 @@ export default function CategoriesPage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-zinc-400 uppercase tracking-widest leading-none">Description</label>
+                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">Description</label>
                                     <textarea
                                         rows={3}
                                         value={form.description}
@@ -358,7 +364,7 @@ export default function CategoriesPage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-zinc-400 uppercase tracking-widest leading-none">Status</label>
+                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">Status</label>
                                     <div className="grid grid-cols-2 gap-2">
                                         {(['Active', 'Inactive'] as const).map(s => (
                                             <button
@@ -383,7 +389,7 @@ export default function CategoriesPage() {
                             <Button
                                 onClick={handleSave}
                                 disabled={saving}
-                                className="w-full rounded-2xl h-14 font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-500 text-white border-0 shadow-xl shadow-purple-500/25 uppercase italic tracking-tighter hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
+                                className="w-full rounded-2xl h-14 font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-500 text-white border-0 shadow-xl shadow-purple-500/25 uppercase tracking-tighter hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
                             >
                                 {saving ? <Loader2 className="animate-spin h-5 w-5" /> : <Check className="h-5 w-5" />}
                                 {editingId ? "Save Changes" : "Create Category"}

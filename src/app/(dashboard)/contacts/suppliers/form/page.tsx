@@ -126,7 +126,7 @@ function SupplierFormContent() {
                         <Truck size={20} className="md:w-6 md:h-6" />
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase italic pr-4 leading-tight mb-1">
+                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase pr-4 leading-tight mb-1">
                             {contactId ? 'Edit Supplier' : 'New Supplier'}
                         </h2>
                         <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
@@ -136,8 +136,7 @@ function SupplierFormContent() {
                 </div>
             </div>
 
-            <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 shadow-xl overflow-hidden rounded-[2rem]">
-                <div className="h-2 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500" />
+            <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 shadow-xl overflow-hidden rounded-xl">
                 <CardContent className="p-0">
                     <form ref={formRef} onSubmit={handleSubmit} className="p-0">
                         <Tabs defaultValue="add-edit" value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -163,22 +162,22 @@ function SupplierFormContent() {
                                     {/* Column 1 */}
                                     <div className="space-y-6">
                                         <div className="space-y-3">
-                                            <Label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">Supplier Name *</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Supplier Name *</Label>
                                             <Input name="name" defaultValue={contact?.name} required className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="Enter supplier name" />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">Email</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Email</Label>
                                             <Input name="email" type="email" defaultValue={contact?.email} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="supplier@example.com" />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label className="flex justify-between items-center text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
+                                            <Label className="flex justify-between items-center text-[10px] font-black text-black dark:text-white uppercase tracking-widest">
                                                 <span>GST Number</span>
                                                 <a href="#" className="text-purple-500 hover:underline normal-case text-[10px]">Verify</a>
                                             </Label>
                                             <Input name="gst_number" defaultValue={contact?.gst_number} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="Enter GST number" />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label className="flex justify-between items-center text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
+                                            <Label className="flex justify-between items-center text-[10px] font-black text-black dark:text-white uppercase tracking-widest">
                                                 <span>Credit Limit</span>
                                                 <span className="text-[10px] text-zinc-500 normal-case">-1 for No Limit</span>
                                             </Label>
@@ -189,19 +188,19 @@ function SupplierFormContent() {
                                     {/* Column 2 */}
                                     <div className="space-y-6">
                                         <div className="space-y-3">
-                                            <Label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">Mobile</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Mobile</Label>
                                             <Input name="mobile" defaultValue={contact?.mobile} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="+1..." />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">Phone</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Phone</Label>
                                             <Input name="phone" defaultValue={contact?.phone} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="Office number" />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">TAX Number</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">TAX Number</Label>
                                             <Input name="tax_id" defaultValue={contact?.tax_id} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="Tax Identification Number" />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label className="flex justify-between items-center text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
+                                            <Label className="flex justify-between items-center text-[10px] font-black text-black dark:text-white uppercase tracking-widest">
                                                 <span>Attachment</span>
                                                 <span className="text-[10px] text-red-500 normal-case">Max 2MB</span>
                                             </Label>
@@ -217,11 +216,11 @@ function SupplierFormContent() {
                                     {/* Column 3 */}
                                     <div className="space-y-6">
                                         <div className="space-y-3">
-                                            <Label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">Opening Balance</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Opening Balance</Label>
                                             <Input name="opening_balance" type="number" step="0.01" defaultValue={contact?.opening_balance || 0} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium font-mono" />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">Previous Due</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Previous Due</Label>
                                             <Input name="previous_due" type="number" step="0.01" defaultValue={contact?.previous_due || 0} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium font-mono" />
                                         </div>
                                     </div>
@@ -243,33 +242,33 @@ function SupplierFormContent() {
 
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Country</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Country</Label>
                                                     <Input name="country" defaultValue={contact?.country} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">State</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">State</Label>
                                                     <Input name="state" defaultValue={contact?.state} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">City</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">City</Label>
                                                     <Input name="city" defaultValue={contact?.city} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Postcode</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Postcode</Label>
                                                     <Input name="postcode" defaultValue={contact?.postcode} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                             </div>
 
                                             <div className="space-y-3">
-                                                <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Address Line</Label>
+                                                <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Address Line</Label>
                                                 <textarea name="address" defaultValue={contact?.address} className="w-full min-h-[100px] rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 text-sm bg-zinc-50 dark:bg-zinc-900/50 font-medium focus:ring-2 focus:ring-purple-500 outline-none transition-all resize-y" placeholder="Full street address..." />
                                             </div>
 
                                             <div className="space-y-3">
-                                                <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Location Link (Map)</Label>
+                                                <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Location Link (Map)</Label>
                                                 <Input name="location_link" defaultValue={contact?.location_link} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="https://maps.google.com/..." />
                                             </div>
                                         </div>
@@ -286,7 +285,7 @@ function SupplierFormContent() {
                                                     </h4>
                                                 </div>
                                                 <label className="flex items-center gap-2 cursor-pointer group">
-                                                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider group-hover:text-zinc-700 transition-colors">Copy Billing</span>
+                                                    <span className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest group-hover:text-zinc-700 transition-colors">Copy Billing</span>
                                                     <div className="relative flex items-center justify-center">
                                                         <input type="checkbox" onChange={handleCopyAddress} className="peer appearance-none w-5 h-5 border-2 border-zinc-300 rounded-md checked:bg-orange-500 checked:border-orange-500 transition-colors outline-none focus:ring-2 focus:ring-orange-500/20 focus:ring-offset-1" />
                                                         <Loader2 className="absolute text-white pointer-events-none opacity-0 peer-checked:opacity-100 w-3 h-3" /> {/* Check icon visually */}
@@ -296,33 +295,33 @@ function SupplierFormContent() {
 
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Country</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Country</Label>
                                                     <Input name="shipping_country" defaultValue={contact?.shipping_country} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-orange-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">State</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">State</Label>
                                                     <Input name="shipping_state" defaultValue={contact?.shipping_state} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-orange-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">City</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">City</Label>
                                                     <Input name="shipping_city" defaultValue={contact?.shipping_city} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-orange-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Postcode</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Postcode</Label>
                                                     <Input name="shipping_postcode" defaultValue={contact?.shipping_postcode} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-orange-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                             </div>
 
                                             <div className="space-y-3">
-                                                <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Address Line</Label>
+                                                <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Address Line</Label>
                                                 <textarea name="shipping_address" defaultValue={contact?.shipping_address} className="w-full min-h-[100px] rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 text-sm bg-zinc-50 dark:bg-zinc-900/50 font-medium focus:ring-2 focus:ring-orange-500 outline-none transition-all resize-y" placeholder="Full street address..." />
                                             </div>
 
                                             <div className="space-y-3">
-                                                <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Location Link (Map)</Label>
+                                                <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Location Link (Map)</Label>
                                                 <Input name="shipping_location_link" defaultValue={contact?.shipping_location_link} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-orange-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="https://maps.google.com/..." />
                                             </div>
                                         </div>
@@ -331,7 +330,7 @@ function SupplierFormContent() {
                             </TabsContent>
 
                             <TabsContent value="advanced" className="p-8 mt-0 outline-none min-h-[400px]">
-                                <div className="max-w-md w-full p-8 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/30 space-y-6">
+                                <div className="max-w-md w-full p-8 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/30 space-y-6">
                                     <h4 className="font-black text-xl tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-3">
                                         <div className="h-10 w-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600">
                                             <Edit2 size={20} />
@@ -340,7 +339,7 @@ function SupplierFormContent() {
                                     </h4>
 
                                     <div className="space-y-3">
-                                        <Label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">Price Level Type</Label>
+                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Price Level Type</Label>
                                         <select name="price_level_type" defaultValue={contact?.price_level_type || "Increase"} className="w-full h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 px-4 text-sm bg-white dark:bg-zinc-900 font-medium focus:ring-2 focus:ring-purple-500 outline-none transition-all shadow-sm">
                                             <option value="Increase">Increase Price</option>
                                             <option value="Decrease">Decrease Price (Discount)</option>
@@ -348,7 +347,7 @@ function SupplierFormContent() {
                                     </div>
 
                                     <div className="space-y-3">
-                                        <Label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">Price Level (%)</Label>
+                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Price Level (%)</Label>
                                         <div className="relative">
                                             <Input name="price_level" type="number" step="0.01" defaultValue={contact?.price_level || 0} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-white dark:bg-zinc-900 pl-12 transition-all font-medium text-lg font-mono shadow-sm" />
                                             <div className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-purple-500 text-lg">%</div>
@@ -358,19 +357,19 @@ function SupplierFormContent() {
                                 </div>
                             </TabsContent>
 
-                            <div className="bg-zinc-50 dark:bg-zinc-900/80 border-t border-zinc-200 dark:border-zinc-800 p-6 flex justify-end gap-4 rounded-b-[2rem]">
+                            <div className="bg-zinc-50 dark:bg-zinc-900/80 border-t border-zinc-200 dark:border-zinc-800 p-6 flex justify-end gap-4 rounded-b-xl">
                                 <Button
                                     type="button"
                                     variant="outline"
                                     onClick={() => router.push('/contacts/suppliers')}
-                                    className="h-12 bg-white dark:bg-zinc-900 hover:bg-zinc-100 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 px-8 rounded-full font-bold shadow-sm transition-all hover:scale-105 active:scale-95"
+                                    className="h-12 bg-white dark:bg-zinc-900 hover:bg-zinc-100 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 px-8 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95"
                                 >
                                     Cancel
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={submitting}
-                                    className="h-12 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 hover:from-indigo-600 hover:via-purple-700 hover:to-pink-600 text-white px-10 rounded-full font-black uppercase italic tracking-tighter shadow-lg shadow-purple-500/25 transition-all hover:scale-105 active:scale-95 border-0"
+                                    className="h-12 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 hover:from-indigo-600 hover:via-purple-700 hover:to-pink-600 text-white px-10 rounded-xl font-black uppercase tracking-tighter shadow-lg shadow-purple-500/25 transition-all hover:scale-105 active:scale-95 border-0"
                                 >
                                     {submitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
                                     {contactId ? 'Save Changes' : 'Create Supplier'}

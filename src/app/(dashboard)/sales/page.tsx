@@ -200,19 +200,26 @@ export default function SalesPage() {
     return (
         <div className="space-y-8 max-w-[1600px] mx-auto pb-10">
             {/* Header section with glass effect */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <h2 className="text-4xl font-black tracking-tighter bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                        SALES & INVOICING
-                    </h2>
-                    <p className="text-zinc-500 font-medium mt-1">Manage your revenue stream and customer transactions elegantly.</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div className="flex items-center gap-3 md:gap-4">
+                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 transform rotate-3 transition-transform hover:rotate-0">
+                        <ShoppingCart size={20} className="md:w-6 md:h-6" />
+                    </div>
+                    <div>
+                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase pr-4 leading-tight mb-1">
+                            Sales & Invoicing
+                        </h2>
+                        <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
+                            Manage your revenue stream and customer transactions elegantly.
+                        </p>
+                    </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Button variant="outline" className="rounded-full border-zinc-200 dark:border-zinc-800 font-bold text-xs uppercase tracking-widest px-6 h-12 hover:bg-zinc-50 dark:hover:bg-zinc-800">
+                    <Button variant="outline" className="rounded-full border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest px-6 h-12 hover:bg-zinc-50 dark:hover:bg-zinc-800">
                         <Download className="mr-2 h-4 w-4" /> Export
                     </Button>
                     <Link href="/sales/new">
-                        <Button className="rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-xs uppercase tracking-widest px-8 shadow-xl shadow-indigo-500/20 border-0 h-12">
+                        <Button className="rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-black text-[10px] uppercase tracking-widest px-8 shadow-xl shadow-indigo-500/20 border-0 h-12 transition-all hover:scale-[1.02] active:scale-95">
                             <Plus className="mr-2 h-5 w-5" /> New Invoice
                         </Button>
                     </Link>
@@ -224,35 +231,35 @@ export default function SalesPage() {
                 <ModernStatCard
                     title="Gross Revenue"
                     value={`$${Number(stats.totalSales).toLocaleString()}`}
-                    trend="+12.5% vs last month"
+                    description="+12.5% vs last month"
                     icon={TrendingUp}
-                    color="blue"
+                    color="indigo"
                 />
                 <ModernStatCard
                     title="Total Collected"
                     value={`$${Number(stats.totalReceived).toLocaleString()}`}
-                    trend="Steady cashflow"
+                    description="Steady cashflow"
                     icon={ArrowUpRight}
-                    color="teal"
+                    color="emerald"
                 />
                 <ModernStatCard
                     title="Outstanding"
                     value={`$${Number(stats.totalPending).toLocaleString()}`}
-                    trend="Needs follow-up"
+                    description="Needs follow-up"
                     icon={FileText}
-                    color="purple"
+                    color="amber"
                 />
                 <ModernStatCard
                     title="Total Invoices"
                     value={stats.count.toString()}
-                    trend="High volume"
+                    description="High volume sales"
                     icon={ShoppingCart}
-                    color="orange"
+                    color="purple"
                 />
             </div>
 
             {/* Table Area */}
-            <Card className="border-0 bg-white dark:bg-zinc-900 shadow-2xl shadow-indigo-500/5 rounded-[32px] overflow-hidden">
+            <Card className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 shadow-xl rounded-xl overflow-hidden">
                 <CardHeader className="p-8 pb-4">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="relative w-full md:w-96 group">
@@ -260,13 +267,13 @@ export default function SalesPage() {
                                 placeholder="Search invoices, clients, references..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="h-12 pl-12 bg-zinc-50 dark:bg-zinc-800/50 border-zinc-100 dark:border-zinc-800 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
+                                className="h-12 pl-12 bg-zinc-50 dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-full focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
                             />
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
                         </div>
                         <div className="flex items-center gap-2">
-                            <Button variant="outline" size="icon" className="h-12 w-12 rounded-2xl border-zinc-100 dark:border-zinc-800">
-                                <Filter size={18} className="text-zinc-500" />
+                            <Button variant="outline" className="h-10 px-6 rounded-full border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest">
+                                <Filter size={14} className="mr-2" /> More Filters
                             </Button>
                         </div>
                     </div>
@@ -274,14 +281,14 @@ export default function SalesPage() {
                 <CardContent className="p-0">
                     <div className="overflow-x-auto">
                         <Table>
-                            <TableHeader>
-                                <TableRow className="border-zinc-50 dark:border-zinc-800 hover:bg-transparent">
-                                    <TableHead className="pl-8 text-[10px] font-black uppercase tracking-widest text-zinc-400 h-16">Invoice</TableHead>
-                                    <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 h-16">Customer</TableHead>
-                                    <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 h-16">Date</TableHead>
-                                    <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 h-16">Payment</TableHead>
-                                    <TableHead className="text-[10px] font-black uppercase tracking-widest text-zinc-400 h-16 text-right">Grand Total</TableHead>
-                                    <TableHead className="pr-8 text-[10px] font-black uppercase tracking-widest text-zinc-400 h-16 text-right">Actions</TableHead>
+                            <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/50">
+                                <TableRow className="border-b border-zinc-100 dark:border-zinc-800 hover:bg-transparent">
+                                    <TableHead className="pl-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Invoice</TableHead>
+                                    <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Customer</TableHead>
+                                    <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Date</TableHead>
+                                    <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Payment</TableHead>
+                                    <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Grand Total</TableHead>
+                                    <TableHead className="pr-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -411,7 +418,7 @@ export default function SalesPage() {
                                                                     <Trash2 size={16} className="mr-2" /> Delete Forever
                                                                 </DropdownMenuItem>
                                                             </AlertDialogTrigger>
-                                                            <AlertDialogContent className="rounded-[2.5rem] border-0 shadow-2xl p-0 overflow-hidden max-w-md">
+                                                            <AlertDialogContent className="rounded-xl border-0 shadow-2xl p-0 overflow-hidden max-w-md">
                                                                 <div className="bg-red-500 p-8 text-white relative">
                                                                     <div className="absolute top-0 right-0 p-8 opacity-10">
                                                                         <Trash2 size={120} />
@@ -419,7 +426,7 @@ export default function SalesPage() {
                                                                     <div className="h-14 w-14 rounded-2xl bg-white/20 flex items-center justify-center mb-6 backdrop-blur-md border border-white/20">
                                                                         <Trash2 size={28} />
                                                                     </div>
-                                                                    <AlertDialogTitle className="text-3xl font-black italic tracking-tighter uppercase leading-none mb-2">
+                                                                    <AlertDialogTitle className="text-3xl font-black tracking-tighter uppercase leading-none mb-2">
                                                                         Delete Invoice?
                                                                     </AlertDialogTitle>
                                                                     <AlertDialogDescription className="text-red-50 font-bold text-sm leading-relaxed opacity-90">
@@ -454,8 +461,8 @@ export default function SalesPage() {
                                                     <ShoppingCart size={40} />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <p className="text-xl font-bold text-zinc-700 dark:text-zinc-300 italic">No sales found</p>
-                                                    <p className="text-sm text-zinc-500">Add your first invoice to see it here.</p>
+                                                    <p className="text-xl font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tighter">No sales found</p>
+                                                    <p className="text-sm text-zinc-500 font-bold">Add your first invoice to see it here.</p>
                                                 </div>
                                                 <Link href="/sales/new">
                                                     <Button className="rounded-full bg-indigo-600/10 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all font-black uppercase text-[10px] tracking-widest h-11 px-8 border-0">
@@ -470,39 +477,38 @@ export default function SalesPage() {
                         </Table>
                     </div>
                     {filteredSales.length > 0 && (
-                        <div className="px-8 py-5 bg-zinc-50/50 dark:bg-zinc-900/50 border-t border-zinc-50 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="px-8 py-4 bg-zinc-50/50 dark:bg-zinc-900/50 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                             <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest order-2 sm:order-1">
                                 Showing {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredSales.length)} of {filteredSales.length} Records
                             </span>
 
                             {/* Pagination Controls */}
-                            <div className="flex items-center gap-2 order-1 sm:order-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
+                            <div className="flex items-center gap-3 order-1 sm:order-2">
+                                <button
                                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                                     disabled={currentPage === 1}
-                                    className="rounded-full h-9 px-4 border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest hover:bg-white dark:hover:bg-zinc-800"
+                                    className="h-10 w-10 rounded-xl flex items-center justify-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
                                 >
-                                    <ChevronLeft size={14} className="mr-1" /> PREV
-                                </Button>
+                                    <ChevronLeft size={18} />
+                                </button>
 
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-2">
                                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                                         let pageNum = i + 1;
                                         if (totalPages > 5 && currentPage > 3) {
                                             pageNum = Math.min(currentPage - 2 + i, totalPages - 4 + i);
                                         }
 
+                                        const isActive = currentPage === pageNum;
                                         return (
                                             <button
                                                 key={pageNum}
                                                 onClick={() => setCurrentPage(pageNum)}
                                                 className={cn(
-                                                    "h-8 w-8 rounded-full text-[10px] font-black transition-all",
-                                                    currentPage === pageNum
-                                                        ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
-                                                        : "text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                                    "h-10 w-10 rounded-xl text-xs font-black transition-all flex items-center justify-center",
+                                                    isActive
+                                                        ? "bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 text-white shadow-lg shadow-indigo-500/30"
+                                                        : "bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-300 dark:hover:border-zinc-700"
                                                 )}
                                             >
                                                 {pageNum}
@@ -511,15 +517,13 @@ export default function SalesPage() {
                                     })}
                                 </div>
 
-                                <Button
-                                    variant="outline"
-                                    size="sm"
+                                <button
                                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                                     disabled={currentPage === totalPages}
-                                    className="rounded-full h-9 px-4 border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest hover:bg-white dark:hover:bg-zinc-800"
+                                    className="h-10 w-10 rounded-xl flex items-center justify-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm"
                                 >
-                                    NEXT <ChevronRight size={14} className="ml-1" />
-                                </Button>
+                                    <ChevronRight size={18} />
+                                </button>
                             </div>
                         </div>
                     )}
@@ -533,13 +537,13 @@ export default function SalesPage() {
             />
 
             <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
-                <DialogContent className="max-w-md rounded-3xl border-0 shadow-2xl p-0 overflow-hidden">
+                <DialogContent className="max-w-md rounded-xl border-0 shadow-2xl p-0 overflow-hidden">
                     <div className="bg-gradient-to-br from-indigo-600 to-purple-700 p-8 text-white relative">
                         <div className="absolute top-0 right-0 p-8 opacity-10">
                             <Mail size={120} />
                         </div>
                         <DialogHeader>
-                            <DialogTitle className="text-3xl font-black italic tracking-tighter uppercase leading-none mb-2">
+                            <DialogTitle className="text-3xl font-black tracking-tighter uppercase leading-none mb-2">
                                 Send via Email
                             </DialogTitle>
                             <DialogDescription className="text-indigo-100 font-bold text-sm leading-relaxed opacity-90">
@@ -602,20 +606,20 @@ function ReceiptIcon({ size }: { size: number }) {
     )
 }
 
-function ModernStatCard({ title, value, description, icon: Icon, trend, color }: any) {
+ function ModernStatCard({ title, value, description, icon: Icon, color }: any) {
     const gradientClasses: any = {
-        blue: "bg-gradient-to-r from-[#2B5BFF] to-[#5138EE]",
-        teal: "bg-gradient-to-r from-[#00D09E] to-[#019DA3]",
+        indigo: "bg-gradient-to-r from-[#2B5BFF] to-[#5138EE]",
+        emerald: "bg-gradient-to-r from-[#00D09E] to-[#019DA3]",
+        amber: "bg-gradient-to-r from-[#FF8800] to-[#FF3B3B]",
         purple: "bg-gradient-to-r from-[#AD3BFC] to-[#713BFF]",
-        orange: "bg-gradient-to-r from-[#FF8800] to-[#FF3B3B]",
     };
 
     return (
-        <Card className={cn("border-0 rounded-2xl overflow-hidden text-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative group w-full", gradientClasses[color])}>
+        <Card className={cn("border-0 rounded-xl overflow-hidden text-white transition-all duration-300 shadow-xl hover:-translate-y-1 relative group w-full", gradientClasses[color])}>
             <CardContent className="p-5 flex flex-col justify-center h-[120px]">
                 <div className="flex justify-between items-start">
                     <div className="space-y-1">
-                        <p className="text-[10px] uppercase font-black tracking-wider text-white/90 drop-shadow-sm">{title}</p>
+                        <p className="text-[15px] uppercase font-bold tracking-wider text-white/90 drop-shadow-sm">{title}</p>
                         <h3 className="text-3xl font-black tracking-tight text-white drop-shadow-md">{value}</h3>
                     </div>
                     <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center mt-1 shadow-inner border border-white/10">
@@ -624,7 +628,7 @@ function ModernStatCard({ title, value, description, icon: Icon, trend, color }:
                 </div>
                 <div className="flex items-center gap-1.5 text-[10px] font-bold text-white/90 mt-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-90"><path d="M7 7h10v10" /><path d="M7 17 17 7" /></svg>
-                    <span>{trend}</span>
+                    <span>{description}</span>
                 </div>
             </CardContent>
         </Card>

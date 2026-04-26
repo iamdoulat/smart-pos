@@ -187,8 +187,8 @@ export default function WhatsappSettingsPage() {
                         <MessageCircle size={20} className="md:w-6 md:h-6" />
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-2xl font-extrabold bg-gradient-to-r from-emerald-500 via-green-600 to-teal-500 bg-clip-text text-transparent tracking-tight">WhatsApp Settings</h2>
-                        <p className="text-xs md:text-sm text-zinc-500 dark:text-zinc-400">
+                        <h2 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-emerald-500 via-green-600 to-teal-500 bg-clip-text text-transparent tracking-tight">WhatsApp Settings</h2>
+                        <p className="text-xs md:text-sm text-zinc-500 dark:text-zinc-400 font-medium">
                             Manage your WhatsApp API gateways (bipsms.com).
                         </p>
                     </div>
@@ -309,7 +309,7 @@ export default function WhatsappSettingsPage() {
                                         onClick={() => handleOpenTestModal(config)}
                                         disabled={!config.is_active}
                                         variant="outline"
-                                        className="flex-1 rounded-xl md:rounded-2xl font-black border-2 border-zinc-100 dark:border-zinc-800 h-11 md:h-14 hover:bg-emerald-500 hover:text-white transition-all uppercase italic tracking-tighter text-sm md:text-base group/btn"
+                                        className="flex-1 rounded-xl md:rounded-2xl font-bold border-2 border-zinc-100 dark:border-zinc-800 h-11 md:h-14 hover:bg-emerald-500 hover:text-white transition-all uppercase tracking-tight text-sm md:text-base group/btn"
                                     >
                                         <Send className="mr-2 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" size={14} />
                                         Test Gateway
@@ -328,7 +328,7 @@ export default function WhatsappSettingsPage() {
                     <p className="text-sm md:text-lg text-zinc-500 dark:text-zinc-400 max-w-sm mb-8 md:mb-10 font-bold tracking-tight">Connect your bipsms.com WhatsApp account to start sending messages reliably.</p>
                     <Button
                         onClick={handleOpenAddModal}
-                        className="bg-emerald-500 text-white rounded-2xl md:rounded-3xl px-8 md:px-12 h-14 md:h-16 font-black md:text-xl hover:bg-emerald-600 transition-all shadow-2xl shadow-emerald-500/20 transform -rotate-1 hover:rotate-0"
+                        className="bg-emerald-500 text-white rounded-2xl md:rounded-3xl px-8 md:px-12 h-14 md:h-16 font-bold md:text-xl hover:bg-emerald-600 transition-all shadow-2xl shadow-emerald-500/20 transform -rotate-1 hover:rotate-0"
                     >
                         CONNECT ACCOUNT NOW
                     </Button>
@@ -345,7 +345,7 @@ export default function WhatsappSettingsPage() {
                         >
                             <X size={16} />
                         </Button>
-                        <DialogTitle className="text-xl md:text-2xl font-black tracking-tighter flex items-center gap-2 uppercase italic">
+                        <DialogTitle className="text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2 uppercase">
                             <Send size={20} />
                             Test Connection
                         </DialogTitle>

@@ -153,7 +153,7 @@ export default function WarehousesPage() {
                         <Building2 size={22} />
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-orange-500 via-red-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase italic leading-none mb-1">
+                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-orange-500 via-red-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase leading-none mb-1">
                             Warehouse List
                         </h2>
                         <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
@@ -182,17 +182,17 @@ export default function WarehousesPage() {
             </div>
 
             {/* ── Table ── */}
-            <div className="bg-white dark:bg-zinc-900/50 rounded-[1.5rem] border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden relative">
+            <div className="bg-white dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden relative">
                 <div className="overflow-x-auto">
                     <Table>
-                        <TableHeader className="bg-[#E9EDF2] dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 font-bold border-b border-zinc-200 dark:border-zinc-700">
-                            <TableRow className="hover:bg-transparent">
-                                <TableHead className="px-6 py-4 uppercase tracking-wider text-xs">Warehouse Name</TableHead>
-                                <TableHead className="px-6 py-4 uppercase tracking-wider text-xs">Mobile</TableHead>
-                                <TableHead className="px-6 py-4 uppercase tracking-wider text-xs">Email</TableHead>
-                                <TableHead className="px-6 py-4 uppercase tracking-wider text-xs">Details</TableHead>
-                                <TableHead className="px-6 py-4 uppercase tracking-wider text-xs">Status</TableHead>
-                                <TableHead className="px-6 py-4 text-left uppercase tracking-wider text-xs w-[120px]">Action</TableHead>
+                        <TableHeader className="bg-zinc-50 dark:bg-zinc-900/50">
+                            <TableRow className="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800">
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Warehouse Name</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Mobile</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Email</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Details</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Status</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-left w-[120px]">Action</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody className="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -204,7 +204,7 @@ export default function WarehousesPage() {
                                 </TableRow>
                             ) : filteredWarehouses.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="px-6 py-20 text-center text-zinc-400 font-medium italic">
+                                    <TableCell colSpan={6} className="px-6 py-20 text-center text-zinc-400 font-medium">
                                         No warehouses found.
                                     </TableCell>
                                 </TableRow>
@@ -226,16 +226,16 @@ export default function WarehousesPage() {
                                             {warehouse.email || <span className="opacity-30">N/A</span>}
                                         </TableCell>
                                         <TableCell className="px-6 py-4">
-                                            <div className="space-y-1 py-2 px-3 rounded-xl bg-[#E9EDF2] dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 min-w-[180px]">
-                                                <div className="flex justify-between items-center text-[10px] font-bold text-zinc-500 italic">
+                                            <div className="space-y-1 py-2 px-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 min-w-[180px]">
+                                                <div className="flex justify-between items-center text-[10px] font-bold text-zinc-500">
                                                     <span>Total Items:</span>
                                                     <span className="text-zinc-900 dark:text-zinc-100">{warehouse.total_items ?? 0}</span>
                                                 </div>
-                                                <div className="flex justify-between items-center text-[10px] font-bold text-zinc-500 italic">
+                                                <div className="flex justify-between items-center text-[10px] font-bold text-zinc-500">
                                                     <span>Available Quantity:</span>
                                                     <span className="text-zinc-900 dark:text-zinc-100">{Number(warehouse.total_quantity ?? 0).toFixed(2)}</span>
                                                 </div>
-                                                <div className="flex justify-between items-center text-[10px] font-bold text-zinc-500 italic">
+                                                <div className="flex justify-between items-center text-[10px] font-bold text-zinc-500">
                                                     <span>Worth:</span>
                                                     <span className="text-zinc-900 dark:text-zinc-100">$ {Number(warehouse.total_worth ?? 0).toFixed(2)}</span>
                                                 </div>
@@ -254,7 +254,7 @@ export default function WarehousesPage() {
                                         <TableCell className="px-6 py-4">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="default" className="bg-[#4192B3] hover:bg-[#367a96] text-white rounded-md h-9 px-4 flex items-center gap-2 font-bold text-xs uppercase italic border-0">
+                                                    <Button variant="default" className="bg-[#4192B3] hover:bg-[#367a96] text-white rounded-md h-9 px-4 flex items-center gap-2 font-bold text-xs uppercase border-0">
                                                         Action <ChevronDown size={14} />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -274,7 +274,7 @@ export default function WarehousesPage() {
                                                         <AlertDialogContent className="rounded-[2.5rem] border-0 shadow-2xl p-0 overflow-hidden">
                                                             <div className="bg-red-500 p-8 text-white">
                                                                 <div className="h-14 w-14 rounded-2xl bg-white/20 flex items-center justify-center mb-4"><Trash2 size={28} /></div>
-                                                                <AlertDialogTitle className="text-2xl font-black italic tracking-tighter uppercase leading-none">Delete Warehouse?</AlertDialogTitle>
+                                                                <AlertDialogTitle className="text-2xl font-bold tracking-tight uppercase leading-none">Delete Warehouse?</AlertDialogTitle>
                                                                 <AlertDialogDescription className="text-red-50 mt-2 font-medium">Permanently remove <span className="font-bold underline">{warehouse.name}</span>.</AlertDialogDescription>
                                                             </div>
                                                             <AlertDialogFooter className="p-6 bg-white dark:bg-zinc-950 gap-3">
@@ -302,7 +302,7 @@ export default function WarehousesPage() {
                         <div className="h-1.5 bg-gradient-to-r from-orange-400 via-red-500 to-pink-600" />
                         <div className="p-8 space-y-8 flex-1">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-2xl font-black italic tracking-tighter uppercase leading-none bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent">
+                                <h3 className="text-2xl font-black tracking-tighter uppercase leading-none bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent">
                                     {editingWarehouse ? "Edit Warehouse" : "New Warehouse"}
                                 </h3>
                                 <button onClick={() => setDrawerOpen(false)} className="h-8 w-8 rounded-full hover:bg-zinc-100 flex items-center justify-center text-zinc-400"><X size={20} /></button>
@@ -310,7 +310,7 @@ export default function WarehousesPage() {
 
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-zinc-400 uppercase tracking-widest leading-none">Warehouse Name *</label>
+                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">Warehouse Name *</label>
                                     <div className="relative group">
                                         <Building className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-orange-500 transition-colors" size={18} />
                                         <Input
@@ -323,7 +323,7 @@ export default function WarehousesPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-zinc-400 uppercase tracking-widest leading-none">Mobile</label>
+                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">Mobile</label>
                                     <div className="relative group">
                                         <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-orange-500 transition-colors" size={18} />
                                         <Input
@@ -336,7 +336,7 @@ export default function WarehousesPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-zinc-400 uppercase tracking-widest leading-none">Email</label>
+                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">Email</label>
                                     <div className="relative group">
                                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-orange-500 transition-colors" size={18} />
                                         <Input
@@ -349,7 +349,7 @@ export default function WarehousesPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-black text-zinc-400 uppercase tracking-widest leading-none">Status</label>
+                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">Status</label>
                                     <div className="grid grid-cols-2 gap-2">
                                         {(['Active', 'Inactive'] as const).map(s => (
                                             <button
@@ -374,7 +374,7 @@ export default function WarehousesPage() {
                             <Button
                                 onClick={handleSave}
                                 disabled={saving}
-                                className="w-full rounded-2xl h-14 font-black bg-gradient-to-r from-orange-400 via-red-500 to-orange-400 text-white border-0 shadow-xl shadow-red-500/25 uppercase italic tracking-tighter hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
+                                className="w-full rounded-2xl h-14 font-black bg-gradient-to-r from-orange-400 via-red-500 to-orange-400 text-white border-0 shadow-xl shadow-red-500/25 uppercase tracking-tighter hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
                             >
                                 {saving ? <Loader2 className="animate-spin h-5 w-5" /> : <Check className="h-5 w-5" />}
                                 {editingWarehouse ? "Save Changes" : "Create Warehouse"}

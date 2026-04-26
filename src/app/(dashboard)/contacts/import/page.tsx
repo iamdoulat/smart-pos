@@ -78,7 +78,7 @@ function ImportContent() {
                     <ArrowLeftCircle size={28} />
                 </div>
                 <div>
-                    <h2 className="text-3xl font-black bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500 bg-clip-text text-transparent tracking-tighter uppercase italic py-1 leading-none">
+                    <h2 className="text-3xl font-black bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500 bg-clip-text text-transparent tracking-tighter uppercase py-1 leading-none">
                         Import {isCustomer ? "Customers" : "Suppliers"}
                     </h2>
                     <p className="text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight mt-1">
@@ -89,7 +89,7 @@ function ImportContent() {
 
             <div className="grid gap-8 md:grid-cols-3">
                 {/* Instructions */}
-                <Card className="md:col-span-1 border-0 shadow-xl bg-white dark:bg-zinc-900/50 rounded-[2rem] overflow-hidden">
+                <Card className="md:col-span-1 border-0 shadow-xl bg-white dark:bg-zinc-900/50 rounded-xl overflow-hidden">
                     <div className="h-2 bg-zinc-200 dark:bg-zinc-800" />
                     <CardHeader>
                         <CardTitle className="text-lg font-black flex items-center gap-2 tracking-tight">
@@ -112,7 +112,7 @@ function ImportContent() {
                 </Card>
 
                 {/* Upload Zone */}
-                <Card className="md:col-span-2 border-0 shadow-2xl bg-white dark:bg-zinc-900 rounded-[2.5rem] overflow-hidden">
+                <Card className="md:col-span-2 border-0 shadow-2xl bg-white dark:bg-zinc-900 rounded-xl overflow-hidden">
                     <div className={cn(
                         "h-2",
                         isCustomer ? "bg-gradient-to-r from-amber-500 to-pink-500" : "bg-gradient-to-r from-indigo-500 to-purple-500"
@@ -120,8 +120,8 @@ function ImportContent() {
                     <CardContent className="p-10">
                         <div
                             className={cn(
-                                "border-4 border-dashed rounded-[2rem] p-12 text-center transition-all group relative cursor-pointer",
-                                file ? "border-green-500 bg-green-500/5" : "border-zinc-100 dark:border-zinc-800 hover:border-indigo-500 hover:bg-indigo-500/5"
+                                "border-4 border-dashed rounded-xl p-12 text-center transition-all group relative cursor-pointer",
+                                file ? "border-green-500 bg-green-50 dark:bg-green-500/10" : "border-zinc-200 dark:border-zinc-800 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10"
                             )}
                         >
                             <input
@@ -163,7 +163,7 @@ function ImportContent() {
                                 disabled={!file || importing}
                                 onClick={handleImport}
                                 className={cn(
-                                    "px-10 h-14 rounded-full font-black uppercase italic tracking-tighter text-lg shadow-xl transition-all",
+                                    "px-10 h-14 rounded-xl font-black uppercase tracking-tighter text-lg shadow-xl transition-all",
                                     isCustomer
                                         ? "bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 text-white shadow-orange-500/20"
                                         : "bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 text-white shadow-indigo-500/20"

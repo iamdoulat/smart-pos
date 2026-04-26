@@ -190,8 +190,8 @@ export default function GeneralSettingsPage() {
                         <Settings size={24} />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight">System Settings</h2>
-                        <p className="text-sm text-zinc-500 dark:text-zinc-400">Manage your company details and application preferences.</p>
+                        <h2 className="text-2xl font-bold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight">System Settings</h2>
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium">Manage your company details and application preferences.</p>
                     </div>
                 </div>
             </div>
@@ -199,10 +199,10 @@ export default function GeneralSettingsPage() {
             <form ref={formRef} onSubmit={handleSubmit}>
                 <Tabs defaultValue="general" className="space-y-6">
                     <TabsList className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-1 rounded-full h-12 shadow-sm">
-                        <TabsTrigger value="general" className="rounded-full px-8 data-[state=active]:bg-gradient-to-r from-rose-500 to-orange-500 data-[state=active]:text-white font-bold transition-all duration-300 uppercase tracking-tighter">
+                        <TabsTrigger value="general" className="rounded-full px-8 data-[state=active]:bg-gradient-to-r from-rose-500 to-orange-500 data-[state=active]:text-white font-bold transition-all duration-300 uppercase tracking-tight">
                             General Details
                         </TabsTrigger>
-                        <TabsTrigger value="pwa" className="rounded-full px-8 data-[state=active]:bg-gradient-to-r from-rose-500 to-orange-500 data-[state=active]:text-white font-bold transition-all duration-300 uppercase tracking-tighter">
+                        <TabsTrigger value="pwa" className="rounded-full px-8 data-[state=active]:bg-gradient-to-r from-rose-500 to-orange-500 data-[state=active]:text-white font-bold transition-all duration-300 uppercase tracking-tight">
                             PWA Settings
                         </TabsTrigger>
                     </TabsList>

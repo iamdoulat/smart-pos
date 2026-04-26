@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +20,10 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2, ArrowLeft, MailCheck } from "lucide-react";
 import Image from "next/image";
+import { useAuthStore } from "@/lib/store";
+import { getAssetUrl } from "@/lib/utils";
+import logoImg from "@/assets/logo.png";
+import bgImg from "@/assets/auth-bg.png";
 
 const forgotPasswordSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -30,6 +34,15 @@ type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 export default function ForgotPasswordPage() {
     const [loading, setLoading] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
+    const { currentCompany, refreshCompany } = useAuthStore();
+
+    useEffect(() => {
+        if (!currentCompany) {
+            refreshCompany();
+        }
+    }, [currentCompany, refreshCompany]);
+
+    const companyLogo = currentCompany?.logo_url ? getAssetUrl(currentCompany.logo_url) : null;
 
     const form = useForm<ForgotPasswordFormValues>({
         resolver: zodResolver(forgotPasswordSchema),
@@ -56,7 +69,7 @@ export default function ForgotPasswordPage() {
             {/* Background Image */}
             <div className="absolute inset-0 z-0 pointer-events-none">
                 <Image
-                    src="/images/auth-bg.png"
+                    src={bgImg}
                     alt="Background"
                     fill
                     className="object-cover opacity-30 dark:opacity-40 blur-[1px]"
@@ -73,10 +86,12 @@ export default function ForgotPasswordPage() {
                 <div className="flex flex-col items-center mb-8">
                     <div className="relative w-20 h-20 mb-4 drop-shadow-2xl">
                         <Image
-                            src="/images/logo.png"
-                            alt="Hurpori Logo"
+                            src={companyLogo || logoImg}
+                            alt={currentCompany?.name || "Hurpori Logo"}
                             fill
                             className="object-contain"
+                            priority
+                            unoptimized={!!companyLogo}
                         />
                     </div>
                     <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white">

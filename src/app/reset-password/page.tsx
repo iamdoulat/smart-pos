@@ -21,6 +21,10 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
+import { useAuthStore } from "@/lib/store";
+import { getAssetUrl } from "@/lib/utils";
+import logoImg from "@/assets/logo.png";
+import bgImg from "@/assets/auth-bg.png";
 
 const resetPasswordSchema = z.object({
     password: z.string().min(8, { message: "Password must be at least 8 characters" }),
@@ -37,6 +41,15 @@ function ResetPasswordForm() {
     const searchParams = useSearchParams();
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const { currentCompany, refreshCompany } = useAuthStore();
+
+    useEffect(() => {
+        if (!currentCompany) {
+            refreshCompany();
+        }
+    }, [currentCompany, refreshCompany]);
+
+    const companyLogo = currentCompany?.logo_url ? getAssetUrl(currentCompany.logo_url) : null;
 
     const token = searchParams.get("token") || "";
     const email = searchParams.get("email") || "";
@@ -78,7 +91,7 @@ function ResetPasswordForm() {
             {/* Background Image */}
             <div className="absolute inset-0 z-0 pointer-events-none">
                 <Image
-                    src="/images/auth-bg.png"
+                    src={bgImg}
                     alt="Background"
                     fill
                     className="object-cover opacity-30 dark:opacity-40 blur-[1px]"
@@ -95,10 +108,12 @@ function ResetPasswordForm() {
                 <div className="flex flex-col items-center mb-8">
                     <div className="relative w-20 h-20 mb-4 drop-shadow-2xl">
                         <Image
-                            src="/images/logo.png"
-                            alt="Hurpori Logo"
+                            src={companyLogo || logoImg}
+                            alt={currentCompany?.name || "Hurpori Logo"}
                             fill
                             className="object-contain"
+                            priority
+                            unoptimized={!!companyLogo}
                         />
                     </div>
                     <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white">

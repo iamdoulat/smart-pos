@@ -251,12 +251,12 @@ export default function RolesSettingsPage() {
                                 <div className="space-y-2">
                                     <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">{t("roles.permissions")}</p>
                                     <div className="flex flex-wrap gap-1.5">
-                                        {role.permissions?.slice(0, 4).map((p) => (
-                                            <span key={typeof p === 'string' ? p : p.id} className="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-100 dark:border-emerald-800/50">
-                                                {t(ALL_PERMISSIONS.find(perm => perm.id === (typeof p === 'string' ? p : p.name))?.label || (typeof p === 'string' ? p : p.name))}
+                                        {role.permissions?.slice(0, 4).map((p: string) => (
+                                            <span key={p} className="px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-100 dark:border-emerald-800/50">
+                                                {t(ALL_PERMISSIONS.find(perm => perm.id === p)?.label || p)}
                                             </span>
                                         ))}
-                                        {role.permissions?.length > 4 && (
+                                        {role.permissions && role.permissions.length > 4 && (
                                             <span className="px-2 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-500 text-[10px] font-bold">
                                                 +{role.permissions.length - 4}
                                             </span>

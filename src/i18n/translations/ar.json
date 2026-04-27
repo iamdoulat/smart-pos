@@ -960,6 +960,8 @@
   "contacts.label_email": "البريد الإلكتروني",
   "contacts.label_mobile": "الجوال",
   "contacts.label_phone": "الهاتف",
+  "contacts.enter_mobile": "أدخل رقم الجوال",
+  "contacts.enter_email": "أدخل عنوان البريد الإلكتروني",
   "contacts.label_gst": "رقم ضريبة السلع والخدمات",
   "contacts.label_tax": "الرقم الضريبي",
   "contacts.label_credit_limit": "الحد الائتماني",

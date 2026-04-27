@@ -993,6 +993,8 @@
   "contacts.label_email": "Email",
   "contacts.label_mobile": "Mobile",
   "contacts.label_phone": "Phone",
+  "contacts.enter_mobile": "Enter Mobile Number",
+  "contacts.enter_email": "Enter Email ID",
   "contacts.label_gst": "GST Number",
   "contacts.label_tax": "TAX Number",
   "contacts.label_credit_limit": "Credit Limit",

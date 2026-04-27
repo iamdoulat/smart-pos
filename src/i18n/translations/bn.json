@@ -993,6 +993,8 @@
   "contacts.label_email": "ইমেইল",
   "contacts.label_mobile": "মোবাইল",
   "contacts.label_phone": "ফোন",
+  "contacts.enter_mobile": "মোবাইল নম্বর লিখুন",
+  "contacts.enter_email": "ইমেল আইডি লিখুন",
   "contacts.label_gst": "জিএসটি নম্বর",
   "contacts.label_tax": "ট্যাক্স নম্বর",
   "contacts.label_credit_limit": "ক্রেডিট সীমা",

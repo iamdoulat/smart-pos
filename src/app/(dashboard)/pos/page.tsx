@@ -941,7 +941,7 @@ export default function POSTerminalPage() {
 
              {/* Checkout Confirmation Modal */}
             <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-                <DialogContent className="max-w-md bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-[40px] p-8 shadow-2xl text-slate-900 dark:text-zinc-100 max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-[515px] bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-[40px] p-8 shadow-2xl text-slate-900 dark:text-zinc-100 max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle className="text-center font-black uppercase tracking-tighter text-3xl italic text-slate-900 dark:text-zinc-100 leading-none">{t('pos.confirm')} <span className="text-indigo-600 dark:text-indigo-400">{t('pos.checkout')}</span></DialogTitle>
                     </DialogHeader>
@@ -967,7 +967,7 @@ export default function POSTerminalPage() {
                                         step="0.01"
                                         value={discount}
                                         onChange={(e) => setDiscount(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                         className="h-10 pl-7 text-right rounded-xl border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 font-black text-sm pr-3 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 dark:text-zinc-100 w-full"
+                                         className="h-10 pl-12 text-right rounded-xl border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 font-black text-sm pr-3 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 dark:text-zinc-100 w-full"
                                     />
                                 </div>
                             </div>
@@ -1030,7 +1030,7 @@ export default function POSTerminalPage() {
                                                     step="0.01"
                                                     value={method.state}
                                                      onChange={(e) => method.setter(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                                    className="h-12 pl-6 pt-5 bg-white dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 font-black text-sm focus:ring-2 focus:ring-indigo-500/20 transition-all text-slate-900 dark:text-zinc-100 w-full"
+                                                    className="h-12 pl-12 pt-5 bg-white dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 font-black text-sm focus:ring-2 focus:ring-indigo-500/20 transition-all text-slate-900 dark:text-zinc-100 w-full"
                                                     placeholder="0.00"
                                                 />
                                             </div>
@@ -1062,7 +1062,7 @@ export default function POSTerminalPage() {
                                             step="0.01"
                                             value={checkoutPaidAmount}
                                              onChange={(e) => setCheckoutPaidAmount(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                            className="h-14 pl-10 rounded-2xl border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 font-black text-lg focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900 dark:text-zinc-100 w-full"
+                                            className="h-14 pl-16 rounded-2xl border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 font-black text-lg focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900 dark:text-zinc-100 w-full"
                                         />
                                     </div>
                                      {checkoutStatus === "Paid" && Number(checkoutPaidAmount) > totals.roundedTotal && (

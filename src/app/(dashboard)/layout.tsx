@@ -321,8 +321,14 @@ function DashboardLayoutInner({
 
     const SidebarContent = ({ collapsed = false, onChildClick = () => {} }) => (
         <>
-            <div className="h-16 px-4 flex items-center gap-3 sticky top-0 z-10 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className={cn(
+                "h-16 flex items-center sticky top-0 z-10 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800",
+                collapsed ? "justify-center px-2" : "px-4 gap-3"
+            )}>
+                <div className={cn(
+                    "flex items-center min-w-0",
+                    collapsed ? "justify-center" : "gap-3 flex-1"
+                )}>
                     {currentCompany?.logo_url && (
                         <div className="p-[2px] rounded-xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-pink-500 shadow-lg shadow-orange-500/20 shrink-0">
                             <div className="h-10 w-10 rounded-[10px] overflow-hidden bg-white dark:bg-zinc-900 border border-white/10 flex items-center justify-center">
@@ -342,16 +348,6 @@ function DashboardLayoutInner({
                         </div>
                     )}
                 </div>
-                {!onChildClick && ( // Only show toggle on desktop
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setIsCollapsed(!isCollapsed)}
-                        className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-                    >
-                        {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-                    </Button>
-                )}
             </div>
 
             <div className="flex-1 overflow-y-auto min-h-0 px-4">
@@ -514,8 +510,14 @@ function DashboardLayoutInner({
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="lg:hidden text-zinc-500 hover:text-zinc-900"
-                            onClick={() => setIsMobileOpen(true)}
+                            className="text-zinc-500 hover:text-zinc-900"
+                            onClick={() => {
+                                if (window.innerWidth < 1024) {
+                                    setIsMobileOpen(true);
+                                } else {
+                                    setIsCollapsed(!isCollapsed);
+                                }
+                            }}
                         >
                             <Menu size={20} />
                         </Button>

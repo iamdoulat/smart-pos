@@ -38,6 +38,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { SmsService, SmsConfiguration } from "@/lib/sms-service";
+import { cn } from "@/lib/utils";
 
 export default function SmsSettingsPage() {
     const [configs, setConfigs] = useState<SmsConfiguration[]>([]);

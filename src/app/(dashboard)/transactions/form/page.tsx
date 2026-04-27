@@ -23,31 +23,11 @@ import {
     Hash,
 } from "lucide-react";
 import { toast } from "sonner";
-
-const TYPES: { value: TransactionType; label: string }[] = [
-    { value: "income", label: "💰 Income" },
-    { value: "expense", label: "💸 Expense" },
-    { value: "sales", label: "🛒 Sales" },
-    { value: "purchase", label: "📦 Purchase" },
-    { value: "transfer", label: "🔄 Transfer" },
-    { value: "tax", label: "🧾 Tax" },
-    { value: "shipping", label: "🚚 Shipping" },
-];
-
-const PAYMENT_METHODS: { value: PaymentMethod; label: string }[] = [
-    { value: "cash", label: "💵 Cash" },
-    { value: "bank", label: "🏦 Bank Transfer" },
-    { value: "online", label: "💳 Online Payment" },
-];
-
-const STATUSES: { value: TransactionStatus; label: string; color: string }[] = [
-    { value: "completed", label: "Completed", color: "from-emerald-500 to-green-600" },
-    { value: "pending", label: "Pending", color: "from-amber-500 to-yellow-600" },
-    { value: "cancelled", label: "Cancelled", color: "from-rose-500 to-red-600" },
-];
+import { useTranslation } from "@/i18n/TranslationContext";
 
 function TransactionFormContent() {
     const router = useRouter();
+    const { t } = useTranslation();
     const searchParams = useSearchParams();
     const editId = searchParams.get("id");
     const isEdit = !!editId;
@@ -59,8 +39,30 @@ function TransactionFormContent() {
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [accounts, setAccounts] = useState<any[]>([]);
 
+    const TYPES: { value: TransactionType; label: string, emoji: string }[] = [
+        { value: "income", label: t('transactions.type_income'), emoji: "💰" },
+        { value: "expense", label: t('transactions.type_expense'), emoji: "💸" },
+        { value: "sales", label: t('transactions.type_sales'), emoji: "🛒" },
+        { value: "purchase", label: t('transactions.type_purchase'), emoji: "📦" },
+        { value: "transfer", label: t('transactions.type_transfer'), emoji: "🔄" },
+        { value: "tax", label: t('transactions.type_tax'), emoji: "🧾" },
+        { value: "shipping", label: t('transactions.type_shipping'), emoji: "🚚" },
+    ];
+
+    const PAYMENT_METHODS: { value: PaymentMethod; label: string, emoji: string }[] = [
+        { value: "cash", label: t('transactions.payment_cash'), emoji: "💵" },
+        { value: "bank", label: t('transactions.payment_bank'), emoji: "🏦" },
+        { value: "online", label: t('transactions.payment_online'), emoji: "💳" },
+    ];
+
+    const STATUSES: { value: TransactionStatus; label: string; color: string }[] = [
+        { value: "completed", label: t('transactions.status_completed'), color: "from-emerald-500 to-green-600" },
+        { value: "pending", label: t('transactions.status_pending'), color: "from-amber-500 to-yellow-600" },
+        { value: "cancelled", label: t('transactions.status_cancelled'), color: "from-rose-500 to-red-600" },
+    ];
+
     const [form, setForm] = useState({
-        type: "expense" as TransactionType,
+        type: (searchParams.get("type") as TransactionType) || ("expense" as TransactionType),
         amount: "",
         date: new Date().toISOString().split("T")[0],
         payment_method: "cash" as PaymentMethod,
@@ -68,7 +70,7 @@ function TransactionFormContent() {
         category_id: "",
         contact_id: "",
         description: "",
-        reference_number: "Manual",
+        reference_number: t('transactions.field_reference_manual') || "Manual",
         tax_id: "",
         account_id: "",
     });
@@ -114,10 +116,10 @@ function TransactionFormContent() {
                         account_id: tx.account_id ? String(tx.account_id) : "",
                     });
                 })
-                .catch(() => toast.error("Failed to load transaction"))
+                .catch(() => toast.error(t('transactions.error_save') || "Failed to load transaction"))
                 .finally(() => setLoading(false));
         }
-    }, [currentCompany, editId, isEdit]);
+    }, [currentCompany, editId, isEdit, t]);
 
     const set = (key: string, value: string) => setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -125,7 +127,7 @@ function TransactionFormContent() {
         e.preventDefault();
         if (!currentCompany) return;
         if (!form.amount || isNaN(Number(form.amount))) {
-            toast.error("Please enter a valid amount");
+            toast.error(t('transactions.error_invalid_amount') || "Please enter a valid amount");
             return;
         }
 
@@ -147,14 +149,14 @@ function TransactionFormContent() {
         try {
             if (isEdit) {
                 await TransactionService.update(Number(editId), payload);
-                toast.success("Transaction updated successfully");
+                toast.success(t('transactions.success_update') || "Transaction updated successfully");
             } else {
                 await TransactionService.create(payload);
-                toast.success("Transaction recorded successfully");
+                toast.success(t('transactions.success_create') || "Transaction recorded successfully");
             }
             router.push("/transactions");
         } catch {
-            toast.error("Failed to save transaction");
+            toast.error(t('transactions.error_save') || "Failed to save transaction");
         } finally {
             setSubmitting(false);
         }
@@ -171,7 +173,7 @@ function TransactionFormContent() {
     const isIncome = ["income", "sales"].includes(form.type);
 
     return (
-        <div className="p-4 md:p-8 max-w-5xl mx-auto animate-in fade-in duration-700 pb-20">
+        <div className="w-full p-4 md:p-6 animate-in fade-in duration-700 pb-20">
             {/* Back */}
             <button
                 onClick={() => router.push("/transactions")}
@@ -180,7 +182,7 @@ function TransactionFormContent() {
                 <span className="h-8 w-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/30 transition-colors">
                     <ArrowLeft size={16} className="group-hover:text-emerald-600" />
                 </span>
-                Back to Transactions
+                {t('transactions.back_to_list')}
             </button>
 
             {/* Header */}
@@ -190,10 +192,10 @@ function TransactionFormContent() {
                 </div>
                 <div>
                     <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-500 bg-clip-text text-transparent tracking-tighter uppercase italic leading-none">
-                        {isEdit ? "Edit Transaction" : "New Transaction"}
+                        {isEdit ? t('transactions.edit_title') : t('transactions.new_title')}
                     </h1>
                     <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium mt-1">
-                        {isEdit ? "Update the transaction details below." : "Record a new income or expense transaction."}
+                        {isEdit ? t('transactions.edit_subtitle') : t('transactions.new_subtitle')}
                     </p>
                 </div>
             </div>
@@ -201,20 +203,20 @@ function TransactionFormContent() {
             <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Transaction Type Selector */}
                 <div className="bg-white dark:bg-zinc-900/50 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-lg p-6 md:p-8">
-                    <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-4">Transaction Type</h3>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-4">{t('transactions.section_type')}</h3>
                     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
-                        {TYPES.map((t) => (
+                        {TYPES.map((type) => (
                             <button
-                                key={t.value}
+                                key={type.value}
                                 type="button"
-                                onClick={() => set("type", t.value)}
-                                className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 font-bold text-xs transition-all ${form.type === t.value
+                                onClick={() => set("type", type.value)}
+                                className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 font-bold text-xs transition-all ${form.type === type.value
                                     ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 scale-105 shadow-md"
                                     : "border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:border-zinc-400 dark:hover:border-zinc-600"
                                     }`}
                             >
-                                <span className="text-xl">{t.label.split(" ")[0]}</span>
-                                <span className="uppercase tracking-wider text-[9px]">{t.label.split(" ")[1]}</span>
+                                <span className="text-xl">{type.emoji}</span>
+                                <span className="uppercase tracking-wider text-[9px]">{type.label}</span>
                             </button>
                         ))}
                     </div>
@@ -222,12 +224,12 @@ function TransactionFormContent() {
 
                 {/* Main Fields */}
                 <div className="bg-white dark:bg-zinc-900/50 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-lg p-6 md:p-8">
-                    <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-6">Transaction Details</h3>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-6">{t('transactions.section_details')}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                         {/* Amount */}
                         <div className="space-y-2">
                             <Label className="text-xs font-black uppercase tracking-wider text-zinc-500">
-                                Amount <span className="text-red-500">*</span>
+                                {t('transactions.field_amount')} <span className="text-red-500">*</span>
                             </Label>
                             <div className="relative">
                                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-zinc-400">
@@ -249,7 +251,7 @@ function TransactionFormContent() {
                         {/* Date */}
                         <div className="space-y-2">
                             <Label className="text-xs font-black uppercase tracking-wider text-zinc-500 flex items-center gap-1">
-                                <Calendar size={11} /> Date <span className="text-red-500">*</span>
+                                <Calendar size={11} /> {t('transactions.field_date')} <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 required
@@ -263,7 +265,7 @@ function TransactionFormContent() {
                         {/* Reference */}
                         <div className="space-y-2">
                             <Label className="text-xs font-black uppercase tracking-wider text-zinc-500 flex items-center gap-1">
-                                <Hash size={11} /> Reference Number
+                                <Hash size={11} /> {t('transactions.field_reference')}
                             </Label>
                             <Input
                                 placeholder="INV-2024-001"
@@ -276,14 +278,14 @@ function TransactionFormContent() {
                         {/* Category */}
                         <div className="space-y-2">
                             <Label className="text-xs font-black uppercase tracking-wider text-zinc-500 flex items-center gap-1">
-                                <Tag size={11} /> Category
+                                <Tag size={11} /> {t('transactions.field_category')}
                             </Label>
                             <select
                                 value={form.category_id}
                                 onChange={(e) => set("category_id", e.target.value)}
                                 className="w-full h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm font-semibold px-3 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                             >
-                                <option value="">— Select Category —</option>
+                                <option value="">— {t('transactions.select_category')} —</option>
                                 {categories.map((c) => (
                                     <option key={c.id} value={c.id}>{c.name}</option>
                                 ))}
@@ -293,14 +295,14 @@ function TransactionFormContent() {
                         {/* Contact */}
                         <div className="space-y-2">
                             <Label className="text-xs font-black uppercase tracking-wider text-zinc-500 flex items-center gap-1">
-                                <User size={11} /> Contact / Party
+                                <User size={11} /> {t('transactions.field_contact')}
                             </Label>
                             <select
                                 value={form.contact_id}
                                 onChange={(e) => set("contact_id", e.target.value)}
                                 className="w-full h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm font-semibold px-3 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                             >
-                                <option value="">— Select Contact —</option>
+                                <option value="">— {t('transactions.select_contact')} —</option>
                                 {contacts.map((c) => (
                                     <option key={c.id} value={c.id}>{c.name}</option>
                                 ))}
@@ -310,7 +312,7 @@ function TransactionFormContent() {
                         {/* Payment Method */}
                         <div className="space-y-2">
                             <Label className="text-xs font-black uppercase tracking-wider text-zinc-500 flex items-center gap-1">
-                                <CreditCard size={11} /> Payment Method <span className="text-red-500">*</span>
+                                <CreditCard size={11} /> {t('transactions.field_payment_method')} <span className="text-red-500">*</span>
                             </Label>
                             <select
                                 required
@@ -319,7 +321,7 @@ function TransactionFormContent() {
                                 className="w-full h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm font-semibold px-3 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                             >
                                 {PAYMENT_METHODS.map((pm) => (
-                                    <option key={pm.value} value={pm.value}>{pm.label}</option>
+                                    <option key={pm.value} value={pm.value}>{pm.emoji} {pm.label}</option>
                                 ))}
                             </select>
                         </div>
@@ -327,7 +329,7 @@ function TransactionFormContent() {
                         {/* Account */}
                         <div className="space-y-2">
                             <Label className="text-xs font-black uppercase tracking-wider text-zinc-500 flex items-center gap-1">
-                                <CreditCard size={11} /> Account <span className="text-red-500">*</span>
+                                <CreditCard size={11} /> {t('transactions.field_account')} <span className="text-red-500">*</span>
                             </Label>
                             <select
                                 required
@@ -335,7 +337,7 @@ function TransactionFormContent() {
                                 onChange={(e) => set("account_id", e.target.value)}
                                 className="w-full h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm font-semibold px-3 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                             >
-                                <option value="">— Select Account —</option>
+                                <option value="">— {t('transactions.select_account')} —</option>
                                 {accounts.map((acc) => (
                                     <option key={acc.id} value={acc.id}>{acc.name}</option>
                                 ))}
@@ -346,11 +348,11 @@ function TransactionFormContent() {
                     {/* Description */}
                     <div className="mt-5 space-y-2">
                         <Label className="text-xs font-black uppercase tracking-wider text-zinc-500 flex items-center gap-1">
-                            <FileText size={11} /> Description / Notes
+                            <FileText size={11} /> {t('transactions.field_description')}
                         </Label>
                         <textarea
                             rows={3}
-                            placeholder="Optional description or notes about this transaction..."
+                            placeholder={t('transactions.field_description')}
                             value={form.description}
                             onChange={(e) => set("description", e.target.value)}
                             className="w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm font-medium px-4 py-3 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
@@ -360,20 +362,20 @@ function TransactionFormContent() {
 
                 {/* Status */}
                 <div className="bg-white dark:bg-zinc-900/50 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-lg p-6 md:p-8">
-                    <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-4">Transaction Status</h3>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-4">{t('transactions.section_status')}</h3>
                     <div className="flex flex-wrap gap-3">
-                        {STATUSES.map((s) => (
+                        {STATUSES.map((status) => (
                             <button
-                                key={s.value}
+                                key={status.value}
                                 type="button"
-                                onClick={() => set("status", s.value)}
-                                className={`flex items-center gap-2 px-6 h-12 rounded-full border-2 font-bold text-sm transition-all ${form.status === s.value
-                                    ? `bg-gradient-to-r ${s.color} text-white border-transparent shadow-md scale-105`
+                                onClick={() => set("status", status.value)}
+                                className={`flex items-center gap-2 px-6 h-12 rounded-full border-2 font-bold text-sm transition-all ${form.status === status.value
+                                    ? `bg-gradient-to-r ${status.color} text-white border-transparent shadow-md scale-105`
                                     : "border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:border-zinc-400"
                                     }`}
                             >
-                                <span className={`h-2 w-2 rounded-full ${form.status === s.value ? "bg-white" : "bg-zinc-400"}`} />
-                                {s.label}
+                                <span className={`h-2 w-2 rounded-full ${form.status === status.value ? "bg-white" : "bg-zinc-400"}`} />
+                                {status.label}
                             </button>
                         ))}
                     </div>
@@ -387,7 +389,7 @@ function TransactionFormContent() {
                         onClick={() => router.push("/transactions")}
                         className="h-12 px-8 rounded-full font-bold border-zinc-300 dark:border-zinc-700"
                     >
-                        Cancel
+                        {t('common.cancel') || "Cancel"}
                     </Button>
                     <Button
                         type="submit"
@@ -395,7 +397,7 @@ function TransactionFormContent() {
                         className="h-12 px-10 rounded-full font-black uppercase italic tracking-tighter bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-500 text-white border-0 shadow-lg shadow-emerald-500/25 hover:scale-[1.02] active:scale-95 transition-all"
                     >
                         {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-                        {isEdit ? "Update Transaction" : "Save Transaction"}
+                        {isEdit ? t('transactions.update_transaction') : t('transactions.save_transaction')}
                     </Button>
                 </div>
             </form>

@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle2, Mail } from "lucide-react";
 import { cn, getAssetUrl } from "@/lib/utils";
 import logoImg from "@/assets/logo.png";
 import bgImg from "@/assets/auth-bg.png";
@@ -40,6 +40,8 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export default function RegisterPage() {
     const router = useRouter();
     const { user, setUser, currentCompany, refreshCompany } = useAuthStore();
+    const [registrationSuccess, setRegistrationSuccess] = useState(false);
+    const [registeredEmail, setRegisteredEmail] = useState("");
 
     useEffect(() => {
         // Fetch company info for the logo
@@ -72,15 +74,103 @@ export default function RegisterPage() {
     async function onSubmit(data: RegisterFormValues) {
         setLoading(true);
         try {
-            const response = await AuthService.register(data);
-            setUser(response.user);
-            toast.success("Account created successfully!");
-            window.location.href = "/dashboard";
+            await AuthService.register(data);
+            setRegisteredEmail(data.email);
+            setRegistrationSuccess(true);
+            toast.success("Account created! Check your email for verification.");
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Something went wrong");
         } finally {
             setLoading(false);
         }
+    }
+
+    // Success state - show verification message
+    if (registrationSuccess) {
+        return (
+            <>
+                <div className="w-full max-w-md my-8">
+                    <div className="flex flex-col items-center mb-8">
+                        <div className="relative w-24 h-24 mb-4 drop-shadow-2xl group transition-transform hover:scale-105 duration-300">
+                            <div className="absolute inset-0 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-inner" />
+                            <Image
+                                src={companyLogo || logoImg}
+                                alt={currentCompany?.name || "Hurpori Logo"}
+                                fill
+                                className="object-contain p-2 relative z-20"
+                                priority
+                                unoptimized={!!companyLogo}
+                            />
+                        </div>
+                        <div className="bg-black/30 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/20 shadow-xl text-center">
+                            <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-amber-400 via-indigo-400 to-pink-400 bg-clip-text text-transparent drop-shadow-md">
+                                Hurpori POS Software
+                            </h1>
+                            <p className="text-zinc-100 mt-1 font-medium text-sm max-w-[280px]">
+                                Tailored Technology for the Modern Boutique
+                            </p>
+                        </div>
+                    </div>
+
+                    <Card className="border-0 shadow-2xl bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl transition-all duration-300">
+                        <CardContent className="p-8 text-center space-y-6">
+                            <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-xl shadow-emerald-500/20 animate-in zoom-in duration-500">
+                                <Mail className="h-10 w-10 text-white" />
+                            </div>
+                            <div className="space-y-2">
+                                <h2 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
+                                    Check Your Email
+                                </h2>
+                                <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
+                                    We&apos;ve sent a verification link to{" "}
+                                    <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                                        {registeredEmail}
+                                    </span>
+                                    . Please click the link to verify your email address.
+                                </p>
+                            </div>
+
+                            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 text-left">
+                                <p className="text-sm text-amber-800 dark:text-amber-300 font-medium">
+                                    📋 <strong>What happens next?</strong>
+                                </p>
+                                <ol className="text-sm text-amber-700 dark:text-amber-400 mt-2 space-y-1 list-decimal list-inside">
+                                    <li>Verify your email by clicking the link</li>
+                                    <li>Wait for admin to activate your account</li>
+                                    <li>You&apos;ll be able to login once activated</li>
+                                </ol>
+                            </div>
+
+                            <div className="pt-2 space-y-3">
+                                <Button
+                                    onClick={() => router.push("/login")}
+                                    className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all py-6 text-base font-semibold border-0"
+                                >
+                                    Go to Login
+                                </Button>
+                                <button
+                                    onClick={async () => {
+                                        try {
+                                            await AuthService.resendVerification(registeredEmail);
+                                            toast.success("Verification email resent!");
+                                        } catch {
+                                            toast.error("Failed to resend. Please try again later.");
+                                        }
+                                    }}
+                                    className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 font-medium transition-colors"
+                                >
+                                    Didn&apos;t receive the email? Resend verification
+                                </button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <div className="mt-8 text-center text-sm text-zinc-500 dark:text-zinc-400 z-10">
+                    &copy; {new Date().getFullYear()} Hurpori POS Software. All rights reserved.
+                </div>
+            </>
+        );
     }
 
     return (

@@ -1,0 +1,5 @@
+{
+  "sales.total_payable": "সর্বমোট প্রদেয়",
+  "sales.select_warehouse_customer_warning": "অনুগ্রহ করে প্রথমে গুদাম এবং গ্রাহক নির্বাচন করুন।",
+  "sales.out_of_stock": "পণ্যটি স্টকে নেই!"
+}

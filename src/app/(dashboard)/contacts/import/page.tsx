@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ContactService } from "@/lib/contact-service";
 import { useAuthStore } from "@/lib/store";
+import { useTranslation } from "@/i18n/TranslationContext";
 import { Button } from "@/components/ui/button";
 import {
     ArrowLeftCircle,
@@ -22,6 +23,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 function ImportContent() {
+    const { t } = useTranslation();
     const searchParams = useSearchParams();
     const router = useRouter();
     const { currentCompany } = useAuthStore();
@@ -39,17 +41,17 @@ function ImportContent() {
 
     const handleImport = async () => {
         if (!currentCompany || !file) {
-            toast.error("Please select a file first");
+            toast.error(t('contacts.select_file_first'));
             return;
         }
 
         setImporting(true);
         try {
             await ContactService.import(currentCompany.id, isCustomer ? 'customer' : 'vendor', file);
-            toast.success(`${isCustomer ? 'Customers' : 'Suppliers'} imported successfully!`);
+            toast.success(isCustomer ? t('contacts.customers_imported') : t('contacts.suppliers_imported'));
             router.push(`/contacts/${isCustomer ? 'customers' : 'suppliers'}`);
         } catch (error) {
-            toast.error("Failed to import contacts. Please check file format.");
+            toast.error(t('contacts.import_failed'));
         } finally {
             setImporting(false);
         }
@@ -66,23 +68,18 @@ function ImportContent() {
     };
 
     return (
-        <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-700">
+        <div className="w-full p-4 md:p-6 space-y-8 animate-in fade-in duration-700 pb-20">
             {/* Header */}
             <div className="flex items-center gap-4">
-                <div className={cn(
-                    "h-12 w-12 rounded-2xl flex items-center justify-center text-white shadow-lg transform -rotate-3 transition-transform hover:rotate-0",
-                    isCustomer
-                        ? "bg-gradient-to-br from-amber-500 via-indigo-600 to-pink-500 shadow-orange-500/20"
-                        : "bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 shadow-indigo-500/20"
-                )}>
+                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/20 transform -rotate-3 transition-transform hover:rotate-0">
                     <ArrowLeftCircle size={28} />
                 </div>
                 <div>
-                    <h2 className="text-3xl font-black bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500 bg-clip-text text-transparent tracking-tighter uppercase py-1 leading-none">
-                        Import {isCustomer ? "Customers" : "Suppliers"}
+                    <h2 className="text-3xl font-black bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase py-1 leading-tight pt-[5px]">
+                        {isCustomer ? t('contacts.import_customers') : t('contacts.import_suppliers')}
                     </h2>
                     <p className="text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight mt-1">
-                        Bulk upload your directory using a CSV file.
+                        {t('contacts.import_subtitle')}
                     </p>
                 </div>
             </div>
@@ -94,19 +91,19 @@ function ImportContent() {
                     <CardHeader>
                         <CardTitle className="text-lg font-black flex items-center gap-2 tracking-tight">
                             <Info size={18} className="text-indigo-500" />
-                            Instructions
+                            {t('contacts.instructions')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-                        <p>1. Download the CSV template to ensure correct format.</p>
-                        <p>2. Fill in the columns: <code className="bg-zinc-100 dark:bg-zinc-800 px-1 rounded">name</code> (Required), <code className="bg-zinc-100 dark:bg-zinc-800 px-1 rounded">email</code>, <code className="bg-zinc-100 dark:bg-zinc-800 px-1 rounded">phone</code>, etc.</p>
-                        <p>3. Upload the file and confirm the import.</p>
+                        <p>{t('contacts.instruction_1')}</p>
+                        <p>{t('contacts.instruction_2')}</p>
+                        <p>{t('contacts.instruction_3')}</p>
                         <Button
                             variant="outline"
                             onClick={downloadTemplate}
                             className="w-full mt-4 rounded-xl border-2 border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 font-bold"
                         >
-                            <FileText className="mr-2 h-4 w-4" /> Template.csv
+                            <FileText className="mr-2 h-4 w-4" /> {t('contacts.template_csv')}
                         </Button>
                     </CardContent>
                 </Card>
@@ -138,10 +135,10 @@ function ImportContent() {
                                     {file ? <CheckCircle2 size={40} /> : <Upload size={40} />}
                                 </div>
                                 <h3 className="text-xl font-black tracking-tight mb-2">
-                                    {file ? file.name : "Choose CSV File"}
+                                    {file ? file.name : t('contacts.choose_csv')}
                                 </h3>
                                 <p className="text-sm text-zinc-500 font-bold max-w-xs mx-auto">
-                                    {file ? `${(file.size / 1024).toFixed(2)} KB • Ready to import` : "Drag and drop your file here or click to browse files from your computer."}
+                                    {file ? `${(file.size / 1024).toFixed(2)} KB • ${t('contacts.ready_to_import')}` : t('contacts.drag_and_drop')}
                                 </p>
                             </div>
                             {file && (
@@ -157,20 +154,15 @@ function ImportContent() {
                         <div className="mt-10 flex items-center justify-between gap-4">
                             <div className="flex items-center gap-2 text-zinc-400 text-xs font-bold uppercase tracking-widest">
                                 <AlertCircle size={14} />
-                                Max size 5MB • CSV Only
+                                {t('contacts.max_size')}
                             </div>
                             <Button
                                 disabled={!file || importing}
                                 onClick={handleImport}
-                                className={cn(
-                                    "px-10 h-14 rounded-xl font-black uppercase tracking-tighter text-lg shadow-xl transition-all",
-                                    isCustomer
-                                        ? "bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 text-white shadow-orange-500/20"
-                                        : "bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 text-white shadow-indigo-500/20"
-                                )}
+                                className="px-10 h-14 rounded-full bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 text-white shadow-lg shadow-indigo-500/25 font-black uppercase tracking-tighter text-lg transition-all hover:scale-[1.02] active:scale-95 border-0"
                             >
                                 {importing ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : <CheckCircle2 className="mr-2 h-6 w-6" />}
-                                Start Import
+                                {t('contacts.start_import')}
                             </Button>
                         </div>
                     </CardContent>

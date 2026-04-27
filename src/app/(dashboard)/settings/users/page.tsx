@@ -15,9 +15,13 @@ import {
     Phone,
     X,
     Check,
-    Loader2
+    Loader2,
+    Power,
+    PowerOff
 } from "lucide-react";
+import { useTranslation } from "@/i18n/TranslationContext";
 import { UserService, User } from "@/lib/user-service";
+import { RoleService, Role } from "@/lib/role-service";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,6 +61,8 @@ export default function UsersSettingsPage() {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [availableRoles, setAvailableRoles] = useState<Role[]>([]);
+    const { t } = useTranslation();
 
     const fetchUsers = useCallback(async () => {
         setLoading(true);
@@ -64,7 +70,7 @@ export default function UsersSettingsPage() {
             const data = await UserService.getAllUsers();
             setUsers(data);
         } catch (error) {
-            toast.error("Failed to load users");
+            toast.error(t("users.error_load"));
         } finally {
             setLoading(false);
         }
@@ -72,6 +78,7 @@ export default function UsersSettingsPage() {
 
     useEffect(() => {
         fetchUsers();
+        RoleService.getAllRoles().then(setAvailableRoles).catch(console.error);
     }, [fetchUsers]);
 
     const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -83,10 +90,10 @@ export default function UsersSettingsPage() {
         try {
             if (currentUser) {
                 await UserService.updateUser(currentUser.id, data as any);
-                toast.success("User updated successfully");
+                toast.success(t("users.success_update"));
             } else {
                 await UserService.createUser(data as any);
-                toast.success("User created successfully");
+                toast.success(t("users.success_add"));
             }
             setIsFormOpen(false);
             fetchUsers();
@@ -103,14 +110,24 @@ export default function UsersSettingsPage() {
         setIsSubmitting(true);
         try {
             await UserService.deleteUser(deleteId);
-            toast.success("User deleted successfully");
+            toast.success(t("users.success_delete"));
             setDeleteId(null);
             setIsDeleting(false);
             fetchUsers();
         } catch (error) {
-            toast.error("Failed to delete user");
+            toast.error(t("users.error_delete"));
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const handleToggleActive = async (id: number, currentStatus: boolean) => {
+        try {
+            await UserService.toggleActive(id, !currentStatus);
+            toast.success(currentStatus ? "User deactivated successfully" : "User activated successfully");
+            fetchUsers();
+        } catch (error) {
+            toast.error("Failed to change user status");
         }
     };
 
@@ -122,7 +139,7 @@ export default function UsersSettingsPage() {
     );
 
     return (
-        <div className="max-w-6xl mx-auto space-y-6">
+        <div className="w-full p-4 md:p-6 space-y-8">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -130,8 +147,8 @@ export default function UsersSettingsPage() {
                         <UserCog size={24} />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight">Users Management</h2>
-                        <p className="text-sm text-zinc-500 dark:text-zinc-400">Manage your team accounts, roles and permissions.</p>
+                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight">{t("users.title")}</h2>
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("users.subtitle")}</p>
                     </div>
                 </div>
                 <Button
@@ -142,7 +159,7 @@ export default function UsersSettingsPage() {
                     className="bg-gradient-to-r from-amber-500 to-indigo-600 text-white rounded-full px-6 gap-2 shadow-lg shadow-orange-500/20 py-6"
                 >
                     <Plus size={18} />
-                    <span className="font-bold">Add New User</span>
+                    <span className="font-bold">{t("users.add_user")}</span>
                 </Button>
             </div>
 
@@ -151,7 +168,7 @@ export default function UsersSettingsPage() {
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                     <Input
-                        placeholder="Search by name, email, role or designation..."
+                        placeholder={t("users.search_placeholder")}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-10 rounded-xl border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 focus:ring-amber-500"
@@ -165,27 +182,28 @@ export default function UsersSettingsPage() {
                     <table className="w-full text-left">
                         <thead>
                             <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/50">
-                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">User ID</th>
-                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Name</th>
-                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Email</th>
-                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Role</th>
-                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Designation</th>
-                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Phone</th>
-                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider text-right">Action</th>
+                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">{t("users.id")}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">{t("users.name")}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">{t("users.email")}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">{t("users.role")}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">{t("users.designation")}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">{t("users.phone")}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider text-right">{t("users.action")}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={7} className="px-6 py-12 text-center text-zinc-500">
+                                    <td colSpan={8} className="px-6 py-12 text-center text-zinc-500">
                                         <Loader2 className="animate-spin mx-auto mb-2" size={24} />
-                                        Loading users...
+                                        {t("users.loading")}
                                     </td>
                                 </tr>
                             ) : filteredUsers.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="px-6 py-12 text-center text-zinc-500">
-                                        No users found.
+                                    <td colSpan={8} className="px-6 py-12 text-center text-zinc-500">
+                                        {t("users.no_users")}
                                     </td>
                                 </tr>
                             ) : (
@@ -211,6 +229,20 @@ export default function UsersSettingsPage() {
                                                 {user.role || "User"}
                                             </span>
                                         </td>
+                                        <td className="px-6 py-4">
+                                            <span className={cn(
+                                                "px-2.5 py-1 rounded-full text-xs font-bold tracking-tight inline-flex items-center gap-1",
+                                                user.is_active 
+                                                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" 
+                                                    : "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
+                                            )}>
+                                                {user.is_active ? (
+                                                    <><Check size={12} /> Active</>
+                                                ) : (
+                                                    <><X size={12} /> Inactive</>
+                                                )}
+                                            </span>
+                                        </td>
                                         <td className="px-6 py-4 text-sm text-zinc-500 dark:text-zinc-400 font-medium">
                                             {user.designation || <span className="text-zinc-300 italic">—</span>}
                                         </td>
@@ -233,7 +265,17 @@ export default function UsersSettingsPage() {
                                                         className="gap-2.5 rounded-lg cursor-pointer"
                                                     >
                                                         <Edit2 size={14} className="text-indigo-500" />
-                                                        <span className="text-xs font-bold">Edit User</span>
+                                                        <span className="text-xs font-bold">{t("users.edit_user")}</span>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleToggleActive(user.id, !!user.is_active)}
+                                                        className="gap-2.5 rounded-lg cursor-pointer"
+                                                    >
+                                                        {user.is_active ? (
+                                                            <><PowerOff size={14} className="text-amber-500" /><span className="text-xs font-bold text-amber-600 dark:text-amber-400">Deactivate</span></>
+                                                        ) : (
+                                                            <><Power size={14} className="text-emerald-500" /><span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">Activate</span></>
+                                                        )}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
                                                         onClick={() => {
@@ -243,7 +285,7 @@ export default function UsersSettingsPage() {
                                                         className="gap-2.5 rounded-lg cursor-pointer text-red-600 focus:text-red-600"
                                                     >
                                                         <Trash2 size={14} />
-                                                        <span className="text-xs font-bold">Delete</span>
+                                                        <span className="text-xs font-bold">{t("users.delete")}</span>
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -261,61 +303,61 @@ export default function UsersSettingsPage() {
                 <DialogContent className="max-w-md rounded-2xl p-0 overflow-hidden border-0">
                     <form onSubmit={handleSave}>
                         <div className="bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 p-6 text-white">
-                            <DialogTitle className="text-xl font-extrabold tracking-tight">{currentUser ? "Edit User Account" : "Create New User"}</DialogTitle>
-                            <DialogDescription className="text-white/80 text-sm mt-1">{currentUser ? "Modify user details below." : "Enter details for the new team member."}</DialogDescription>
+                            <DialogTitle className="text-xl font-extrabold tracking-tight">{currentUser ? t("users.edit_user_title") : t("users.create_user_title")}</DialogTitle>
+                            <DialogDescription className="text-white/80 text-sm mt-1">{currentUser ? t("users.edit_desc") : t("users.create_desc")}</DialogDescription>
                         </div>
                         <div className="p-6 space-y-4 bg-white dark:bg-zinc-900">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2 col-span-2">
-                                    <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-zinc-500">Full Name</Label>
+                                    <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-zinc-500">{t("users.full_name")}</Label>
                                     <div className="relative">
                                         <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
                                         <Input id="name" name="name" defaultValue={currentUser?.name} placeholder="John Doe" className="pl-10 rounded-xl" required />
                                     </div>
                                 </div>
                                 <div className="space-y-2 col-span-2">
-                                    <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-zinc-500">Email Address</Label>
+                                    <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-zinc-500">{t("users.email_address")}</Label>
                                     <div className="relative">
                                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
                                         <Input id="email" name="email" type="email" defaultValue={currentUser?.email} placeholder="john@example.com" className="pl-10 rounded-xl" required />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="role" className="text-xs font-bold uppercase tracking-wider text-zinc-500">System Role</Label>
+                                    <Label htmlFor="role" className="text-xs font-bold uppercase tracking-wider text-zinc-500">{t("users.system_role")}</Label>
                                     <div className="relative">
                                         <Shield className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
                                         <select name="role" id="role" defaultValue={currentUser?.role || ""} className="w-full pl-10 h-10 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none appearance-none">
-                                            <option value="">Select Role</option>
-                                            <option value="Admin">Admin</option>
-                                            <option value="Staff">Staff</option>
-                                            <option value="Manager">Manager</option>
+                                            <option value="">{t("users.select_role")}</option>
+                                            {availableRoles.map(role => (
+                                                <option key={role.id} value={role.name}>{role.name}</option>
+                                            ))}
                                         </select>
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="designation" className="text-xs font-bold uppercase tracking-wider text-zinc-500">Designation</Label>
+                                    <Label htmlFor="designation" className="text-xs font-bold uppercase tracking-wider text-zinc-500">{t("users.designation")}</Label>
                                     <div className="relative">
                                         <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
                                         <Input id="designation" name="designation" defaultValue={currentUser?.designation} placeholder="Web Developer" className="pl-10 rounded-xl" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="phone" className="text-xs font-bold uppercase tracking-wider text-zinc-500">Phone Number</Label>
+                                    <Label htmlFor="phone" className="text-xs font-bold uppercase tracking-wider text-zinc-500">{t("users.phone_number")}</Label>
                                     <div className="relative">
                                         <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
                                         <Input id="phone" name="phone" defaultValue={currentUser?.phone} placeholder="+1 234 567 890" className="pl-10 rounded-xl" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-zinc-500">{currentUser ? "New Password (Optional)" : "Account Password"}</Label>
+                                    <Label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-zinc-500">{currentUser ? t("users.new_password") : t("users.password")}</Label>
                                     <Input id="password" name="password" type="password" placeholder="••••••••" className="rounded-xl" required={!currentUser} />
                                 </div>
                             </div>
                         </div>
                         <div className="p-6 bg-zinc-50 dark:bg-zinc-800/30 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-3">
-                            <Button type="button" variant="ghost" onClick={() => setIsFormOpen(false)} className="rounded-full px-6 font-bold">Cancel</Button>
+                            <Button type="button" variant="ghost" onClick={() => setIsFormOpen(false)} className="rounded-full px-6 font-bold">{t("common.discard")}</Button>
                             <Button type="submit" disabled={isSubmitting} className="bg-gradient-to-r from-amber-500 to-indigo-600 text-white rounded-full px-8 gap-2 shadow-lg shadow-orange-500/20 font-bold">
-                                {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : (currentUser ? "Update User" : "Save User")}
+                                {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : (currentUser ? t("users.update_user") : t("users.save_user"))}
                             </Button>
                         </div>
                     </form>
@@ -329,11 +371,11 @@ export default function UsersSettingsPage() {
                         <div className="h-12 w-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                             <Trash2 size={24} />
                         </div>
-                        <h3 className="text-lg font-extrabold tracking-tight">Delete Account?</h3>
+                        <h3 className="text-lg font-extrabold tracking-tight">{t("users.delete_title")}</h3>
                     </div>
                     <div className="p-6 text-center">
                         <p className="text-zinc-500 dark:text-zinc-400 text-sm">
-                            Are you sure you want to delete this user? This action is permanent and cannot be undone.
+                            {t("users.delete_desc")}
                         </p>
                     </div>
                     <div className="p-6 pt-0 flex flex-col gap-2">
@@ -343,14 +385,14 @@ export default function UsersSettingsPage() {
                             className="w-full bg-red-600 hover:bg-red-700 text-white rounded-full py-6 font-bold shadow-lg shadow-red-500/20"
                         >
                             {isSubmitting ? <Loader2 className="animate-spin mr-2" /> : null}
-                            Confirm Delete
+                            {t("users.confirm_delete")}
                         </Button>
                         <Button
                             variant="ghost"
                             onClick={() => setIsDeleting(false)}
                             className="w-full rounded-full py-6 font-bold text-zinc-400"
                         >
-                            Wait, Keep it
+                            {t("users.keep_user")}
                         </Button>
                     </div>
                 </AlertDialogContent>

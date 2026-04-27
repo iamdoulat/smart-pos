@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
+import { useTranslation } from '@/i18n/TranslationContext';
 import { ProductService } from "@/lib/product-service";
 import { ContactService } from "@/lib/contact-service";
 import { SaleService } from "@/lib/sales-purchase-service";
@@ -60,6 +61,7 @@ const QST_RATE = 0.09975;
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || "http://localhost:8000";
 
 export default function POSTerminalPage() {
+    const { t } = useTranslation();
     const router = useRouter();
     const { currentCompany, refreshCompany } = useAuthStore();
     const [loading, setLoading] = useState(false);
@@ -79,7 +81,7 @@ export default function POSTerminalPage() {
     const [sendEmail, setSendEmail] = useState(true);
     const [emailConfig, setEmailConfig] = useState<any>(null);
 
-    const [customerName, setCustomerName] = useState("Walk-in Customer");
+    const [customerName, setCustomerName] = useState(t('pos.walk_in_customer'));
     const [customerMobile, setCustomerMobile] = useState("");
     const [customerEmail, setCustomerEmail] = useState("");
     const [discount, setDiscount] = useState<number | "">(0);
@@ -146,7 +148,7 @@ export default function POSTerminalPage() {
                 }).catch(() => { });
 
             }).catch(() => {
-                toast.error("Failed to load generic data");
+                toast.error(t('common.error_generic_data') || "Failed to load generic data");
             });
 
             // 2. Fetch products separately so the UI isn't blocked by a large inventory payload
@@ -154,7 +156,7 @@ export default function POSTerminalPage() {
             ProductService.getAll(currentCompany.id).then(productsData => {
                 setProducts(productsData);
             }).catch(() => {
-                toast.error("Failed to load products");
+                toast.error(t('common.error_products') || "Failed to load products");
             }).finally(() => {
                 setProductsLoading(false);
             });
@@ -179,7 +181,7 @@ export default function POSTerminalPage() {
 
     // Live Customer Search Logic
     useEffect(() => {
-        const query = (customerName === "Walk-in Customer" ? "" : customerName) || customerMobile;
+        const query = (customerName === t('pos.walk_in_customer') ? "" : customerName) || customerMobile;
         if (query.length >= 3) {
             const results = customers.filter(c =>
                 c.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -217,7 +219,7 @@ export default function POSTerminalPage() {
     // Cart Logic
     const addToCart = (product: any) => {
         if (product.stock_quantity <= 0) {
-            toast.error("Product is out of stock!");
+            toast.error(t('inventory.out_of_stock') || "Product is out of stock!");
             return;
         }
 
@@ -275,7 +277,7 @@ export default function POSTerminalPage() {
             let customerId = selectedCustomer?.id || null;
 
             // Auto-persist customer info if it's not the default Walk-in Customer
-            if (customerName && customerName !== "Walk-in Customer" && !customerName.toLowerCase().includes('walk-in')) {
+            if (customerName && customerName !== t('pos.walk_in_customer') && !customerName.toLowerCase().includes('walk-in')) {
                 const customerData = {
                     company_id: currentCompany.id,
                     type: 'customer' as const,
@@ -358,7 +360,7 @@ export default function POSTerminalPage() {
                     paid_amount: Number(checkoutPaidAmount),
                     sales_date: new Date().toISOString().split('T')[0],
                     company_name: currentCompany.name,
-                }).catch(() => toast.warning("Invoice saved, but WhatsApp failed."));
+                }).catch(() => toast.warning(t('common.whatsapp_failed') || "Invoice saved, but WhatsApp failed."));
             }
 
             // Send Email
@@ -377,10 +379,10 @@ export default function POSTerminalPage() {
                         unit_price: item.cart_price || item.sales_price,
                         total_amount: (item.cart_price || item.sales_price) * item.quantity
                     }))
-                }).catch(() => toast.warning("Invoice saved, but Email failed."));
+                }).catch(() => toast.warning(t('common.email_failed') || "Invoice saved, but Email failed."));
             }
 
-            toast.success("Sale completed successfully!");
+            toast.success(t('pos.payment_success') || "Sale completed successfully!");
             setCart([]);
             setIsConfirmOpen(false);
             setIsReceiptOpen(true);
@@ -429,7 +431,7 @@ export default function POSTerminalPage() {
     };
 
     return (
-        <div className="flex h-[calc(100vh-64px)] gap-4 overflow-hidden p-4 bg-slate-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans selection:bg-indigo-500/10">
+        <div className="flex h-[calc(100vh-64px)] gap-4 overflow-hidden p-4 md:p-6 bg-slate-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans selection:bg-indigo-500/10">
             <style jsx global>{`
                 .scrollbar-visible::-webkit-scrollbar {
                     width: 6px;
@@ -485,7 +487,7 @@ export default function POSTerminalPage() {
                             <input
                                 type="text"
                                 className="flex-1 bg-transparent border-none focus:outline-none font-bold text-slate-700 dark:text-zinc-100 text-sm placeholder:text-slate-300 dark:placeholder:text-zinc-500 w-full"
-                                placeholder="Search by name or mobile..."
+                                placeholder={t('pos.customer_placeholder')}
                                 value={customerName}
                                 onChange={(e) => {
                                     setCustomerName(e.target.value);
@@ -517,8 +519,8 @@ export default function POSTerminalPage() {
                                                         CID-{customer.id.toString().padStart(3, '0')}
                                                     </span>
                                                 </div>
-                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                                                    {customer.mobile || customer.phone || "No Mobile"}
+                                                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                                                    {customer.mobile || customer.phone || t('contacts.no_mobile')}
                                                 </span>
                                             </div>
                                             {customer.email && (
@@ -539,11 +541,11 @@ export default function POSTerminalPage() {
                         )}
 
                         <div className="relative group px-4 h-12 rounded-xl bg-white border border-slate-200 flex items-center gap-2 shadow-sm focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all overflow-hidden pr-2">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500 w-16 shrink-0">Mobile</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500 w-16 shrink-0">{t('pos.mobile')}</span>
                             <input
                                 type="text"
                                 className="flex-1 bg-transparent border-none focus:outline-none font-medium text-slate-700 dark:text-zinc-100 text-sm placeholder:text-slate-300 dark:placeholder:text-zinc-500 w-full"
-                                placeholder="Enter mobile"
+                                placeholder={t('contacts.enter_mobile')}
                                 value={customerMobile}
                                 onChange={(e) => setCustomerMobile(e.target.value)}
                             />
@@ -556,7 +558,7 @@ export default function POSTerminalPage() {
                                         onChange={(e) => setSendWhatsapp(e.target.checked)}
                                         disabled={!customerMobile}
                                         className="h-4 w-4 rounded border-green-500 cursor-pointer accent-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                        title={customerMobile ? "Send WhatsApp Notification" : "Enter mobile number to enable WhatsApp"}
+                                        title={customerMobile ? t('pos.send_whatsapp_notification') : t('pos.enter_mobile_to_enable_whatsapp')}
                                     />
                                     <label htmlFor="pos-whatsapp" className={cn("cursor-pointer", !customerMobile && "opacity-50 cursor-not-allowed")}>
                                         <MessageCircle size={16} className={customerMobile ? "text-green-500" : "text-slate-300"} />
@@ -566,11 +568,11 @@ export default function POSTerminalPage() {
                         </div>
 
                         <div className="relative group px-4 h-12 rounded-xl bg-white border border-slate-200 flex items-center gap-2 shadow-sm focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all overflow-hidden pr-2">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-purple-500 w-16 shrink-0">Email ID</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-purple-500 w-16 shrink-0">{t('pos.email')}</span>
                             <input
                                 type="email"
                                 className="flex-1 bg-transparent border-none focus:outline-none font-medium text-slate-700 dark:text-zinc-100 text-sm placeholder:text-slate-300 dark:placeholder:text-zinc-500 w-full"
-                                placeholder="Enter email"
+                                placeholder={t('contacts.enter_email')}
                                 value={customerEmail}
                                 onChange={(e) => setCustomerEmail(e.target.value)}
                             />
@@ -583,7 +585,7 @@ export default function POSTerminalPage() {
                                         onChange={(e) => setSendEmail(e.target.checked)}
                                         disabled={!customerEmail}
                                         className="h-4 w-4 rounded border-indigo-500 cursor-pointer accent-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                        title={customerEmail ? "Send Email Notification" : "Enter email address to enable Email"}
+                                        title={customerEmail ? t('pos.send_email_notification') : t('pos.enter_email_to_enable_email')}
                                     />
                                     <label htmlFor="pos-email" className={cn("cursor-pointer", !customerEmail && "opacity-50 cursor-not-allowed")}>
                                         <Mail size={16} className={customerEmail ? "text-indigo-500" : "text-slate-300"} />
@@ -598,7 +600,7 @@ export default function POSTerminalPage() {
                             <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-3xl blur opacity-0 group-focus-within:opacity-100 transition duration-1000 group-focus-within:duration-200"></div>
                             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-indigo-600 transition-colors" size={22} />
                              <Input
-                                placeholder="Scan barcode or search products..."
+                                placeholder={t('pos.search_products')}
                                 className="h-13 pl-14 pr-12 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-slate-200 dark:border-zinc-800 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 dark:focus:border-indigo-500/50 font-medium text-lg placeholder:text-zinc-400 dark:placeholder:text-zinc-400 transition-all text-slate-900 dark:text-zinc-100"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -614,11 +616,11 @@ export default function POSTerminalPage() {
                                 <SelectTrigger className="w-[180px] h-13 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-slate-200 dark:border-zinc-800 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 dark:focus:border-indigo-500/50 font-medium transition-all text-slate-900 dark:text-zinc-100">
                                     <div className="flex items-center gap-2">
                                         <Layers size={18} className="text-indigo-600 dark:text-indigo-400" />
-                                        <SelectValue placeholder="Categories" />
+                                        <SelectValue placeholder={t('inventory.categories')} />
                                     </div>
                                 </SelectTrigger>
                                  <SelectContent className="rounded-2xl border-slate-200 dark:border-zinc-800 shadow-xl overflow-hidden p-1 bg-white dark:bg-zinc-900 text-slate-900 dark:text-zinc-100">
-                                    <SelectItem value="all" className="rounded-xl font-bold uppercase tracking-widest text-[10px] focus:bg-indigo-50 dark:focus:bg-indigo-500/10 focus:text-indigo-600 dark:focus:text-indigo-400 py-3">All Categories</SelectItem>
+                                    <SelectItem value="all" className="rounded-xl font-bold uppercase tracking-widest text-[10px] focus:bg-indigo-50 dark:focus:bg-indigo-500/10 focus:text-indigo-600 dark:focus:text-indigo-400 py-3">{t('pos.all_categories')}</SelectItem>
                                     {categories.map(cat => (
                                         <SelectItem key={cat.id} value={cat.id.toString()} className="rounded-xl font-bold uppercase tracking-widest text-[10px] focus:bg-indigo-50 focus:text-indigo-600 py-3">{cat.name}</SelectItem>
                                     ))}
@@ -629,11 +631,11 @@ export default function POSTerminalPage() {
                                 <SelectTrigger className="w-[180px] h-13 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-slate-200 dark:border-zinc-800 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 dark:focus:border-indigo-500/50 font-medium transition-all text-slate-900 dark:text-zinc-100">
                                     <div className="flex items-center gap-2">
                                         <Check size={18} className="text-purple-600 dark:text-purple-400" />
-                                        <SelectValue placeholder="Brands" />
+                                        <SelectValue placeholder={t('inventory.brands')} />
                                     </div>
                                 </SelectTrigger>
                                 <SelectContent className="rounded-2xl border-slate-200 dark:border-zinc-800 shadow-xl overflow-hidden p-1 bg-white dark:bg-zinc-900 text-slate-900 dark:text-zinc-100">
-                                    <SelectItem value="all" className="rounded-xl font-bold uppercase tracking-widest text-[10px] focus:bg-purple-50 dark:focus:bg-purple-500/10 focus:text-purple-600 dark:focus:text-purple-400 py-3">All Brands</SelectItem>
+                                    <SelectItem value="all" className="rounded-xl font-bold uppercase tracking-widest text-[10px] focus:bg-purple-50 dark:focus:bg-purple-500/10 focus:text-purple-600 dark:focus:text-purple-400 py-3">{t('pos.all_brands')}</SelectItem>
                                     {brands.map(brand => (
                                         <SelectItem key={brand.id} value={brand.id.toString()} className="rounded-xl font-bold uppercase tracking-widest text-[10px] focus:bg-purple-50 focus:text-purple-600 py-3">{brand.name}</SelectItem>
                                     ))}
@@ -652,7 +654,7 @@ export default function POSTerminalPage() {
                                     <div className="absolute inset-0 bg-indigo-500/20 blur-2xl rounded-full animate-pulse" />
                                     <Loader2 size={48} className="animate-spin text-indigo-500 relative z-10" />
                                 </div>
-                                <p className="mt-4 text-sm font-black uppercase tracking-[0.2em] text-slate-400 animate-pulse text-center">Initializing Inventory</p>
+                                <p className="mt-4 text-sm font-black uppercase tracking-[0.2em] text-slate-400 animate-pulse text-center">{t('common.loading')}</p>
                             </div>
                         ) : visibleProducts.length > 0 ? (
                             visibleProducts.map((product) => (
@@ -681,7 +683,7 @@ export default function POSTerminalPage() {
 
                                             {product.stock_quantity <= 0 ? (
                                                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] py-2 bg-red-500/90 backdrop-blur-sm text-white text-[10px] font-black uppercase tracking-[0.2em] text-center rotate-[-15deg] shadow-xl border border-red-400 z-20">
-                                                    Out of Stock
+                                                    {t('inventory.out_of_stock')}
                                                 </div>
                                             ) : (
                                                 <div className="absolute top-3 right-3 h-10 w-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center border border-slate-200 opacity-0 group-hover:opacity-100 transition duration-300 translate-y-2 group-hover:translate-y-0 text-indigo-600 shadow-sm">
@@ -693,12 +695,12 @@ export default function POSTerminalPage() {
                                             <div className="flex flex-col">
                                                 <h3 className="font-bold text-sm text-slate-800 dark:text-zinc-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1 leading-tight">{product.name}</h3>
                                                  <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-zinc-300 mt-0.5">
-                                                    {categories.find(c => c.id === product.category_id)?.name || "Apparel"}
+                                                    {categories.find(c => c.id === product.category_id)?.name || t('inventory.apparel')}
                                                 </p>
                                             </div>
                                             <div className="flex items-end justify-between mt-1">
                                                  <span className="font-black text-lg tracking-tighter text-slate-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors origin-left">
-                                                    ${product.sales_price}
+                                                    {currentCompany?.currency} {product.sales_price}
                                                 </span>
                                                 <div className={cn(
                                                     "px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider shadow-sm transition-all",
@@ -707,9 +709,9 @@ export default function POSTerminalPage() {
                                                         : "bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-indigo-500/20"
                                                 )}>
                                                     {product.stock_quantity <= 0 ? (
-                                                        "No Stock"
+                                                        t('inventory.no_stock')
                                                     ) : (
-                                                        <>Qty: {product.stock_quantity}</>
+                                                        <>{t('pos.qty')}: {product.stock_quantity}</>
                                                     )}
                                                 </div>
                                             </div>
@@ -720,7 +722,7 @@ export default function POSTerminalPage() {
                         ) : (
                             <div className="col-span-full h-80 flex flex-col items-center justify-center text-slate-300">
                                 <Search size={64} className="opacity-20 mb-6" />
-                                <p className="text-xl font-medium italic opacity-40">No items matching your criteria.</p>
+                                <p className="text-xl font-medium italic opacity-40">{t('common.no_results')}</p>
                             </div>
                         )}
                         {!productsLoading && filteredProducts.length > visibleCount && (
@@ -730,7 +732,7 @@ export default function POSTerminalPage() {
                                     onClick={() => setVisibleCount(prev => prev + 50)}
                                     className="rounded-xl font-bold uppercase tracking-widest text-indigo-600 border-indigo-200 hover:bg-indigo-50"
                                 >
-                                    Load More Products
+                                    {t('common.load_more')}
                                 </Button>
                             </div>
                         )}
@@ -740,7 +742,7 @@ export default function POSTerminalPage() {
                 {/* Payment Selection Section */}
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 shrink-0 pt-3 border-t border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/50">
                     <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl p-4 shadow-sm h-full flex flex-col gap-3">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600/70 dark:text-indigo-400/70">Quick Gateway Selection</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600/70 dark:text-indigo-400/70">{t('pos.quick_gateway')}</p>
                         <div className="grid grid-cols-4 gap-2">
                             {[
                                 { id: "Cash", icon: Banknote, color: "from-emerald-500 to-teal-600 shadow-emerald-500/20", border: "border-emerald-200", text: "text-emerald-600" },
@@ -771,7 +773,7 @@ export default function POSTerminalPage() {
                                             paymentMode === method.id ? "text-white scale-110" : "text-slate-400 group-hover:text-slate-600"
                                         )}
                                     >
-                                        {method.id}
+                                        {method.id === "Cash" ? t('pos.payment_cash') : method.id === "Card" ? t('pos.payment_card') : method.id}
                                     </span>
                                 </button>
                             ))}
@@ -782,7 +784,7 @@ export default function POSTerminalPage() {
                         <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-slate-300 dark:text-zinc-600 group-hover:text-indigo-400 transition-colors">
                             <Plus size={20} />
                         </div>
-                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-300 dark:text-zinc-600 group-hover:text-slate-400 dark:group-hover:text-zinc-500 transition-colors italic">Reserved Space</p>
+                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-300 dark:text-zinc-600 group-hover:text-slate-400 dark:group-hover:text-zinc-500 transition-colors italic">{t('pos.reserved_space')}</p>
                     </div>
                 </div>
             </div>
@@ -802,14 +804,14 @@ export default function POSTerminalPage() {
                                     </div>
                                 </div>
                                  <div>
-                                    <h2 className="text-xl font-black italic uppercase tracking-tight bg-gradient-to-r from-blue-600 via-purple-600 to-rose-500 bg-clip-text text-transparent pr-1 truncate">Shopping Cart</h2>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-500 mt-1">{cart.length} Items</p>
+                                    <h2 className="text-xl font-black italic uppercase tracking-tight bg-gradient-to-r from-blue-600 via-purple-600 to-rose-500 bg-clip-text text-transparent pr-1 truncate">{t('pos.cart_title')}</h2>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-500 mt-1">{cart.length} {t('pos.item')}</p>
                                 </div>
                             </div>
                              <button
                                 onClick={() => setCart([])}
                                 className="h-10 w-10 rounded-2xl bg-white dark:bg-zinc-800 border border-rose-100 dark:border-rose-900/30 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-200 dark:hover:border-rose-800 shadow-lg shadow-rose-500/10 hover:shadow-xl hover:shadow-rose-500/20 flex items-center justify-center transition-all group/clear text-rose-400"
-                                title="Clear Cart"
+                                title={t('pos.clear_cart')}
                             >
                                 <Trash2 size={16} className="group-hover/clear:scale-110 transition-transform" />
                             </button>
@@ -852,7 +854,7 @@ export default function POSTerminalPage() {
                                                 <div className="flex items-center gap-1 group/price relative">
                                                     <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest">x</span>
                                                     <div className="relative">
-                                                        <span className="absolute left-1 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400">$</span>
+                                                        <span className="absolute left-1 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400">{currentCompany?.currency}</span>
                                                      <input
                                                             type="number"
                                                             className="w-16 h-6 pl-3.5 pr-1 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg text-[10px] font-black text-slate-600 dark:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 dark:focus:border-indigo-500/50 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -863,7 +865,7 @@ export default function POSTerminalPage() {
                                                     </div>
                                                 </div>
                                             </div>
-                                             <span className="font-black text-slate-900 dark:text-zinc-100 italic text-sm">${((item.cart_price || item.sales_price) * item.quantity).toFixed(2)}</span>
+                                             <span className="font-black text-slate-900 dark:text-zinc-100 italic text-sm">{currentCompany?.currency} {((item.cart_price || item.sales_price) * item.quantity).toFixed(2)}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -871,7 +873,7 @@ export default function POSTerminalPage() {
                             {cart.length === 0 && (
                                  <div className="h-80 flex flex-col items-center justify-center text-slate-300 dark:text-zinc-500">
                                     <ShoppingCart size={80} className="opacity-20 mb-6" />
-                                    <p className="font-bold italic uppercase tracking-widest text-[10px] opacity-100 dark:text-zinc-200">Cart is empty</p>
+                                    <p className="font-bold italic uppercase tracking-widest text-[10px] opacity-100 dark:text-zinc-200">{t('pos.empty_cart')}</p>
                                 </div>
                             )}
                         </div>
@@ -879,23 +881,23 @@ export default function POSTerminalPage() {
 
                      <div className="p-6 bg-white dark:bg-zinc-900 border-t border-slate-200 dark:border-zinc-800 space-y-4 shrink-0 shadow-[0_-8px_30px_rgb(0,0,0,0.04)] dark:shadow-none">
                         <div className="space-y-2">
-                             <h3 className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-zinc-400">Order Summary</h3>
+                             <h3 className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-zinc-400">{t('pos.summary')}</h3>
                             <div className="space-y-1">
                                 <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-200 tracking-tight">
-                                    <span>Subtotal</span>
-                                    <span className="text-slate-900 dark:text-zinc-100 font-black">${totals.subtotal.toFixed(2)}</span>
+                                    <span>{t('pos.subtotal')}</span>
+                                    <span className="text-slate-900 dark:text-zinc-100 font-black">{currentCompany?.currency} {totals.subtotal.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-200 tracking-tight">
-                                    <span>GST (5.00%)</span>
-                                    <span className="text-slate-900 dark:text-zinc-100 font-black">${totals.gst.toFixed(2)}</span>
+                                    <span>{t('pos.tax')} (GST 5.00%)</span>
+                                    <span className="text-slate-900 dark:text-zinc-100 font-black">{currentCompany?.currency} {totals.gst.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-200 tracking-tight">
-                                    <span>QST (9.975%)</span>
-                                    <span className="text-slate-900 dark:text-zinc-100 font-black">${totals.qst.toFixed(2)}</span>
+                                    <span>{t('pos.tax')} (QST 9.975%)</span>
+                                    <span className="text-slate-900 dark:text-zinc-100 font-black">{currentCompany?.currency} {totals.qst.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-zinc-200 tracking-tight">
                                     <div className="flex items-center gap-2">
-                                        <span>Discount</span>
+                                        <span>{t('pos.discount')}</span>
                                         <input
                                             type="number"
                                             className="w-16 h-5 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded px-1 text-[9px] font-black focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -904,15 +906,15 @@ export default function POSTerminalPage() {
                                             placeholder="0.00"
                                         />
                                     </div>
-                                    <span className="text-rose-600 dark:text-rose-400 font-black">-${Number(discount).toFixed(2)}</span>
+                                    <span className="text-rose-600 dark:text-rose-400 font-black">-{currentCompany?.currency} {Number(discount).toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex justify-between items-center group/total py-2 text-slate-900 dark:text-zinc-100">
-                              <span className="text-xl font-black italic uppercase tracking-tighter text-slate-400 dark:text-zinc-100 group-hover/total:text-indigo-600 dark:group-hover/total:text-indigo-400 transition-colors">Grand Total</span>
+                              <span className="text-xl font-black italic uppercase tracking-tighter text-slate-400 dark:text-zinc-100 group/total:text-indigo-600 dark:group-hover/total:text-indigo-400 transition-colors">{t('pos.total_payable')}</span>
                             <span className="text-2xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent italic tracking-tight transition-all pr-1">
-                                ${totals.total.toFixed(2)}
+                                {currentCompany?.currency} {totals.total.toFixed(2)}
                             </span>
                         </div>
 
@@ -928,7 +930,7 @@ export default function POSTerminalPage() {
                                 ) : (
                                     <>
                                         <CreditCard size={20} className="text-white group-hover/pay:rotate-12 transition-transform" />
-                                        <span className="text-lg font-black italic uppercase tracking-[0.1em] text-white">COMPLETE SALE</span>
+                                        <span className="text-lg font-black italic uppercase tracking-[0.1em] text-white">{t('pos.checkout')}</span>
                                     </>
                                 )}
                             </div>
@@ -941,39 +943,39 @@ export default function POSTerminalPage() {
             <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
                 <DialogContent className="max-w-md bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-[40px] p-8 shadow-2xl text-slate-900 dark:text-zinc-100 max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle className="text-center font-black uppercase tracking-tighter text-3xl italic text-slate-900 dark:text-zinc-100 leading-none">Confirm <span className="text-indigo-600 dark:text-indigo-400">Checkout</span></DialogTitle>
+                        <DialogTitle className="text-center font-black uppercase tracking-tighter text-3xl italic text-slate-900 dark:text-zinc-100 leading-none">{t('pos.confirm')} <span className="text-indigo-600 dark:text-indigo-400">{t('pos.checkout')}</span></DialogTitle>
                     </DialogHeader>
 
                     <div className="space-y-6 mt-6">
                         {/* Summary Card */}
                         <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100 flex flex-col gap-3">
                             <div className="flex justify-between items-center opacity-40">
-                                <span className="text-[10px] font-black uppercase tracking-widest leading-none">Subtotal</span>
-                                <span className="text-[10px] font-black uppercase tracking-widest leading-none">Items: {cart.length}</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest leading-none">{t('pos.subtotal')}</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest leading-none">{t('pos.item')}: {cart.length}</span>
                             </div>
                             <div className="flex justify-between items-end border-b border-black/5 pb-3">
-                                <span className="text-xl font-black italic tracking-tighter text-slate-700 leading-none">${totals.subtotal.toFixed(2)}</span>
+                                <span className="text-xl font-black italic tracking-tighter text-slate-700 leading-none">{currentCompany?.currency} {totals.subtotal.toFixed(2)}</span>
                             </div>
 
                             <div className="flex justify-between items-center mt-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Discount</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t('pos.discount')}</label>
                                 <div className="relative w-32 group/discount">
-                                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within/discount:text-indigo-600 font-black">$</div>
-                                    <Input
+                                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within/discount:text-indigo-600 font-black">{currentCompany?.currency}</div>
+                                    <input
                                         type="number"
                                         placeholder="0.00"
                                         step="0.01"
                                         value={discount}
                                         onChange={(e) => setDiscount(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                         className="h-10 pl-7 text-right rounded-xl border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 font-black text-sm pr-3 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 dark:text-zinc-100"
+                                         className="h-10 pl-7 text-right rounded-xl border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 font-black text-sm pr-3 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 dark:text-zinc-100 w-full"
                                     />
                                 </div>
                             </div>
 
                             <div className="flex justify-between items-end mt-2 pt-2 border-t border-indigo-100/50">
                                 <div>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-1 block">Grand Total</span>
-                                    <span className="text-3xl font-black italic tracking-tighter text-indigo-700 leading-none">${totals.roundedTotal.toFixed(2)}</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-1 block">{t('pos.grand_total')}</span>
+                                    <span className="text-3xl font-black italic tracking-tighter text-indigo-700 leading-none">{currentCompany?.currency} {totals.roundedTotal.toFixed(2)}</span>
                                 </div>
                                  <div className="flex items-center gap-2 bg-indigo-50/50 dark:bg-indigo-500/10 px-3 py-2 rounded-xl border border-indigo-100 dark:border-indigo-900/50">
                                     <input
@@ -983,14 +985,14 @@ export default function POSTerminalPage() {
                                         onChange={(e) => setIsRounded(e.target.checked)}
                                         className="w-4 h-4 text-indigo-600 rounded border-indigo-300 focus:ring-indigo-500 transition-all cursor-pointer accent-indigo-600"
                                     />
-                                    <label htmlFor="roundOff" className="text-[10px] font-black uppercase tracking-widest text-indigo-700 cursor-pointer select-none">Round Off</label>
+                                    <label htmlFor="roundOff" className="text-[10px] font-black uppercase tracking-widest text-indigo-700 cursor-pointer select-none">{t('pos.round_off')}</label>
                                 </div>
                             </div>
                         </div>
 
                         {/* Payment Status */}
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Payment Status</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">{t('pos.payment_status')}</label>
                             <div className="grid grid-cols-4 gap-2">
                                 {["Paid", "Partial", "Unpaid", "Split"].map((status) => (
                                     <button
@@ -1003,7 +1005,7 @@ export default function POSTerminalPage() {
                                                 : "bg-white dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-slate-400 dark:text-zinc-500 hover:border-indigo-300 dark:hover:border-indigo-800 hover:bg-slate-50 dark:hover:bg-zinc-700/50"
                                         )}
                                     >
-                                        {status}
+                                        {status === "Paid" ? t('pos.paid') : status === "Partial" ? t('pos.partial') : status === "Unpaid" ? t('pos.unpaid') : t('pos.split_payment')}
                                     </button>
                                 ))}
                             </div>
@@ -1015,72 +1017,72 @@ export default function POSTerminalPage() {
                                 <div className="space-y-3 bg-slate-50/50 dark:bg-zinc-950/50 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800">
                                     <div className="grid grid-cols-2 gap-3">
                                         {[
-                                            { label: "Cash", state: splitCash, setter: setSplitCash },
-                                            { label: "Card", state: splitCard, setter: setSplitCard },
-                                            { label: "PayPal", state: splitPaypal, setter: setSplitPaypal },
-                                            { label: "Interac", state: splitInterac, setter: setSplitInterac },
+                                            { label: t('pos.payment_cash'), key: 'Cash', state: splitCash, setter: setSplitCash },
+                                            { label: t('pos.payment_card'), key: 'Card', state: splitCard, setter: setSplitCard },
+                                            { label: t('pos.payment_paypal'), key: 'Paypal', state: splitPaypal, setter: setSplitPaypal },
+                                            { label: t('pos.payment_interac'), key: 'Interac', state: splitInterac, setter: setSplitInterac },
                                         ].map((method) => (
-                                            <div key={method.label} className="relative group/input">
+                                            <div key={method.key} className="relative group/input">
                                                 <label className="absolute left-3 top-1 text-[9px] font-black uppercase tracking-widest text-slate-400">{method.label}</label>
-                                                <div className="absolute left-3 top-6 text-slate-300 group-focus-within/input:text-indigo-600 transition-colors font-black text-sm">$</div>
-                                                <Input
+                                                <div className="absolute left-3 top-6 text-slate-300 group-focus-within/input:text-indigo-600 transition-colors font-black text-sm">{currentCompany?.currency}</div>
+                                                <input
                                                     type="number"
                                                     step="0.01"
                                                     value={method.state}
                                                      onChange={(e) => method.setter(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                                    className="h-12 pl-6 pt-5 bg-white dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 font-black text-sm focus:ring-2 focus:ring-indigo-500/20 transition-all text-slate-900 dark:text-zinc-100"
+                                                    className="h-12 pl-6 pt-5 bg-white dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 font-black text-sm focus:ring-2 focus:ring-indigo-500/20 transition-all text-slate-900 dark:text-zinc-100 w-full"
                                                     placeholder="0.00"
                                                 />
                                             </div>
                                         ))}
                                     </div>
                                      <div className="flex justify-between items-center py-2 border-t border-slate-200 dark:border-zinc-800 border-dashed mt-2">
-                                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-zinc-400">Split Total</span>
-                                        <span className="text-lg font-black text-indigo-600 dark:text-indigo-400">${Number(checkoutPaidAmount).toFixed(2)}</span>
+                                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-zinc-400">{t('pos.total')}</span>
+                                        <span className="text-lg font-black text-indigo-600 dark:text-indigo-400">{currentCompany?.currency} {Number(checkoutPaidAmount).toFixed(2)}</span>
                                     </div>
                                     {Number(checkoutPaidAmount) < totals.roundedTotal ? (
                                          <p className="text-[10px] font-bold text-amber-500 dark:text-amber-400 uppercase tracking-tight bg-amber-50 dark:bg-amber-950/30 rounded-lg p-2 border border-amber-100 dark:border-amber-900/30 italic">
-                                            Remaining Due: ${(totals.roundedTotal - Number(checkoutPaidAmount)).toFixed(2)} will be record as debt.
+                                            {t('pos.balance_due')}: {currentCompany?.currency} {(totals.roundedTotal - Number(checkoutPaidAmount)).toFixed(2)}
                                         </p>
                                     ) : Number(checkoutPaidAmount) > totals.roundedTotal ? (
                                          <p className="text-[14px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-tight bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-2 border border-emerald-100 dark:border-emerald-900/30 italic">
-                                            Change Return: ${(Number(checkoutPaidAmount) - totals.roundedTotal).toFixed(2)}
+                                            {t('pos.change_amount')}: {currentCompany?.currency} {(Number(checkoutPaidAmount) - totals.roundedTotal).toFixed(2)}
                                         </p>
                                     ) : null}
                                 </div>
                             ) : (
                                 <>
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">
-                                        Amount (Customer Gave)
+                                        {t('pos.paid_amount')}
                                     </label>
                                     <div className="relative group/input">
-                                        <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within/input:text-indigo-600 transition-colors font-black text-lg">$</div>
-                                        <Input
+                                        <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within/input:text-indigo-600 transition-colors font-black text-lg">{currentCompany?.currency}</div>
+                                        <input
                                             type="number"
                                             step="0.01"
                                             value={checkoutPaidAmount}
                                              onChange={(e) => setCheckoutPaidAmount(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                            className="h-14 pl-10 rounded-2xl border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 font-black text-lg focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900 dark:text-zinc-100"
+                                            className="h-14 pl-10 rounded-2xl border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 font-black text-lg focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900 dark:text-zinc-100 w-full"
                                         />
                                     </div>
                                      {checkoutStatus === "Paid" && Number(checkoutPaidAmount) > totals.roundedTotal && (
                                         <p className="text-[14px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-tight pl-1 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-2 border border-emerald-100 dark:border-emerald-900/30 italic mt-2">
-                                            Change Return: ${(Number(checkoutPaidAmount) - totals.roundedTotal).toFixed(2)}
+                                            {t('pos.change_amount')}: {currentCompany?.currency} {(Number(checkoutPaidAmount) - totals.roundedTotal).toFixed(2)}
                                         </p>
                                     )}
                                     {checkoutStatus === "Paid" && Number(checkoutPaidAmount) < totals.roundedTotal && (
                                         <p className="text-[10px] font-bold text-amber-500 uppercase tracking-tight pl-1 bg-amber-50 rounded-lg p-2 border border-amber-100 italic mt-2">
-                                            Warning: Amount is less than Grand Total. Should this be Partial?
+                                            {t('pos.amount_less_warning')}
                                         </p>
                                     )}
                                     {checkoutStatus === "Partial" && (
                                         <p className="text-[10px] font-bold text-amber-500 uppercase tracking-tight pl-1 bg-amber-50 rounded-lg p-2 border border-amber-100 italic mt-2">
-                                            Remaining Due: ${Math.max(0, totals.roundedTotal - Number(checkoutPaidAmount)).toFixed(2)} will be record as debt.
+                                            {t('pos.balance_due')}: {currentCompany?.currency} {Math.max(0, totals.roundedTotal - Number(checkoutPaidAmount)).toFixed(2)}
                                         </p>
                                     )}
                                     {checkoutStatus === "Unpaid" && (
                                         <p className="text-[10px] font-bold text-rose-500 uppercase tracking-tight pl-1 bg-rose-50 rounded-lg p-2 border border-rose-100 italic mt-2">
-                                            Full amount of ${totals.roundedTotal.toFixed(2)} will be marked as due.
+                                            {t('pos.full_amount_due_message', { amount: totals.roundedTotal.toFixed(2) })}
                                         </p>
                                     )}
                                 </>
@@ -1094,7 +1096,7 @@ export default function POSTerminalPage() {
                                 onClick={() => setIsConfirmOpen(false)}
                                 disabled={loading}
                             >
-                                Cancel
+                                {t('pos.cancel')}
                             </button>
                             <button
                                 className="relative flex-[2] h-14 rounded-full overflow-hidden group/pay transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-30 disabled:grayscale shadow-lg shadow-orange-500/30"
@@ -1104,7 +1106,7 @@ export default function POSTerminalPage() {
                                 <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-orange-500 to-indigo-600 transition-colors" />
                                 <div className="relative flex items-center justify-center gap-3">
                                     {loading ? <Loader2 className="animate-spin text-white" size={18} /> : <Check size={18} className="text-white group-hover/pay:rotate-12 transition-transform" />}
-                                    <span className="text-white font-black uppercase tracking-widest text-[11px]">Confirm Sale</span>
+                                    <span className="text-white font-black uppercase tracking-widest text-[11px]">{t('pos.checkout')}</span>
                                 </div>
                             </button>
                         </div>
@@ -1116,7 +1118,7 @@ export default function POSTerminalPage() {
             <Dialog open={isReceiptOpen} onOpenChange={setIsReceiptOpen}>
                 <DialogContent className="max-w-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-[40px] p-8 shadow-2xl text-slate-900 dark:text-zinc-100">
                     <DialogHeader>
-                        <DialogTitle className="text-center font-black uppercase tracking-tighter text-3xl italic text-slate-900 dark:text-zinc-100 leading-none">Sale <span className="text-indigo-600 dark:text-indigo-400">Confirmed</span></DialogTitle>
+                        <DialogTitle className="text-center font-black uppercase tracking-tighter text-3xl italic text-slate-900 dark:text-zinc-100 leading-none">{t('pos.payment_success')} <span className="text-indigo-600 dark:text-indigo-400">{t('pos.receipt_title')}</span></DialogTitle>
                     </DialogHeader>
 
                     <ScrollArea className="max-h-[70vh] pr-4 -mr-4 cart-scrollbar">
@@ -1136,17 +1138,17 @@ export default function POSTerminalPage() {
                                         </div>
                                     )}
                                 </div>
-                                <h3 className="font-black text-xs uppercase tracking-tight leading-none text-center">{currentCompany?.name || '9416-3169 Quebec Inc.'}</h3>
-                                <p className="opacity-60 text-[8px] text-center">{currentCompany?.pos_receipt_address || 'Quebec, Canada'}</p>
-                                <p className="opacity-60 text-[8px] text-center font-black text-indigo-600 mt-1">INV: {lastSale?.sales_code?.replace('SL/', '')}, DT: {new Date().toLocaleString()}</p>
+                                <h3 className="font-black text-xs uppercase tracking-tight leading-none text-center">{currentCompany?.name || 'HurPori Fashion'}</h3>
+                                <p className="opacity-60 text-[8px] text-center">{currentCompany?.pos_receipt_address || currentCompany?.address || 'Montreal, Canada'}</p>
+                                <p className="opacity-60 text-[8px] text-center font-black text-indigo-600 mt-1">{t('pos.receipt_inv')}: {lastSale?.sales_code?.replace('SL/', '')}, {t('pos.receipt_dt')}: {new Date().toLocaleString()}</p>
                                 <div className="mt-1 flex flex-col items-center opacity-70 text-[8px] font-bold uppercase tracking-wider text-slate-600 space-y-0.5">
                                     <div className="flex gap-2 text-center justify-center w-full">
                                         <span>{currentCompany?.tax_id || 'N/A'}</span>
                                     </div>
                                     <div className="flex gap-2">
-                                        <span>Cus: {lastSale?.customer_name || customerName}</span>
+                                        <span>{t('pos.receipt_cus')}: {lastSale?.customer_name || customerName}</span>
                                         <span className="opacity-30">|</span>
-                                        <span>Mob: {lastSale?.customer_mobile || customerMobile}</span>
+                                        <span>{t('pos.receipt_mob')}: {lastSale?.customer_mobile || customerMobile}</span>
                                     </div>
                                 </div>
                             </div>
@@ -1155,15 +1157,15 @@ export default function POSTerminalPage() {
 
                             <div className="space-y-1 my-3 text-slate-900 font-mono">
                                 <div className="flex justify-between items-center text-[7px] font-black uppercase tracking-widest opacity-40 mb-2 pb-1 border-b border-dotted border-black">
-                                    <span className="w-1/2">Description</span>
-                                    <span className="w-1/4 text-center">Qty</span>
-                                    <span className="w-1/4 text-right">Total</span>
+                                    <span className="w-1/2">{t('pos.receipt_desc')}</span>
+                                    <span className="w-1/4 text-center">{t('pos.receipt_qty')}</span>
+                                    <span className="w-1/4 text-right">{t('pos.receipt_total')}</span>
                                 </div>
                                 {lastSale?.items?.map((item: any, i: number) => (
                                     <div key={i} className="flex justify-between items-start text-[9px]">
-                                        <span className="w-1/2 truncate pr-2 font-bold uppercase">{item.product?.name || 'Product'}</span>
+                                        <span className="w-1/2 truncate pr-2 font-bold uppercase">{item.product?.name || t('common.product')}</span>
                                         <span className="w-1/4 text-center">{Number(item.quantity).toFixed(0)}</span>
-                                        <span className="w-1/4 text-right font-black">${Number(item.total_amount).toFixed(2)}</span>
+                                        <span className="w-1/4 text-right font-black">{currentCompany?.currency} {Number(item.total_amount).toFixed(2)}</span>
                                     </div>
                                 ))}
                             </div>
@@ -1172,50 +1174,50 @@ export default function POSTerminalPage() {
 
                             <div className="space-y-0.5 my-3 opacity-80 text-slate-900 font-mono">
                                 <div className="flex justify-between items-center text-[9px]">
-                                    <span className="uppercase tracking-widest text-[8px] font-bold">Subtotal (Excl. Tax)</span>
-                                    <span className="font-black">${Number(lastSale?.subtotal || 0).toFixed(2)}</span>
+                                    <span className="uppercase tracking-widest text-[8px] font-bold">{t('pos.subtotal')}</span>
+                                    <span className="font-black">{currentCompany?.currency} {Number(lastSale?.subtotal || 0).toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-[9px]">
-                                    <span className="uppercase tracking-widest text-[8px] font-bold">GST (5.00%)</span>
-                                    <span className="font-black">${Number(lastSale?.subtotal ? (lastSale.subtotal * GST_RATE) : 0).toFixed(2)}</span>
+                                    <span className="uppercase tracking-widest text-[8px] font-bold">{t('pos.tax')} (GST 5.00%)</span>
+                                    <span className="font-black">{currentCompany?.currency} {Number(lastSale?.subtotal ? (lastSale.subtotal * GST_RATE) : 0).toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-[9px]">
-                                    <span className="uppercase tracking-widest text-[8px] font-bold">QST (9.975%)</span>
-                                    <span className="font-black">${Number(lastSale?.subtotal ? (lastSale.subtotal * QST_RATE) : 0).toFixed(2)}</span>
+                                    <span className="uppercase tracking-widest text-[8px] font-bold">{t('pos.tax')} (QST 9.975%)</span>
+                                    <span className="font-black">{currentCompany?.currency} {Number(lastSale?.subtotal ? (lastSale.subtotal * QST_RATE) : 0).toFixed(2)}</span>
                                 </div>
                                 {(Number(lastSale?.discount_amount || 0) > 0 || Number(lastSale?.discount_on_all || 0) > 0) && (
                                     <div className="flex justify-between items-center text-[9px]">
-                                        <span className="uppercase tracking-widest text-[8px] font-bold">Discount</span>
-                                        <span className="font-black">-${Number(lastSale.discount_amount || lastSale.discount_on_all).toFixed(2)}</span>
+                                        <span className="uppercase tracking-widest text-[8px] font-bold">{t('pos.discount')}</span>
+                                        <span className="font-black">-{currentCompany?.currency} {Number(lastSale.discount_amount || lastSale.discount_on_all).toFixed(2)}</span>
                                     </div>
                                 )}
                                 <div className="flex justify-between items-center text-[10px] mt-2 pt-1 border-t border-dotted border-black">
-                                    <span className="uppercase tracking-widest text-[8px] font-bold">Grand Total</span>
-                                    <span className="font-black">${Number(lastSale?.grand_total || 0).toFixed(2)}</span>
+                                    <span className="uppercase tracking-widest text-[8px] font-bold">{t('pos.grand_total')}</span>
+                                    <span className="font-black">{currentCompany?.currency} {Number(lastSale?.grand_total || 0).toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-[9px] mt-1 text-emerald-700">
-                                    <span className="uppercase tracking-widest text-[8px] font-bold">Paid Amount</span>
-                                    <span className="font-black">${Number(checkoutPaidAmount || lastSale?.paid_amount || 0).toFixed(2)}</span>
+                                    <span className="uppercase tracking-widest text-[8px] font-bold">{t('pos.paid_amount')}</span>
+                                    <span className="font-black">{currentCompany?.currency} {Number(checkoutPaidAmount || lastSale?.paid_amount || 0).toFixed(2)}</span>
                                 </div>
                                 {Number(checkoutPaidAmount) > Number(lastSale?.grand_total || 0) && (
                                     <div className="flex justify-between items-center text-[9px] mt-1 text-emerald-700">
-                                        <span className="uppercase tracking-widest text-[8px] font-bold">Change Return</span>
-                                        <span className="font-black">${(Number(checkoutPaidAmount) - Number(lastSale?.grand_total || 0)).toFixed(2)}</span>
+                                        <span className="uppercase tracking-widest text-[8px] font-bold">{t('pos.change_amount')}</span>
+                                        <span className="font-black">{currentCompany?.currency} {(Number(checkoutPaidAmount) - Number(lastSale?.grand_total || 0)).toFixed(2)}</span>
                                     </div>
                                 )}
                                 {(Number(lastSale?.grand_total || 0) - Number(checkoutPaidAmount || lastSale?.paid_amount || 0) > 0) && (
                                     <div className="flex justify-between items-center text-[9px] mt-1 text-rose-600">
-                                        <span className="uppercase tracking-widest text-[8px] font-bold">Due</span>
-                                        <span className="font-black">${(Number(lastSale?.grand_total || 0) - Number(checkoutPaidAmount || lastSale?.paid_amount || 0)).toFixed(2)}</span>
+                                        <span className="uppercase tracking-widest text-[8px] font-bold">{t('pos.balance_due')}</span>
+                                        <span className="font-black">{currentCompany?.currency} {(Number(lastSale?.grand_total || 0) - Number(checkoutPaidAmount || lastSale?.paid_amount || 0)).toFixed(2)}</span>
                                     </div>
                                 )}
                             </div>
 
                             <div className="text-center mt-6 space-y-2">
                                  <div className="payment-badge inline-block px-4 py-1.5 border border-slate-900 dark:border-zinc-500 rounded-lg bg-white dark:bg-zinc-800 shadow-[4px_4px_0px_rgba(0,0,0,0.1)] text-[8px] font-black uppercase tracking-widest text-slate-900 dark:text-zinc-100 italic">
-                                    [{lastSale?.payment_type || paymentMode}] SALE
+                                    [{lastSale?.payment_type || paymentMode}] {t('pos.receipt_sale_status')}
                                 </div>
-                                <p className="text-[8px] font-black italic uppercase tracking-[0.1em] text-indigo-600 dark:text-indigo-400 opacity-60">Merci pour votre confiance!</p>
+                                <p className="text-[8px] font-black italic uppercase tracking-[0.1em] text-indigo-600 dark:text-indigo-400 opacity-60">{t('pos.receipt_footer')}</p>
 
                                 {(currentCompany?.pos_email || currentCompany?.pos_website || currentCompany?.pos_mobile) && (
                                     <div className="mt-4 pt-4 border-t border-dotted border-black space-y-1">
@@ -1230,7 +1232,7 @@ export default function POSTerminalPage() {
 
                                     {currentCompany?.qr_code_url || currentCompany?.qr_code_path ? (
                                         <div className="mt-4 flex flex-col items-center gap-1">
-                                            <p className="text-[8px] font-black uppercase tracking-widest text-rose-500">Review on Google Business</p>
+                                            <p className="text-[8px] font-black uppercase tracking-widest text-rose-500">{t('pos.receipt_review_message')}</p>
                                             <img
                                                 src={getAssetUrl(currentCompany.qr_code_url || currentCompany.qr_code_path)}
                                                 alt="Review QR"
@@ -1249,13 +1251,13 @@ export default function POSTerminalPage() {
                             disabled={loading}
                         >
                             {loading ? <Loader2 size={16} className="animate-spin" /> : <Mail size={16} className="text-indigo-500" />}
-                            Email
+                            {t('pos.email')}
                         </button>
                         <button
                             className="flex-[2] h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-widest text-[10px] shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-3 active:scale-95 transition-all"
                             onClick={printReceipt}
                         >
-                            <Printer size={16} /> Print Receipt
+                            <Printer size={16} /> {t('pos.print_receipt')}
                         </button>
                     </div>
                 </DialogContent>

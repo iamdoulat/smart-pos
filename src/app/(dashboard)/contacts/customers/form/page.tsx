@@ -19,8 +19,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Edit2 } from "lucide-react";
 import Link from "next/link";
 
+import { useTranslation } from "@/i18n/TranslationContext";
+
 function CustomerFormContent() {
     const router = useRouter();
+    const { t } = useTranslation();
     const searchParams = useSearchParams();
     const idParam = searchParams.get('id');
     const { currentCompany } = useAuthStore();
@@ -51,14 +54,14 @@ function CustomerFormContent() {
                 const data = await ContactService.getById(Number(idParam));
                 setEditingContact(data);
             } catch (error) {
-                toast.error("Failed to load customer details");
+                toast.error(t('contacts.failed_to_load_details'));
                 router.push('/contacts/customers');
             } finally {
                 setLoading(false);
             }
         };
         loadContact();
-    }, [idParam, router]);
+    }, [idParam, router, t]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -80,14 +83,14 @@ function CustomerFormContent() {
         try {
             if (editingContact) {
                 await ContactService.update(editingContact.id, formDataPayload);
-                toast.success("Customer updated successfully");
+                toast.success(t('contacts.customer_updated_success'));
             } else {
                 await ContactService.create(formDataPayload);
-                toast.success("Customer added successfully");
+                toast.success(t('contacts.customer_added_success'));
             }
             router.push('/contacts/customers');
         } catch (error) {
-            toast.error("Failed to save customer");
+            toast.error(t('contacts.failed_to_save'));
         } finally {
             setSubmitting(false);
         }
@@ -102,7 +105,7 @@ function CustomerFormContent() {
     }
 
     return (
-        <div className="w-full space-y-6 animate-in fade-in duration-700 pb-20 px-8 py-6">
+        <div className="w-full p-4 md:p-6 space-y-6 animate-in fade-in duration-700 pb-20">
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
                 <Link href="/contacts/customers">
@@ -110,15 +113,15 @@ function CustomerFormContent() {
                         <ArrowLeft size={20} />
                     </Button>
                 </Link>
-                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-amber-500 via-indigo-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/20 shrink-0">
+                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-rose-500/20 shrink-0">
                     <PlusSquare size={24} />
                 </div>
                 <div>
-                    <h2 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase leading-none">
-                        {editingContact ? "Edit Customer" : "Add Customer"}
+                    <h2 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase leading-none mb-1">
+                        {editingContact ? t('contacts.edit_customer') : t('contacts.add_customer')}
                     </h2>
                     <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mt-1">
-                        Enter customer information and billing details.
+                        {t('contacts.customer_form_desc')}
                     </p>
                 </div>
             </div>
@@ -132,13 +135,13 @@ function CustomerFormContent() {
                                     value="add-edit"
                                     className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-600 data-[state=active]:shadow-none bg-transparent hover:bg-transparent px-2 py-3 text-sm font-bold uppercase tracking-wider text-zinc-500"
                                 >
-                                    <Edit2 size={14} className="mr-2 text-red-500" /> Add/Edit
+                                    <Edit2 size={14} className="mr-2 text-red-500" /> {t('contacts.tab_add_edit')}
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="advanced"
                                     className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-600 data-[state=active]:shadow-none bg-transparent hover:bg-transparent px-2 py-3 text-sm font-bold uppercase tracking-wider text-zinc-500"
                                 >
-                                    <Loader2 size={14} className="mr-2 text-red-500" /> Advanced
+                                    <Loader2 size={14} className="mr-2 text-red-500" /> {t('contacts.tab_advanced')}
                                 </TabsTrigger>
                             </TabsList>
                         </div>
@@ -148,19 +151,19 @@ function CustomerFormContent() {
                                 {/* Column 1: Primary Info */}
                                 <div className="space-y-6">
                                     <div className="grid grid-cols-3 items-center gap-4">
-                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">Customer Name*</Label>
+                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_name_customer')}*</Label>
                                         <Input name="name" defaultValue={editingContact?.name} required className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                     </div>
                                     <div className="grid grid-cols-3 items-center gap-4">
-                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">Email</Label>
+                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_email')}</Label>
                                         <Input name="email" type="email" defaultValue={editingContact?.email} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                     </div>
                                     <div className="grid grid-cols-3 items-center gap-4">
-                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">Mobile</Label>
+                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_mobile')}</Label>
                                         <Input name="mobile" defaultValue={editingContact?.mobile} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                     </div>
                                     <div className="grid grid-cols-3 items-center gap-4">
-                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">Phone</Label>
+                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_phone')}</Label>
                                         <Input name="phone" defaultValue={editingContact?.phone} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                     </div>
                                 </div>
@@ -168,30 +171,30 @@ function CustomerFormContent() {
                                 {/* Column 2: Tax & Limits */}
                                 <div className="space-y-6">
                                     <div className="grid grid-cols-3 items-start gap-4">
-                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right mt-3">GST Number</Label>
+                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right mt-3">{t('contacts.label_gst')}</Label>
                                         <div className="col-span-2">
                                             <Input name="gst_number" defaultValue={editingContact?.gst_number} className="h-10 rounded-xl border-zinc-200" />
-                                            <div className="text-right mt-1"><a href="#" className="text-[10px] text-blue-500 hover:underline">Verify</a></div>
+                                            <div className="text-right mt-1"><a href="#" className="text-[10px] text-blue-500 hover:underline">{t('contacts.verify')}</a></div>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-3 items-center gap-4">
-                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">TAX Number</Label>
+                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_tax')}</Label>
                                         <Input name="tax_id" defaultValue={editingContact?.tax_id} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                     </div>
                                     <div className="grid grid-cols-3 items-start gap-4">
-                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right mt-3">Credit Limit</Label>
+                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right mt-3">{t('contacts.label_credit_limit')}</Label>
                                         <div className="col-span-2">
                                             <Input name="credit_limit" type="number" step="0.01" defaultValue={editingContact?.credit_limit !== undefined ? editingContact.credit_limit : -1} className="h-10 rounded-xl border-zinc-200" />
-                                            <p className="text-[10px] text-zinc-500 mt-1">-1 for No Limit</p>
+                                            <p className="text-[10px] text-zinc-500 mt-1">{t('contacts.no_limit_hint')}</p>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-3 items-start gap-4">
-                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right mt-3">Attachment</Label>
+                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right mt-3">{t('contacts.label_attachment')}</Label>
                                         <div className="col-span-2 space-y-1">
                                             <Input name="attachment" type="file" className="text-xs h-10 rounded-xl border-zinc-200 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-zinc-100 file:text-zinc-700 hover:file:bg-zinc-200" />
-                                            <p className="text-[10px] text-red-500">Size: 2MB</p>
+                                            <p className="text-[10px] text-red-500">{t('contacts.max_size_hint')}</p>
                                             {editingContact?.attachment && (
-                                                <a href={`${process.env.NEXT_PUBLIC_APP_URL}/storage/${editingContact.attachment}`} target="_blank" className="inline-block text-[10px] font-bold bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded">Click to view</a>
+                                                <a href={`${process.env.NEXT_PUBLIC_APP_URL}/storage/${editingContact.attachment}`} target="_blank" className="inline-block text-[10px] font-bold bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded">{t('contacts.click_to_view')}</a>
                                             )}
                                         </div>
                                     </div>
@@ -200,11 +203,11 @@ function CustomerFormContent() {
                                 {/* Column 3: Balances */}
                                 <div className="space-y-6">
                                     <div className="grid grid-cols-3 items-center gap-4">
-                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">Opening Balance</Label>
+                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_opening_balance')}</Label>
                                         <Input name="opening_balance" type="number" step="0.01" defaultValue={editingContact?.opening_balance || 0} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                     </div>
                                     <div className="grid grid-cols-3 items-center gap-4">
-                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">Previous Due</Label>
+                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_previous_due')}</Label>
                                         <Input name="previous_due" type="number" step="0.01" defaultValue={editingContact?.previous_due || 0} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                     </div>
                                 </div>
@@ -212,36 +215,36 @@ function CustomerFormContent() {
 
                             <div className="space-y-6 pt-6 border-t border-zinc-100 dark:border-zinc-800">
                                 <h4 className="flex items-center gap-2 text-green-700 font-bold uppercase tracking-wider text-sm border-b border-green-700/20 pb-2">
-                                    <MapPin size={16} /> Address Details
+                                    <MapPin size={16} /> {t('contacts.section_address')}
                                 </h4>
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-6">
                                     <div className="space-y-6">
                                         <div className="grid grid-cols-3 items-center gap-4">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">Country</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_country')}</Label>
                                             <Input name="country" defaultValue={editingContact?.country} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                         </div>
                                         <div className="grid grid-cols-3 items-center gap-4">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">City</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_city')}</Label>
                                             <Input name="city" defaultValue={editingContact?.city} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                         </div>
                                     </div>
                                     <div className="space-y-6">
                                         <div className="grid grid-cols-3 items-center gap-4">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">State</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_state')}</Label>
                                             <Input name="state" defaultValue={editingContact?.state} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                         </div>
                                         <div className="grid grid-cols-3 items-center gap-4">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">Postcode</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_postcode')}</Label>
                                             <Input name="postcode" defaultValue={editingContact?.postcode} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                         </div>
                                     </div>
                                     <div className="space-y-6">
                                         <div className="grid grid-cols-3 items-center gap-4">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">Location Link</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_location_link')}</Label>
                                             <Input name="location_link" defaultValue={editingContact?.location_link} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                         </div>
                                         <div className="grid grid-cols-3 items-start gap-4">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right mt-3">Address</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right mt-3">{t('contacts.label_address')}</Label>
                                             <textarea name="address" defaultValue={editingContact?.address} className="col-span-2 min-h-[60px] rounded-xl border border-zinc-200 p-2 text-sm max-h-32 resize-y" />
                                         </div>
                                     </div>
@@ -250,40 +253,40 @@ function CustomerFormContent() {
 
                             <div className="space-y-6 pt-6 border-t border-zinc-100 dark:border-zinc-800">
                                 <h4 className="flex items-center gap-2 text-green-700 font-bold uppercase tracking-wider text-sm border-b border-green-700/20 pb-2">
-                                    <MapPin size={16} /> Shipping Address
+                                    <MapPin size={16} /> {t('contacts.section_shipping')}
                                 </h4>
                                 <div className="flex items-center gap-2 mb-4">
-                                    <Label className="text-xs font-bold text-zinc-600 ml-8">Copy Address ?</Label>
+                                    <Label className="text-xs font-bold text-zinc-600 ml-8">{t('contacts.copy_address_customer')}</Label>
                                     <input type="checkbox" onChange={handleCopyAddress} className="rounded border-zinc-300 h-4 w-4" />
                                 </div>
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-6">
                                     <div className="space-y-6">
                                         <div className="grid grid-cols-3 items-center gap-4">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">Country</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_country')}</Label>
                                             <Input name="shipping_country" defaultValue={editingContact?.shipping_country} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                         </div>
                                         <div className="grid grid-cols-3 items-center gap-4">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">City</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_city')}</Label>
                                             <Input name="shipping_city" defaultValue={editingContact?.shipping_city} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                         </div>
                                     </div>
                                     <div className="space-y-6">
                                         <div className="grid grid-cols-3 items-center gap-4">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">State</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_state')}</Label>
                                             <Input name="shipping_state" defaultValue={editingContact?.shipping_state} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                         </div>
                                         <div className="grid grid-cols-3 items-center gap-4">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">Postcode</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_postcode')}</Label>
                                             <Input name="shipping_postcode" defaultValue={editingContact?.shipping_postcode} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                         </div>
                                     </div>
                                     <div className="space-y-6">
                                         <div className="grid grid-cols-3 items-center gap-4">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">Location Link</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_location_link')}</Label>
                                             <Input name="shipping_location_link" defaultValue={editingContact?.shipping_location_link} className="col-span-2 h-10 rounded-xl border-zinc-200" />
                                         </div>
                                         <div className="grid grid-cols-3 items-start gap-4">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right mt-3">Address</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right mt-3">{t('contacts.label_address')}</Label>
                                             <textarea name="shipping_address" defaultValue={editingContact?.shipping_address} className="col-span-2 min-h-[60px] rounded-xl border border-zinc-200 p-2 text-sm max-h-32 resize-y" />
                                         </div>
                                     </div>
@@ -294,14 +297,14 @@ function CustomerFormContent() {
                         <TabsContent value="advanced" className="p-8 mt-0 min-h-[300px] outline-none">
                             <div className="grid grid-cols-1 gap-6 max-w-md">
                                 <div className="grid grid-cols-3 items-center gap-4">
-                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">Price Level Type</Label>
+                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_price_level_type')}</Label>
                                     <select name="price_level_type" defaultValue={editingContact?.price_level_type || "Increase"} className="col-span-2 h-10 rounded-xl border border-zinc-200 px-3 text-sm bg-white">
-                                        <option value="Increase">Increase</option>
-                                        <option value="Decrease">Decrease</option>
+                                        <option value="Increase">{t('contacts.option_increase')}</option>
+                                        <option value="Decrease">{t('contacts.option_decrease')}</option>
                                     </select>
                                 </div>
                                 <div className="grid grid-cols-3 items-center gap-4">
-                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">Price Level</Label>
+                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest text-right">{t('contacts.label_price_level')}</Label>
                                     <div className="col-span-2 flex items-center">
                                         <Input name="price_level" type="number" step="0.01" defaultValue={editingContact?.price_level || 0} className="w-full h-10 rounded-r-none rounded-l-md border-zinc-200" />
                                         <div className="h-10 px-4 bg-zinc-50 border border-l-0 border-zinc-200 rounded-r-md flex items-center justify-center font-bold text-blue-600">%</div>
@@ -314,18 +317,18 @@ function CustomerFormContent() {
                             <Button
                                 type="submit"
                                 disabled={submitting}
-                                className="bg-green-600 hover:bg-green-700 text-white min-w-[120px] rounded-xl shadow"
+                                className="bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 text-white min-w-[160px] rounded-full shadow-lg shadow-indigo-500/20 border-0 h-11 font-black uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95"
                             >
                                 {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                Save
+                                {t('common.save')}
                             </Button>
                             <Link href="/contacts/customers">
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    className="bg-orange-500 hover:bg-orange-600 hover:text-white border-0 text-white min-w-[120px] rounded-xl shadow"
+                                    className="bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 border-0 text-zinc-600 dark:text-zinc-300 min-w-[160px] rounded-full h-11 font-bold uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95"
                                 >
-                                    Close
+                                    {t('common.close')}
                                 </Button>
                             </Link>
                         </div>

@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ProductService } from "@/lib/product-service";
 import { useAuthStore } from "@/lib/store";
+import { useTranslation } from "@/i18n/TranslationContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -93,6 +94,7 @@ const stockStatus = (qty: number, threshold: number): "out" | "low" | "ok" => {
    PAGE
 ═══════════════════════════════════════════════════════════════════════════ */
 export default function InventoryPage() {
+    const { t } = useTranslation();
     const { currentCompany } = useAuthStore();
     const currency = currentCompany?.currency || "USD";
     const router = useRouter();
@@ -115,7 +117,7 @@ export default function InventoryPage() {
             const data = await ProductService.getAll(currentCompany.id);
             setProducts(data);
         } catch {
-            toast.error("Failed to load products");
+            toast.error(t('inventory.load_failed'));
         } finally {
             setLoading(false);
         }
@@ -167,10 +169,10 @@ export default function InventoryPage() {
     const handleDelete = async (id: number) => {
         try {
             await ProductService.delete(id);
-            toast.success("Product deleted");
+            toast.success(t('inventory.delete_success'));
             load();
         } catch {
-            toast.error("Failed to delete product");
+            toast.error(t('inventory.delete_failed'));
         }
     };
 
@@ -178,39 +180,40 @@ export default function InventoryPage() {
        RENDER
     ══════════════════════════════════════════════════════════════════ */
     return (
-        <div className="w-full space-y-6 md:space-y-8 animate-in fade-in duration-700 pb-20 px-8 py-6">
+        <div className="w-full p-4 md:p-6 space-y-6 md:space-y-8 animate-in fade-in duration-700 pb-20">
 
             {/* ── Header ── */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-500 via-violet-600 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-violet-500/30 transform rotate-3 transition-transform hover:rotate-0">
-                        <Package size={22} />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-center gap-3 md:gap-4">
+                    <div className="h-12 w-12 md:h-14 md:w-14 rounded-[1.5rem] bg-gradient-to-br from-rose-500 to-orange-600 flex items-center justify-center text-white shadow-2xl shadow-orange-500/30 relative group transition-all duration-500 hover:scale-105">
+                        <Package size={24} strokeWidth={2.5} className="relative z-10" />
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-[1.5rem]" />
                     </div>
-                    <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-blue-500 via-violet-600 to-indigo-500 bg-clip-text text-transparent tracking-tighter uppercase pr-4 leading-tight mb-1">
-                            Inventory
-                        </h2>
-                        <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
-                            Manage your product catalog and stock levels.
+                    <div className="space-y-1">
+                        <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-orange-400 via-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tighter uppercase leading-tight pt-[5px]">
+                            {t('inventory.title')}
+                        </h1>
+                        <p className="text-[9px] md:text-[11px] text-zinc-500 dark:text-zinc-400 font-black tracking-[0.2em] uppercase opacity-70">
+                            {t('inventory.subtitle')}
                         </p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-violet-500 transition-colors" size={16} />
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <div className="relative w-full sm:w-80 group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
                         <Input
-                            placeholder="Search products…"
+                            placeholder={t('inventory.search_placeholder')}
+                            className="pl-12 h-11 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all font-medium text-sm"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="pl-10 h-11 w-56 md:w-72 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-full shadow-sm focus:ring-2 focus:ring-violet-500 transition-all font-medium text-sm"
                         />
                     </div>
                     <Button
                         onClick={() => router.push("/inventory/add")}
-                        className="bg-gradient-to-r from-blue-500 via-violet-600 to-indigo-600 text-white rounded-full px-6 h-11 shadow-lg shadow-violet-500/30 font-black uppercase tracking-tighter transition-all hover:scale-[1.02] hover:shadow-violet-500/40 active:scale-95 border-0 whitespace-nowrap"
+                        className="w-full sm:w-auto bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-full px-8 h-11 shadow-lg shadow-orange-500/20 font-black uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0 whitespace-nowrap"
                     >
-                        <Plus className="mr-2 h-4 w-4" /> Add Product
+                        <Plus className="mr-2 h-5 w-5" /> {t('inventory.add_product')}
                     </Button>
                 </div>
             </div>
@@ -218,28 +221,28 @@ export default function InventoryPage() {
             {/* ── Summary Cards ── */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <SummaryCard
-                    label="Total Products"
+                    label={t('inventory.total_products')}
                     value={String(products.length)}
                     icon={Package}
                     gradient="from-blue-500 via-blue-600 to-indigo-700"
                     shadow="shadow-blue-500/30"
                 />
                 <SummaryCard
-                    label="Stock Value"
+                    label={t('inventory.stock_value')}
                     value={`${currency} ${fmt(totalStockValue)}`}
                     icon={DollarSign}
                     gradient="from-teal-400 via-emerald-500 to-cyan-600"
                     shadow="shadow-emerald-500/30"
                 />
                 <SummaryCard
-                    label="Low Stock"
+                    label={t('inventory.low_stock')}
                     value={String(lowStockCount)}
                     icon={AlertTriangle}
                     gradient="from-purple-500 via-violet-600 to-indigo-700"
                     shadow="shadow-purple-500/30"
                 />
                 <SummaryCard
-                    label="Out of Stock"
+                    label={t('inventory.out_of_stock')}
                     value={String(outOfStockCount)}
                     icon={BarChart3}
                     gradient="from-orange-400 via-orange-500 to-rose-500"
@@ -249,12 +252,12 @@ export default function InventoryPage() {
 
             {/* ── Stock Filter Pills ── */}
             <div className="flex items-center gap-2 bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-full px-4 h-11 w-fit shadow-sm flex-wrap">
-                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Stock:</span>
+                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{t('inventory.stock_filter')}</span>
                 {([
-                    { key: "all", label: "All" },
-                    { key: "in_stock", label: "In Stock" },
-                    { key: "low_stock", label: "Low Stock" },
-                    { key: "out_of_stock", label: "Out of Stock" },
+                    { key: "all", label: t('inventory.filter_all') },
+                    { key: "in_stock", label: t('inventory.filter_in_stock') },
+                    { key: "low_stock", label: t('inventory.filter_low_stock') },
+                    { key: "out_of_stock", label: t('inventory.filter_out_of_stock') },
                 ] as const).map(({ key, label }) => (
                     <button
                         key={key}
@@ -282,13 +285,13 @@ export default function InventoryPage() {
                         <Table>
                             <TableHeader className="bg-zinc-50 dark:bg-zinc-900/50">
                                 <TableRow className="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800">
-                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Product</TableHead>
-                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">SKU</TableHead>
-                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Buy Price</TableHead>
-                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Sell Price</TableHead>
-                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Margin</TableHead>
-                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Stock</TableHead>
-                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Action</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('inventory.table_product')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('inventory.table_sku')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('inventory.table_buy_price')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('inventory.table_sell_price')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('inventory.table_margin')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('inventory.table_stock')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">{t('inventory.table_action')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
@@ -375,7 +378,7 @@ export default function InventoryPage() {
                                                                 onClick={() => router.push(`/inventory/edit/${p.id}`)}
                                                                 className="flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-violet-50 dark:hover:bg-violet-900/20 text-violet-600 transition-colors font-bold text-xs uppercase tracking-wider"
                                                             >
-                                                                <Edit2 size={14} /> Edit Product
+                                                                <Edit2 size={14} /> {t('inventory.edit_product')}
                                                             </DropdownMenuItem>
 
                                                             <DropdownMenuSeparator className="my-1 bg-zinc-100 dark:bg-zinc-800" />
@@ -386,7 +389,7 @@ export default function InventoryPage() {
                                                                         onSelect={(e) => e.preventDefault()}
                                                                         className="flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-900/20 text-rose-500 transition-colors font-bold text-xs uppercase tracking-wider"
                                                                     >
-                                                                        <Trash2 size={14} /> Delete Product
+                                                                        <Trash2 size={14} /> {t('inventory.delete_product')}
                                                                     </DropdownMenuItem>
                                                                 </AlertDialogTrigger>
                                                                 <AlertDialogContent className="rounded-xl border-0 shadow-2xl p-0 overflow-hidden">
@@ -395,21 +398,21 @@ export default function InventoryPage() {
                                                                             <Trash2 size={28} />
                                                                         </div>
                                                                         <AlertDialogTitle className="text-2xl font-black tracking-tighter uppercase leading-none">
-                                                                            Delete Product?
+                                                                            {t('inventory.delete_confirm_title')}
                                                                         </AlertDialogTitle>
                                                                         <AlertDialogDescription className="text-red-50 mt-2 font-medium">
-                                                                            This will permanently delete <span className="font-bold underline">{p.name}</span> and all its inventory data.
+                                                                            {t('inventory.delete_confirm_desc', { name: p.name })}
                                                                         </AlertDialogDescription>
                                                                     </div>
                                                                     <AlertDialogFooter className="p-6 bg-white dark:bg-zinc-950 gap-3">
                                                                         <AlertDialogCancel className="rounded-full border-zinc-200 dark:border-zinc-800 font-bold px-8 h-12">
-                                                                            Cancel
+                                                                            {t('inventory.cancel')}
                                                                         </AlertDialogCancel>
                                                                         <AlertDialogAction
                                                                             onClick={() => handleDelete(p.id)}
                                                                             className="bg-red-600 hover:bg-red-700 text-white rounded-full font-bold px-10 h-12 shadow-lg shadow-red-500/20 border-0"
                                                                         >
-                                                                            Confirm Delete
+                                                                            {t('inventory.confirm_delete')}
                                                                         </AlertDialogAction>
                                                                     </AlertDialogFooter>
                                                                 </AlertDialogContent>
@@ -431,19 +434,19 @@ export default function InventoryPage() {
                                                     <Package size={40} className="text-violet-400" />
                                                 </div>
                                                 <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-                                                    {search || stockFilter !== "all" ? "No products match your filters" : "No products yet"}
+                                                    {search || stockFilter !== "all" ? t('inventory.no_products_found') : t('inventory.no_products_yet')}
                                                 </h3>
                                                 <p className="text-zinc-500 dark:text-zinc-400 text-sm max-w-sm mt-2 font-medium leading-relaxed">
                                                     {search || stockFilter !== "all"
-                                                        ? "Try adjusting your search or filter."
-                                                        : "Start building your catalog by adding your first product."}
+                                                        ? t('inventory.adjust_filters_hint')
+                                                        : t('inventory.add_first_hint')}
                                                 </p>
                                                 {!search && stockFilter === "all" && (
                                                     <Button
                                                         onClick={() => router.push("/inventory/add")}
                                                         className="mt-8 bg-gradient-to-r from-violet-500 to-indigo-500 text-white rounded-full h-12 px-8 font-bold shadow-lg shadow-violet-500/20 border-0"
                                                     >
-                                                        <Plus className="mr-2 h-4 w-4" /> Add First Product
+                                                        <Plus className="mr-2 h-4 w-4" /> {t('inventory.add_first_product')}
                                                     </Button>
                                                 )}
                                             </div>
@@ -458,7 +461,7 @@ export default function InventoryPage() {
                     {filtered.length > 0 && (
                         <div className="px-8 py-4 bg-zinc-50/50 dark:bg-zinc-900/50 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                             <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest order-2 sm:order-1">
-                                Showing {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filtered.length)} of {filtered.length} Records
+                                {t('inventory.showing_records', { start: (currentPage - 1) * itemsPerPage + 1, end: Math.min(currentPage * itemsPerPage, filtered.length), total: filtered.length })}
                             </span>
 
                             {/* Pagination Controls */}
@@ -548,7 +551,7 @@ function SummaryCard({
                 <p className="text-2xl font-black text-white truncate">{value}</p>
             </div>
 
-            <div className="relative z-10 h-12 w-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
+            <div className="relative z-10 h-12 w-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0">
                 <Icon size={22} className="text-white" />
             </div>
         </div>
@@ -556,25 +559,26 @@ function SummaryCard({
 }
 
 function StockBadge({ qty, threshold }: { qty: number; threshold: number }) {
+    const { t } = useTranslation();
     const st = stockStatus(qty, threshold);
     if (st === "out")
         return (
             <span className="inline-flex items-center gap-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
                 <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
-                Out of Stock
+                {t('inventory.filter_out_of_stock')}
             </span>
         );
     if (st === "low")
         return (
             <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
                 <AlertTriangle size={10} />
-                Low: {qty}
+                {t('inventory.filter_low_stock')}: {qty}
             </span>
         );
     return (
         <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            {qty} in stock
+            {t('inventory.in_stock_msg', { qty })}
         </span>
     );
 }

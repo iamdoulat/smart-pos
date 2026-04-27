@@ -20,7 +20,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import {
     AlertDialog,
@@ -33,9 +32,11 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useTranslation } from "@/i18n/TranslationContext";
 
 function CustomersContent() {
     const router = useRouter();
+    const { t } = useTranslation();
     const { currentCompany } = useAuthStore();
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [loading, setLoading] = useState(true);
@@ -52,7 +53,7 @@ function CustomersContent() {
             const data = await ContactService.getAll(currentCompany.id, 'customer');
             setContacts(data);
         } catch (error) {
-            toast.error("Failed to load customers");
+            toast.error(t('contacts.failed_to_load_customers'));
         } finally {
             setLoading(false);
         }
@@ -65,10 +66,10 @@ function CustomersContent() {
     const handleDelete = async (id: number) => {
         try {
             await ContactService.delete(id);
-            toast.success("Customer deleted successfully");
+            toast.success(t('contacts.customer_deleted_success'));
             loadContacts();
         } catch (error) {
-            toast.error("Failed to delete customer");
+            toast.error(t('contacts.failed_to_delete_customer'));
         }
     };
 
@@ -90,17 +91,20 @@ function CustomersContent() {
     }, [searchTerm]);
 
     return (
-        <div className="w-full space-y-4 animate-in fade-in duration-700 pb-20 px-8 py-6">
+        <div className="w-full p-4 md:p-6 space-y-6 md:space-y-8 animate-in fade-in duration-700 pb-20">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div className="flex items-center gap-3 md:gap-4">
-                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-gradient-to-br from-amber-500 via-indigo-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/20 transform -rotate-3 transition-transform hover:rotate-0">
-                        <Users size={20} className="md:w-6 md:h-6" />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-center gap-4 md:gap-6">
+                    <div className="h-12 w-12 md:h-14 md:w-14 rounded-[1.5rem] bg-gradient-to-br from-rose-500 to-orange-600 flex items-center justify-center text-white shadow-2xl shadow-orange-500/30 relative group transition-all duration-500 hover:scale-105">
+                        <Users size={24} strokeWidth={2.5} className="relative z-10" />
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-[1.5rem]" />
                     </div>
-                    <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase py-1 leading-none mb-1">Customers</h2>
-                        <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
-                            Manage your customer database and relations.
+                    <div className="space-y-1">
+                        <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-orange-400 via-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tighter uppercase leading-tight pt-[5px]">
+                            {t('contacts.customers_title')}
+                        </h1>
+                        <p className="text-[9px] md:text-[11px] text-zinc-500 dark:text-zinc-400 font-black tracking-[0.2em] uppercase opacity-70">
+                            {t('contacts.customers_subtitle')}
                         </p>
                     </div>
                 </div>
@@ -109,7 +113,7 @@ function CustomersContent() {
                     <div className="relative w-full sm:w-80 group">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" size={20} />
                         <Input
-                            placeholder="Search customers by name, email or phone..."
+                            placeholder={t('contacts.search_customers')}
                             className="pl-12 h-12 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-full shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -117,9 +121,9 @@ function CustomersContent() {
                     </div>
                     <Button
                         onClick={() => router.push('/contacts/customers/form')}
-                        className="w-full sm:w-auto bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 text-white rounded-full px-8 h-12 shadow-lg shadow-orange-500/25 font-black uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0"
+                        className="w-full sm:w-auto bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-full px-10 h-12 shadow-xl shadow-orange-500/20 font-black uppercase tracking-widest text-[10px] transition-all hover:scale-[1.02] active:scale-95 border-0"
                     >
-                        <PlusSquare className="mr-2 h-5 w-5" /> Add Customer
+                        <PlusSquare size={18} strokeWidth={3} className="mr-2" /> {t('contacts.add_customer')}
                     </Button>
                 </div>
             </div>
@@ -135,13 +139,13 @@ function CustomersContent() {
                         <table className="w-full text-sm text-left">
                             <thead className="bg-zinc-50 dark:bg-zinc-900/50">
                                 <tr>
-                                    <th className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">CID</th>
-                                    <th className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Customer Name</th>
-                                    <th className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Mobile</th>
-                                    <th className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Email</th>
-                                    <th className="px-6 py-4 text-center font-black text-xs text-black dark:text-white uppercase tracking-widest">Opening Balance</th>
-                                    <th className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Address</th>
-                                    <th className="px-6 py-4 text-right font-black text-xs text-black dark:text-white uppercase tracking-widest">Actions</th>
+                                    <th className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">ID</th>
+                                    <th className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('contacts.table_customer_name')}</th>
+                                    <th className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('contacts.table_mobile')}</th>
+                                    <th className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('contacts.table_email')}</th>
+                                    <th className="px-6 py-4 text-center font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('contacts.table_balance')}</th>
+                                    <th className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('contacts.table_address')}</th>
+                                    <th className="px-6 py-4 text-right font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('inventory.table_action') || "Actions"}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
@@ -149,7 +153,7 @@ function CustomersContent() {
                                     <tr key={contact.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
                                         <td className="px-6 py-4">
                                             <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 px-2 py-0.5 rounded-full font-mono">
-                                                CID-{contact.id.toString().padStart(3, '0')}
+                                                ID-{contact.id.toString().padStart(3, '0')}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
@@ -162,7 +166,7 @@ function CustomersContent() {
                                                     <span>{contact.mobile || contact.phone}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-zinc-400 text-xs font-medium">No mobile</span>
+                                                <span className="text-zinc-400 text-xs font-medium">{t('contacts.no_mobile')}</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4">
@@ -172,7 +176,7 @@ function CustomersContent() {
                                                     <span>{contact.email}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-zinc-400 text-xs font-medium">No email</span>
+                                                <span className="text-zinc-400 text-xs font-medium">{t('contacts.no_email')}</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 text-center">
@@ -187,7 +191,7 @@ function CustomersContent() {
                                                     <span className="truncate leading-relaxed" title={contact.address}>{contact.address}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-zinc-400 text-xs font-medium">No address</span>
+                                                <span className="text-zinc-400 text-xs font-medium">{t('contacts.no_address')}</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 text-right">
@@ -215,14 +219,20 @@ function CustomersContent() {
                                                             <div className="h-16 w-16 rounded-2xl bg-white/20 flex items-center justify-center mb-4">
                                                                 <Trash2 size={32} />
                                                             </div>
-                                                            <AlertDialogTitle className="text-2xl font-black tracking-tighter uppercase leading-none">Delete Customer?</AlertDialogTitle>
+                                                            <AlertDialogTitle className="text-2xl font-black tracking-tighter uppercase leading-none">
+                                                                {t('contacts.delete_customer_title')}
+                                                            </AlertDialogTitle>
                                                             <AlertDialogDescription className="text-red-50 mt-2 font-medium">
-                                                                This action will permanently delete <span className="font-bold underline">{contact.name}</span> and all associated transaction history.
+                                                                {t('contacts.delete_customer_desc', { name: contact.name })}
                                                             </AlertDialogDescription>
                                                         </div>
                                                         <AlertDialogFooter className="p-6 bg-white dark:bg-zinc-950 gap-3">
-                                                            <AlertDialogCancel className="rounded-full border-zinc-200 dark:border-zinc-800 font-bold px-8 h-12">Cancel</AlertDialogCancel>
-                                                            <AlertDialogAction onClick={() => handleDelete(contact.id)} className="bg-red-600 hover:bg-red-700 text-white rounded-full font-bold px-10 h-12 shadow-lg shadow-red-500/20 border-0">Confirm Delete</AlertDialogAction>
+                                                            <AlertDialogCancel className="rounded-full border-zinc-200 dark:border-zinc-800 font-bold px-8 h-12">
+                                                                {t('common.cancel') || "Cancel"}
+                                                            </AlertDialogCancel>
+                                                            <AlertDialogAction onClick={() => handleDelete(contact.id)} className="bg-red-600 hover:bg-red-700 text-white rounded-full font-bold px-10 h-12 shadow-lg shadow-red-500/20 border-0">
+                                                                {t('transactions.confirm_delete') || "Confirm Delete"}
+                                                            </AlertDialogAction>
                                                         </AlertDialogFooter>
                                                     </AlertDialogContent>
                                                 </AlertDialog>
@@ -232,21 +242,23 @@ function CustomersContent() {
                                 ))}
                                 {filteredContacts.length === 0 && (
                                     <tr>
-                                        <td colSpan={4} className="px-6 py-20 text-center">
+                                        <td colSpan={7} className="px-6 py-20 text-center">
                                             <div className="flex flex-col items-center justify-center">
                                                 <div className="h-20 w-20 rounded-3xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-300 mb-6">
                                                     <Users size={40} />
                                                 </div>
-                                                <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">No customers found</h3>
+                                                <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                                                    {t('contacts.no_customers_found')}
+                                                </h3>
                                                 <p className="text-zinc-500 dark:text-zinc-400 text-sm max-w-sm mt-2 font-medium leading-relaxed">
-                                                    {searchTerm ? "No customers match your search criteria." : "Your customer directory is currently empty. Click the button above to start building your database."}
+                                                    {searchTerm ? t('contacts.no_customers_desc') : t('contacts.no_customers_empty')}
                                                 </p>
                                                 {!searchTerm && (
                                                     <Button
                                                         onClick={() => router.push('/contacts/customers/form')}
                                                         className="mt-8 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full h-12 px-8 font-bold shadow-lg shadow-indigo-500/20"
                                                     >
-                                                        <PlusSquare className="mr-2 h-5 w-5" /> Start Now
+                                                        <PlusSquare className="mr-2 h-5 w-5" /> {t('contacts.start_now')}
                                                     </Button>
                                                 )}
                                             </div>
@@ -261,7 +273,11 @@ function CustomersContent() {
                     {filteredContacts.length > 0 && (
                         <div className="px-8 py-4 bg-zinc-50/50 dark:bg-zinc-900/50 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                             <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest order-2 sm:order-1">
-                                Showing {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredContacts.length)} of {filteredContacts.length} Records
+                                {t('contacts.showing_records', {
+                                    start: (currentPage - 1) * itemsPerPage + 1,
+                                    end: Math.min(currentPage * itemsPerPage, filteredContacts.length),
+                                    total: filteredContacts.length
+                                })}
                             </span>
 
                             <div className="flex items-center gap-2 order-1 sm:order-2">

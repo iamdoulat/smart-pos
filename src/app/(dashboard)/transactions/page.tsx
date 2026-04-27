@@ -34,31 +34,34 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
-const TYPE_LABELS: Record<string, string> = {
-    income: "Income",
-    expense: "Expense",
-    transfer: "Transfer",
-    sales: "Sales",
-    purchase: "Purchase",
-    tax: "Tax",
-    shipping: "Shipping",
-};
-
-const PAYMENT_LABELS: Record<string, string> = {
-    cash: "Cash",
-    bank: "Bank",
-    online: "Online",
-};
+import { useTranslation } from "@/i18n/TranslationContext";
+import { cn } from "@/lib/utils";
 
 export default function TransactionsPage() {
     const router = useRouter();
+    const { t } = useTranslation();
     const { currentCompany } = useAuthStore();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [typeFilter, setTypeFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
+
+    const TYPE_LABELS: Record<string, string> = {
+        income: t('transactions.type_income') || "Income",
+        expense: t('transactions.type_expense') || "Expense",
+        transfer: t('transactions.type_transfer') || "Transfer",
+        sales: t('transactions.type_sales') || "Sales",
+        purchase: t('transactions.type_purchase') || "Purchase",
+        tax: t('transactions.type_tax') || "Tax",
+        shipping: t('transactions.type_shipping') || "Shipping",
+    };
+
+    const PAYMENT_LABELS: Record<string, string> = {
+        cash: t('transactions.payment_cash') || "Cash",
+        bank: t('transactions.payment_bank') || "Bank",
+        online: t('transactions.payment_online') || "Online",
+    };
 
     const loadTransactions = async () => {
         if (!currentCompany) return;
@@ -67,7 +70,7 @@ export default function TransactionsPage() {
             const data = await TransactionService.getAll(currentCompany.id);
             setTransactions(data);
         } catch {
-            toast.error("Failed to load transactions");
+            toast.error(t('transactions.load_failed') || "Failed to load transactions");
         } finally {
             setLoading(false);
         }
@@ -80,10 +83,10 @@ export default function TransactionsPage() {
     const handleDelete = async (id: number) => {
         try {
             await TransactionService.delete(id);
-            toast.success("Transaction deleted");
+            toast.success(t('transactions.delete_success') || "Transaction deleted");
             loadTransactions();
         } catch {
-            toast.error("Failed to delete transaction");
+            toast.error(t('transactions.delete_failed') || "Failed to delete transaction");
         }
     };
 
@@ -113,37 +116,38 @@ export default function TransactionsPage() {
         new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 
     return (
-        <div className="w-full space-y-6 md:space-y-10 animate-in fade-in duration-700 pb-20 px-8 py-6">
+        <div className="w-full p-4 md:p-6 space-y-6 md:space-y-10 animate-in fade-in duration-700 pb-20">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div className="flex items-center gap-3 md:gap-4">
-                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 transform rotate-3 transition-transform hover:rotate-0">
-                        <Receipt size={20} className="md:w-6 md:h-6" />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-center gap-4 md:gap-6">
+                    <div className="h-12 w-12 md:h-14 md:w-14 rounded-[1.5rem] bg-gradient-to-br from-rose-500 to-orange-600 flex items-center justify-center text-white shadow-2xl shadow-orange-500/30 relative group transition-all duration-500 hover:scale-105">
+                        <Receipt size={24} strokeWidth={2.5} className="relative z-10" />
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-[1.5rem]" />
                     </div>
-                    <div>
-                        <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-500 bg-clip-text text-transparent tracking-tight uppercase pr-4 leading-tight mb-1">
-                            Transactions
-                        </h2>
-                        <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-semibold tracking-tight">
-                            Track all your income and expenses in one place.
+                    <div className="space-y-1">
+                        <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-orange-400 via-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tighter uppercase leading-tight pt-[5px]">
+                            {t('transactions.title')}
+                        </h1>
+                        <p className="text-[9px] md:text-[11px] text-zinc-500 dark:text-zinc-400 font-black tracking-[0.2em] uppercase opacity-70">
+                            {t('transactions.subtitle')}
                         </p>
                     </div>
                 </div>
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                     <div className="relative w-full sm:w-80 group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" size={20} />
                         <Input
-                            placeholder="Search by category, contact, ref..."
-                            className="pl-12 h-12 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-full shadow-sm focus:ring-2 focus:ring-emerald-500 transition-all font-medium"
+                            placeholder={t('transactions.search_placeholder')}
+                            className="pl-12 h-12 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-full shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <Button
                         onClick={() => router.push("/transactions/form")}
-                        className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-500 text-white rounded-full px-8 h-12 shadow-lg shadow-emerald-500/25 font-bold uppercase tracking-tight transition-all hover:scale-[1.02] active:scale-95 border-0"
+                        className="w-full sm:w-auto bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-full px-10 h-12 shadow-xl shadow-orange-500/20 font-black uppercase tracking-widest text-[10px] transition-all hover:scale-[1.02] active:scale-95 border-0"
                     >
-                        <PlusSquare className="mr-2 h-5 w-5" /> Add Transaction
+                        <PlusSquare size={18} strokeWidth={2.5} className="mr-2" /> {t('transactions.add_transaction')}
                     </Button>
                 </div>
             </div>
@@ -156,7 +160,7 @@ export default function TransactionsPage() {
                         <TrendingUp size={28} className="text-emerald-500" />
                     </div>
                     <div>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase tracking-wider mb-1">Total Income</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase tracking-wider mb-1">{t('transactions.total_income')}</p>
                         <p className="text-2xl font-bold text-emerald-500">{currency} {fmt(totalIncome)}</p>
                     </div>
                 </div>
@@ -166,7 +170,7 @@ export default function TransactionsPage() {
                         <TrendingDown size={28} className="text-rose-500" />
                     </div>
                     <div>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase tracking-wider mb-1">Total Expenses</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold uppercase tracking-wider mb-1">{t('transactions.total_expenses')}</p>
                         <p className="text-2xl font-bold text-rose-500">{currency} {fmt(totalExpense)}</p>
                     </div>
                 </div>
@@ -176,7 +180,7 @@ export default function TransactionsPage() {
                         <DollarSign size={28} className={netBalance >= 0 ? "text-teal-500" : "text-orange-500"} />
                     </div>
                     <div>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-widest mb-1">Net Balance</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-widest mb-1">{t('transactions.net_balance')}</p>
                         <p className={`text-2xl font-black ${netBalance >= 0 ? "text-teal-500" : "text-orange-500"}`}>
                             {netBalance >= 0 ? "+" : ""}{currency} {fmt(Math.abs(netBalance))}
                         </p>
@@ -187,32 +191,32 @@ export default function TransactionsPage() {
             {/* Filters */}
             <div className="flex flex-wrap gap-3">
                 <div className="flex items-center gap-2 bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-full px-4 h-10 shadow-sm">
-                    <span className="text-xs font-black text-zinc-500 uppercase tracking-widest">Type:</span>
-                    {["all", "income", "expense", "sales", "purchase", "transfer"].map((t) => (
+                    <span className="text-xs font-black text-zinc-500 uppercase tracking-widest">{t('transactions.filter_type')}:</span>
+                    {["all", "income", "expense", "sales", "purchase", "transfer"].map((type) => (
                         <button
-                            key={t}
-                            onClick={() => setTypeFilter(t)}
-                            className={`text-xs font-bold px-3 py-1 rounded-full transition-all ${typeFilter === t
+                            key={type}
+                            onClick={() => setTypeFilter(type)}
+                            className={`text-xs font-bold px-3 py-1 rounded-full transition-all ${typeFilter === type
                                 ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow"
                                 : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
                                 }`}
                         >
-                            {t === "all" ? "All" : TYPE_LABELS[t]}
+                            {type === "all" ? (t('common.all') || "All") : TYPE_LABELS[type]}
                         </button>
                     ))}
                 </div>
                 <div className="flex items-center gap-2 bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-full px-4 h-10 shadow-sm">
-                    <span className="text-xs font-black text-zinc-500 uppercase tracking-widest">Status:</span>
-                    {["all", "completed", "pending", "cancelled"].map((s) => (
+                    <span className="text-xs font-black text-zinc-500 uppercase tracking-widest">{t('transactions.filter_status')}:</span>
+                    {["all", "completed", "pending", "cancelled"].map((status) => (
                         <button
-                            key={s}
-                            onClick={() => setStatusFilter(s)}
-                            className={`text-xs font-bold px-3 py-1 rounded-full transition-all ${statusFilter === s
+                            key={status}
+                            onClick={() => setStatusFilter(status)}
+                            className={`text-xs font-bold px-3 py-1 rounded-full transition-all ${statusFilter === status
                                 ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow"
                                 : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
                                 }`}
                         >
-                            {s.charAt(0).toUpperCase() + s.slice(1)}
+                            {status === "all" ? (t('common.all') || "All") : (t(`transactions.status_${status}`) || status.charAt(0).toUpperCase() + status.slice(1))}
                         </button>
                     ))}
                 </div>
@@ -230,15 +234,15 @@ export default function TransactionsPage() {
                         <table className="w-full text-sm text-left">
                             <thead className="bg-zinc-50 dark:bg-zinc-900/50 text-zinc-500 dark:text-zinc-400 uppercase font-black tracking-wider text-[10px]">
                                 <tr>
-                                    <th className="px-6 py-4">Date</th>
-                                    <th className="px-6 py-4">Reference</th>
-                                    <th className="px-6 py-4">Category</th>
-                                    <th className="px-6 py-4">Contact</th>
-                                    <th className="px-6 py-4">Type</th>
-                                    <th className="px-6 py-4">Payment</th>
-                                    <th className="px-6 py-4">Amount</th>
-                                    <th className="px-6 py-4">Status</th>
-                                    <th className="px-6 py-4 text-right">Actions</th>
+                                    <th className="px-6 py-4">{t('transactions.table_date')}</th>
+                                    <th className="px-6 py-4">{t('transactions.table_reference')}</th>
+                                    <th className="px-6 py-4">{t('transactions.table_category')}</th>
+                                    <th className="px-6 py-4">{t('transactions.table_contact')}</th>
+                                    <th className="px-6 py-4">{t('transactions.table_type')}</th>
+                                    <th className="px-6 py-4">{t('transactions.table_payment')}</th>
+                                    <th className="px-6 py-4">{t('transactions.table_amount')}</th>
+                                    <th className="px-6 py-4">{t('transactions.table_status')}</th>
+                                    <th className="px-6 py-4 text-right">{t('inventory.table_action') || "Actions"}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
@@ -286,7 +290,7 @@ export default function TransactionsPage() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <StatusBadge status={tx.status} />
+                                            <StatusBadge status={tx.status} t={t} />
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex justify-end gap-2">
@@ -307,15 +311,15 @@ export default function TransactionsPage() {
                                                             <div className="h-16 w-16 rounded-2xl bg-white/20 flex items-center justify-center mb-4">
                                                                 <Trash2 size={32} />
                                                             </div>
-                                                            <AlertDialogTitle className="text-2xl font-bold tracking-tight uppercase leading-none">Delete Transaction?</AlertDialogTitle>
+                                                            <AlertDialogTitle className="text-2xl font-bold tracking-tight uppercase leading-none">{t('transactions.delete_title')}</AlertDialogTitle>
                                                             <AlertDialogDescription className="text-red-50 mt-2 font-medium">
-                                                                This will permanently delete the {TYPE_LABELS[tx.type]} of <span className="font-bold underline">{currency} {fmt(parseFloat(String(tx.amount)))}</span>.
+                                                                {t('transactions.delete_desc', { type: TYPE_LABELS[tx.type], amount: `${currency} ${fmt(parseFloat(String(tx.amount)))}` })}
                                                             </AlertDialogDescription>
                                                         </div>
                                                         <AlertDialogFooter className="p-6 bg-white dark:bg-zinc-950 gap-3">
-                                                            <AlertDialogCancel className="rounded-full border-zinc-200 dark:border-zinc-800 font-bold px-8 h-12">Cancel</AlertDialogCancel>
+                                                            <AlertDialogCancel className="rounded-full border-zinc-200 dark:border-zinc-800 font-bold px-8 h-12">{t('common.cancel') || "Cancel"}</AlertDialogCancel>
                                                             <AlertDialogAction onClick={() => handleDelete(tx.id)} className="bg-red-600 hover:bg-red-700 text-white rounded-full font-bold px-10 h-12 shadow-lg shadow-red-500/20 border-0">
-                                                                Confirm Delete
+                                                                {t('transactions.confirm_delete')}
                                                             </AlertDialogAction>
                                                         </AlertDialogFooter>
                                                     </AlertDialogContent>
@@ -331,18 +335,18 @@ export default function TransactionsPage() {
                                                 <div className="h-20 w-20 rounded-3xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-300 mb-6">
                                                     <Receipt size={40} />
                                                 </div>
-                                                <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">No transactions found</h3>
+                                                <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{t('transactions.no_records')}</h3>
                                                 <p className="text-zinc-500 dark:text-zinc-400 text-sm max-w-sm mt-2 font-medium leading-relaxed">
                                                     {searchTerm || typeFilter !== "all" || statusFilter !== "all"
-                                                        ? "Try adjusting your filters or search query."
-                                                        : "Start recording your income and expenses by clicking 'Add Transaction'."}
+                                                        ? t('transactions.no_records_desc')
+                                                        : t('transactions.no_records_empty')}
                                                 </p>
                                                 {!searchTerm && typeFilter === "all" && statusFilter === "all" && (
                                                     <Button
                                                         onClick={() => router.push("/transactions/form")}
                                                         className="mt-8 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full h-12 px-8 font-bold shadow-lg shadow-emerald-500/20"
                                                     >
-                                                        <PlusSquare className="mr-2 h-5 w-5" /> Add Transaction
+                                                        <PlusSquare className="mr-2 h-5 w-5" /> {t('transactions.add_transaction')}
                                                     </Button>
                                                 )}
                                             </div>
@@ -355,7 +359,7 @@ export default function TransactionsPage() {
                     {filtered.length > 0 && (
                         <div className="px-6 py-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
                             <span className="text-xs text-zinc-400 font-medium">
-                                Showing {filtered.length} of {transactions.length} transactions
+                                {t('transactions.showing_count', { count: filtered.length, total: transactions.length })}
                             </span>
                         </div>
                     )}
@@ -365,24 +369,24 @@ export default function TransactionsPage() {
     );
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, t }: { status: string, t: any }) {
     switch (status) {
         case "completed":
             return (
                 <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
-                    <CheckCircle2 size={10} /> Completed
+                    <CheckCircle2 size={10} /> {t('transactions.status_completed')}
                 </span>
             );
         case "pending":
             return (
                 <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
-                    <Clock size={10} /> Pending
+                    <Clock size={10} /> {t('transactions.status_pending')}
                 </span>
             );
         case "cancelled":
             return (
                 <span className="inline-flex items-center gap-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
-                    <XCircle size={10} /> Cancelled
+                    <XCircle size={10} /> {t('transactions.status_cancelled')}
                 </span>
             );
         default:

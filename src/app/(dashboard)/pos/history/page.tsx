@@ -52,8 +52,11 @@ import {
 } from "@/components/ui/table";
 import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from "lucide-react";
 
+import { useTranslation } from "@/i18n/TranslationContext";
+
 export default function PosHistoryPage() {
     const router = useRouter();
+    const { t } = useTranslation();
     const { currentCompany } = useAuthStore();
     const [sales, setSales] = useState<Sale[]>([]);
     const [loading, setLoading] = useState(true);
@@ -75,7 +78,7 @@ export default function PosHistoryPage() {
             const data = await SaleService.getAll(currentCompany.id);
             setSales(data);
         } catch {
-            toast.error("Failed to load sales history");
+            toast.error(t('pos.failed_to_load_history'));
         } finally {
             setLoading(false);
         }
@@ -88,37 +91,37 @@ export default function PosHistoryPage() {
 
 
     const handleDelete = async (id: number) => {
-        if (!confirm("Are you sure you want to delete this sale? This will revert product stock.")) return;
+        if (!confirm(t('pos.confirm_delete_sale'))) return;
         try {
             await SaleService.delete(id);
-            toast.success("Sale deleted and stock reverted");
+            toast.success(t('pos.sale_deleted_success'));
             loadSales();
         } catch {
-            toast.error("Failed to delete sale");
+            toast.error(t('pos.failed_to_delete_sale'));
         }
     };
 
     const handleDownload = async (sale: Sale) => {
         try {
-            toast.loading("Generating PDF...", { id: "pdf-gen" });
+            toast.loading(t('pos.generating_pdf'), { id: "pdf-gen" });
             await SaleService.downloadPdf(sale.id!, sale.sales_code);
-            toast.success("PDF downloaded successfully", { id: "pdf-gen" });
+            toast.success(t('pos.pdf_download_success'), { id: "pdf-gen" });
         } catch {
-            toast.error("Failed to generate PDF", { id: "pdf-gen" });
+            toast.error(t('pos.failed_to_generate_pdf'), { id: "pdf-gen" });
         }
     };
 
     const handleRefund = async (sale: Sale) => {
         if (!sale.id) return;
-        if (!confirm(`Are you sure you want to refund sale ${sale.sales_code}? This will restock items and mark the sale as Refunded.`)) return;
+        if (!confirm(t('pos.confirm_refund_sale', { code: sale.sales_code }))) return;
 
         try {
-            toast.loading("Processing refund...", { id: "refund-process" });
+            toast.loading(t('pos.processing_refund'), { id: "refund-process" });
             await SaleService.refund(sale.id);
-            toast.success("Sale refunded and stock restocked", { id: "refund-process" });
+            toast.success(t('pos.refund_success'), { id: "refund-process" });
             loadSales();
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to process refund", { id: "refund-process" });
+            toast.error(error.response?.data?.message || t('pos.failed_to_refund'), { id: "refund-process" });
         }
     };
 
@@ -152,19 +155,19 @@ export default function PosHistoryPage() {
         new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 
     return (
-        <div className="w-full space-y-6 md:space-y-10 animate-in fade-in duration-700 pb-20 px-8 py-6">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div className="flex items-center gap-3 md:gap-4">
-                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 transform rotate-3 transition-transform hover:rotate-0">
-                        <Receipt size={20} className="md:w-6 md:h-6" />
+        <div className="w-full p-4 md:p-6 space-y-6 md:space-y-8 animate-in fade-in duration-700 pb-20">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-rose-500/20">
+                        <Receipt size={24} />
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase pr-4 leading-tight mb-1">
-                            POS History
+                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight leading-tight uppercase pr-4 pt-[5px]">
+                            {t('pos.history_title')}
                         </h2>
-                        <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
-                            Track and manage all your terminal sales and receipts.
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
+                            {t('pos.history_desc')}
                         </p>
                     </div>
                 </div>
@@ -172,32 +175,32 @@ export default function PosHistoryPage() {
                     <div className="relative w-full sm:w-80 group">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
                         <Input
-                            placeholder="Search by code, client, ref..."
-                            className="pl-12 h-12 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-full shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
+                            placeholder={t('pos.search_placeholder')}
+                            className="pl-12 h-11 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <Button
                         onClick={() => router.push("/pos")}
-                        className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white rounded-full px-8 h-12 shadow-lg shadow-indigo-500/25 font-black uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0"
+                        className="w-full sm:w-auto bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 text-white rounded-full px-8 h-11 shadow-lg shadow-indigo-500/20 font-black uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0"
                     >
-                        <PlusSquare className="mr-2 h-5 w-5" /> New Terminal Sale
+                        <PlusSquare className="mr-2 h-5 w-5" /> {t('pos.new_sale')}
                     </Button>
                 </div>
             </div>
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <ModernStatCard title="Gross Sales" value={`${currency} ${fmt(totalSales)}`} description="Total sales volume from POS" icon={TrendingUp} color="indigo" />
-                <ModernStatCard title="Collected" value={`${currency} ${fmt(totalPaid)}`} description="Payments received successfully" icon={CheckCircle2} color="emerald" />
-                <ModernStatCard title="Outstanding" value={`${currency} ${fmt(totalPending)}`} description="Pending or partial balances" icon={Clock} color="amber" />
+                <ModernStatCard title={t('pos.gross_sales')} value={`${currency} ${fmt(totalSales)}`} description={t('pos.gross_sales_desc')} icon={TrendingUp} color="indigo" />
+                <ModernStatCard title={t('pos.collected')} value={`${currency} ${fmt(totalPaid)}`} description={t('pos.collected_desc')} icon={CheckCircle2} color="emerald" />
+                <ModernStatCard title={t('pos.outstanding')} value={`${currency} ${fmt(totalPending)}`} description={t('pos.outstanding_desc')} icon={Clock} color="amber" />
             </div>
 
             {/* Filters */}
             <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-2 bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-full px-4 h-10 shadow-sm">
-                    <span className="text-xs font-black text-zinc-500 uppercase tracking-widest">Payment:</span>
+                    <span className="text-xs font-black text-zinc-500 uppercase tracking-widest">{t('pos.payment_label')}</span>
                     {["all", "paid", "partial", "unpaid"].map((s) => (
                         <button
                             key={s}
@@ -207,13 +210,13 @@ export default function PosHistoryPage() {
                                 : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
                                 }`}
                         >
-                            {s.charAt(0).toUpperCase() + s.slice(1)}
+                            {t(`common.${s}`)}
                         </button>
                     ))}
                 </div>
 
                 <Button variant="outline" className="rounded-full border-zinc-200 dark:border-zinc-800 h-10 px-6 font-bold text-[10px] uppercase tracking-widest">
-                    <Filter size={14} className="mr-2" /> More Filters
+                    <Filter size={14} className="mr-2" /> {t('common.more_filters')}
                 </Button>
             </div>
 
@@ -222,7 +225,7 @@ export default function PosHistoryPage() {
                 <div className="flex h-[400px] items-center justify-center">
                     <div className="flex flex-col items-center gap-3">
                         <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
-                        <p className="text-zinc-400 font-bold uppercase tracking-widest text-[10px]">Syncing Sales Data...</p>
+                        <p className="text-zinc-400 font-bold uppercase tracking-widest text-[10px]">{t('pos.syncing_data')}</p>
                     </div>
                 </div>
             ) : (
@@ -231,13 +234,13 @@ export default function PosHistoryPage() {
                         <Table>
                             <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/50">
                                 <TableRow className="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800">
-                                    <TableHead className="px-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Sale Info</TableHead>
-                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Customer</TableHead>
-                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Date</TableHead>
-                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Payment Method</TableHead>
-                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Grand Total</TableHead>
-                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Status</TableHead>
-                                    <TableHead className="px-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Action</TableHead>
+                                    <TableHead className="px-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('pos.sale_info')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('pos.customer')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('pos.date')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('pos.payment_method')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('pos.grand_total')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('pos.status')}</TableHead>
+                                    <TableHead className="px-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">{t('pos.action')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
@@ -259,7 +262,7 @@ export default function PosHistoryPage() {
                                                     {(sale as any).customer?.name?.[0] || "W"}
                                                 </div>
                                                 <span className="font-bold text-zinc-700 dark:text-zinc-300">
-                                                    {(sale as any).customer?.name || "Walk-in Customer"}
+                                                    {(sale as any).customer?.name || t('pos.walk_in_customer')}
                                                 </span>
                                             </div>
                                         </TableCell>
@@ -273,7 +276,7 @@ export default function PosHistoryPage() {
                                         </TableCell>
                                         <TableCell className="px-6 py-4">
                                             <Badge variant="outline" className="rounded-full bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-800 text-[10px] font-black uppercase tracking-wider px-3 py-0.5">
-                                                {sale.payment_type || "Cash"}
+                                                {sale.payment_type || t('common.cash')}
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="px-6 py-4">
@@ -282,12 +285,12 @@ export default function PosHistoryPage() {
                                                     {currency} {fmt(parseFloat(String(sale.grand_total)))}
                                                 </span>
                                                 <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest">
-                                                    Paid: {fmt(parseFloat(String(sale.paid_amount || 0)))}
+                                                    {t('pos.paid')}: {fmt(parseFloat(String(sale.paid_amount || 0)))}
                                                 </span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="px-6 py-4">
-                                            <StatusBadge status={sale.payment_status || 'Paid'} />
+                                            <StatusBadge status={sale.payment_status || 'Paid'} t={t} />
                                         </TableCell>
                                         <TableCell className="px-8 py-4 text-right">
                                             <div className="flex justify-end">
@@ -302,26 +305,26 @@ export default function PosHistoryPage() {
                                                             onClick={() => router.push(`/sales/edit/${sale.id}`)}
                                                             className="flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-violet-50 dark:hover:bg-violet-900/20 text-violet-600 transition-colors font-bold text-xs uppercase tracking-wider"
                                                         >
-                                                            <Edit2 size={14} /> Edit Sale
+                                                            <Edit2 size={14} /> {t('pos.edit_sale')}
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             onClick={() => { setSelectedSale(sale); setShowPayments(true); }}
                                                             className="flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-indigo-600 transition-colors font-bold text-xs uppercase tracking-wider"
                                                         >
-                                                            <Eye size={14} /> View Details
+                                                            <Eye size={14} /> {t('pos.view_details')}
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             onClick={() => handleDownload(sale)}
                                                             className="flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-emerald-600 transition-colors font-bold text-xs uppercase tracking-wider"
                                                         >
-                                                            <Download size={14} /> Download PDF
+                                                            <Download size={14} /> {t('pos.download_pdf')}
                                                         </DropdownMenuItem>
                                                         {sale.payment_status !== 'Refunded' && (
                                                             <DropdownMenuItem
                                                                 onClick={() => handleRefund(sale)}
                                                                 className="flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-amber-50 dark:hover:bg-amber-900/20 text-amber-600 transition-colors font-bold text-xs uppercase tracking-wider"
                                                             >
-                                                                <RotateCcw size={14} /> Refund Sale
+                                                                <RotateCcw size={14} /> {t('pos.refund_sale')}
                                                             </DropdownMenuItem>
                                                         )}
                                                         <DropdownMenuSeparator className="my-1 bg-zinc-100 dark:bg-zinc-800" />
@@ -329,7 +332,7 @@ export default function PosHistoryPage() {
                                                             onClick={() => handleDelete(sale.id!)}
                                                             className="flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-900/20 text-rose-500 transition-colors font-bold text-xs uppercase tracking-wider"
                                                         >
-                                                            <Trash2 size={14} /> Delete Sale
+                                                            <Trash2 size={14} /> {t('pos.delete_sale')}
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
@@ -344,18 +347,18 @@ export default function PosHistoryPage() {
                                                 <div className="h-24 w-24 rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center text-zinc-200 mb-6">
                                                     <ShoppingCart size={48} />
                                                 </div>
-                                                <h3 className="text-2xl font-black text-zinc-900 dark:text-zinc-100 tracking-tighter uppercase">No POS records found</h3>
+                                                <h3 className="text-2xl font-black text-zinc-900 dark:text-zinc-100 tracking-tighter uppercase">{t('pos.no_records')}</h3>
                                                 <p className="text-zinc-500 dark:text-zinc-400 text-sm max-w-sm mt-2 font-medium">
                                                     {searchTerm || statusFilter !== "all"
-                                                        ? "No sales match your current search or filter criteria."
-                                                        : "You haven't completed any sales through the POS terminal yet."}
+                                                        ? t('pos.no_records_matching')
+                                                        : t('pos.no_records_desc')}
                                                 </p>
                                                 {(!searchTerm && statusFilter === "all") && (
                                                     <Button
                                                         onClick={() => router.push("/pos")}
                                                         className="mt-8 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full h-12 px-10 font-black uppercase tracking-tighter shadow-xl shadow-indigo-500/20"
                                                     >
-                                                        <PlusSquare className="mr-2 h-5 w-5" /> Launch Terminal
+                                                        <PlusSquare className="mr-2 h-5 w-5" /> {t('pos.launch_terminal')}
                                                     </Button>
                                                 )}
                                             </div>
@@ -368,7 +371,11 @@ export default function PosHistoryPage() {
                     {filtered.length > 0 && (
                         <div className="px-8 py-4 bg-zinc-50/50 dark:bg-zinc-900/50 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                             <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest order-2 sm:order-1">
-                                Showing {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filtered.length)} of {filtered.length} Records
+                                {t('common.showing_records', {
+                                    start: (currentPage - 1) * itemsPerPage + 1,
+                                    end: Math.min(currentPage * itemsPerPage, filtered.length),
+                                    total: filtered.length
+                                })}
                             </span>
 
                             {/* Pagination Controls */}
@@ -430,31 +437,31 @@ export default function PosHistoryPage() {
     );
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, t }: { status: string; t: any }) {
     const s = status?.toLowerCase();
     switch (s) {
         case "paid":
             return (
                 <span className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
-                    <CheckCircle2 size={10} /> Paid
+                    <CheckCircle2 size={10} /> {t('common.paid')}
                 </span>
             );
         case "partial":
             return (
                 <span className="inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
-                    <Clock size={10} /> Partial
+                    <Clock size={10} /> {t('common.partial')}
                 </span>
             );
         case "unpaid":
             return (
                 <span className="inline-flex items-center gap-1.5 bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
-                    <XCircle size={10} /> Unpaid
+                    <XCircle size={10} /> {t('common.unpaid')}
                 </span>
             );
         case "refunded":
             return (
                 <span className="inline-flex items-center gap-1.5 bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border border-zinc-500/20 text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
-                    <RotateCcw size={10} /> Refunded
+                    <RotateCcw size={10} /> {t('pos.refunded')}
                 </span>
             );
         default:

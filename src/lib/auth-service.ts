@@ -3,10 +3,7 @@ import api from './axios';
 export const AuthService = {
     async register(data: any) {
         const response = await api.post('/register', data);
-        if (response.data.access_token) {
-            localStorage.setItem('auth_token', response.data.access_token);
-            document.cookie = `auth_token=${response.data.access_token}; path=/; max-age=604800; SameSite=Lax`;
-        }
+        // Registration no longer returns a token - user must verify email first
         return response.data;
     },
 
@@ -54,6 +51,11 @@ export const AuthService = {
 
     async resetPassword(data: { token: string; email: string; password: string; password_confirmation: string }) {
         const response = await api.post('/reset-password', data);
+        return response.data;
+    },
+
+    async resendVerification(email: string) {
+        const response = await api.post('/email/resend', { email });
         return response.data;
     },
 };

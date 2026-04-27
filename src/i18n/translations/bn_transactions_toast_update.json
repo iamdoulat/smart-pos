@@ -1,0 +1,5 @@
+{
+  "transactions.load_failed": "লেনদেন লোড করতে ব্যর্থ হয়েছে",
+  "transactions.delete_success": "লেনদেন সফলভাবে মুছে ফেলা হয়েছে",
+  "transactions.delete_failed": "লেনদেন মুছতে ব্যর্থ হয়েছে"
+}

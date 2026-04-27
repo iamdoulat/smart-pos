@@ -11,9 +11,11 @@ import { toast } from "sonner";
 import { Loader2, Truck, ArrowLeft, MapPin, Edit2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTranslation } from "@/i18n/TranslationContext";
 
 function SupplierFormContent() {
     const router = useRouter();
+    const { t } = useTranslation();
     const searchParams = useSearchParams();
     const { currentCompany } = useAuthStore();
 
@@ -48,7 +50,7 @@ function SupplierFormContent() {
                 const data = await ContactService.getById(Number(contactId));
                 setContact(data);
             } catch (error) {
-                toast.error("Failed to load supplier details");
+                toast.error(t('contacts.failed_to_load_details'));
                 router.push("/contacts/suppliers");
             } finally {
                 setLoading(false);
@@ -86,15 +88,15 @@ function SupplierFormContent() {
         try {
             if (contactId) {
                 await ContactService.update(Number(contactId), formDataPayload);
-                toast.success("Supplier updated successfully");
+                toast.success(t('contacts.supplier_updated_success'));
             } else {
                 await ContactService.create(formDataPayload);
-                toast.success("Supplier added successfully");
+                toast.success(t('contacts.supplier_added_success'));
             }
             router.push("/contacts/suppliers");
         } catch (error: any) {
             console.error("Save error: ", error);
-            const msg = error.response?.data?.message || "Failed to save supplier";
+            const msg = error.response?.data?.message || t('contacts.failed_to_save');
             toast.error(msg);
         } finally {
             setSubmitting(false);
@@ -110,7 +112,7 @@ function SupplierFormContent() {
     }
 
     return (
-        <div className="w-full space-y-6 md:space-y-10 animate-in fade-in duration-700 pb-20 px-8 py-6">
+        <div className="w-full p-4 md:p-6 space-y-6 md:space-y-10 animate-in fade-in duration-700 pb-20 mt-[5px]">
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
                 <Button
@@ -122,15 +124,15 @@ function SupplierFormContent() {
                     <ArrowLeft className="h-5 w-5 md:h-6 md:w-6 text-zinc-600 dark:text-zinc-400" />
                 </Button>
                 <div className="flex items-center gap-3 md:gap-4">
-                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 transform -rotate-3 transition-transform hover:rotate-0">
-                        <Truck size={20} className="md:w-6 md:h-6" />
+                    <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-rose-500/20 flex-shrink-0">
+                        <Truck size={24} />
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase pr-4 leading-tight mb-1">
-                            {contactId ? 'Edit Supplier' : 'New Supplier'}
+                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight leading-tight uppercase pr-4">
+                            {contactId ? t('contacts.edit_supplier') : t('contacts.add_supplier')}
                         </h2>
                         <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
-                            {contactId ? 'Update existing supplier information' : 'Create a new supplier profile'}
+                            {contactId ? t('contacts.supplier_form_desc_edit') : t('contacts.supplier_form_desc_new')}
                         </p>
                     </div>
                 </div>
@@ -146,13 +148,13 @@ function SupplierFormContent() {
                                         value="add-edit"
                                         className="rounded-none border-b-2 border-transparent data-[state=active]:border-purple-500 data-[state=active]:text-purple-600 data-[state=active]:shadow-none bg-transparent hover:bg-transparent px-2 py-3 text-sm font-bold uppercase tracking-wider text-zinc-500"
                                     >
-                                        <Edit2 size={14} className="mr-2 text-purple-500" /> Add/Edit
+                                        <Edit2 size={14} className="mr-2 text-purple-500" /> {t('contacts.tab_add_edit')}
                                     </TabsTrigger>
                                     <TabsTrigger
                                         value="advanced"
                                         className="rounded-none border-b-2 border-transparent data-[state=active]:border-purple-500 data-[state=active]:text-purple-600 data-[state=active]:shadow-none bg-transparent hover:bg-transparent px-2 py-3 text-sm font-bold uppercase tracking-wider text-zinc-500"
                                     >
-                                        <Loader2 size={14} className="mr-2 text-purple-500" /> Advanced
+                                        <Loader2 size={14} className="mr-2 text-purple-500" /> {t('contacts.tab_advanced')}
                                     </TabsTrigger>
                                 </TabsList>
                             </div>
@@ -162,24 +164,24 @@ function SupplierFormContent() {
                                     {/* Column 1 */}
                                     <div className="space-y-6">
                                         <div className="space-y-3">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Supplier Name *</Label>
-                                            <Input name="name" defaultValue={contact?.name} required className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="Enter supplier name" />
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_name_supplier')} *</Label>
+                                            <Input name="name" defaultValue={contact?.name} required className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Email</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_email')}</Label>
                                             <Input name="email" type="email" defaultValue={contact?.email} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="supplier@example.com" />
                                         </div>
                                         <div className="space-y-3">
                                             <Label className="flex justify-between items-center text-[10px] font-black text-black dark:text-white uppercase tracking-widest">
-                                                <span>GST Number</span>
-                                                <a href="#" className="text-purple-500 hover:underline normal-case text-[10px]">Verify</a>
+                                                <span>{t('contacts.label_gst')}</span>
+                                                <a href="#" className="text-purple-500 hover:underline normal-case text-[10px]">{t('contacts.verify')}</a>
                                             </Label>
-                                            <Input name="gst_number" defaultValue={contact?.gst_number} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="Enter GST number" />
+                                            <Input name="gst_number" defaultValue={contact?.gst_number} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                         </div>
                                         <div className="space-y-3">
                                             <Label className="flex justify-between items-center text-[10px] font-black text-black dark:text-white uppercase tracking-widest">
-                                                <span>Credit Limit</span>
-                                                <span className="text-[10px] text-zinc-500 normal-case">-1 for No Limit</span>
+                                                <span>{t('contacts.label_credit_limit')}</span>
+                                                <span className="text-[10px] text-zinc-500 normal-case">{t('contacts.no_limit_hint')}</span>
                                             </Label>
                                             <Input name="credit_limit" type="number" step="0.01" defaultValue={contact?.credit_limit !== undefined ? contact.credit_limit : -1} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium font-mono" />
                                         </div>
@@ -188,26 +190,26 @@ function SupplierFormContent() {
                                     {/* Column 2 */}
                                     <div className="space-y-6">
                                         <div className="space-y-3">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Mobile</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_mobile')}</Label>
                                             <Input name="mobile" defaultValue={contact?.mobile} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="+1..." />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Phone</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_phone')}</Label>
                                             <Input name="phone" defaultValue={contact?.phone} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="Office number" />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">TAX Number</Label>
-                                            <Input name="tax_id" defaultValue={contact?.tax_id} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="Tax Identification Number" />
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_tax')}</Label>
+                                            <Input name="tax_id" defaultValue={contact?.tax_id} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                         </div>
                                         <div className="space-y-3">
                                             <Label className="flex justify-between items-center text-[10px] font-black text-black dark:text-white uppercase tracking-widest">
-                                                <span>Attachment</span>
-                                                <span className="text-[10px] text-red-500 normal-case">Max 2MB</span>
+                                                <span>{t('contacts.label_attachment')}</span>
+                                                <span className="text-[10px] text-red-500 normal-case">{t('contacts.max_size_hint')}</span>
                                             </Label>
                                             <div className="space-y-2">
                                                 <Input name="attachment" type="file" className="h-12 pt-2.5 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100" />
                                                 {contact?.attachment && (
-                                                    <a href={`${process.env.NEXT_PUBLIC_APP_URL}/storage/${contact.attachment}`} target="_blank" className="inline-block text-[10px] font-bold bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1.5 rounded-full transition-colors">View Document</a>
+                                                    <a href={`${process.env.NEXT_PUBLIC_APP_URL}/storage/${contact.attachment}`} target="_blank" className="inline-block text-[10px] font-bold bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1.5 rounded-full transition-colors">{t('contacts.view_document')}</a>
                                                 )}
                                             </div>
                                         </div>
@@ -216,11 +218,11 @@ function SupplierFormContent() {
                                     {/* Column 3 */}
                                     <div className="space-y-6">
                                         <div className="space-y-3">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Opening Balance</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_opening_balance')}</Label>
                                             <Input name="opening_balance" type="number" step="0.01" defaultValue={contact?.opening_balance || 0} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium font-mono" />
                                         </div>
                                         <div className="space-y-3">
-                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Previous Due</Label>
+                                            <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_previous_due')}</Label>
                                             <Input name="previous_due" type="number" step="0.01" defaultValue={contact?.previous_due || 0} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium font-mono" />
                                         </div>
                                     </div>
@@ -236,39 +238,39 @@ function SupplierFormContent() {
                                                     <MapPin size={16} />
                                                 </div>
                                                 <h4 className="text-purple-700 dark:text-purple-400 font-bold uppercase tracking-wider text-sm">
-                                                    Address Details
+                                                    {t('contacts.section_address')}
                                                 </h4>
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Country</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_country')}</Label>
                                                     <Input name="country" defaultValue={contact?.country} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">State</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_state')}</Label>
                                                     <Input name="state" defaultValue={contact?.state} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">City</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_city')}</Label>
                                                     <Input name="city" defaultValue={contact?.city} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Postcode</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_postcode')}</Label>
                                                     <Input name="postcode" defaultValue={contact?.postcode} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                             </div>
 
                                             <div className="space-y-3">
-                                                <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Address Line</Label>
-                                                <textarea name="address" defaultValue={contact?.address} className="w-full min-h-[100px] rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 text-sm bg-zinc-50 dark:bg-zinc-900/50 font-medium focus:ring-2 focus:ring-purple-500 outline-none transition-all resize-y" placeholder="Full street address..." />
+                                                <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_address')}</Label>
+                                                <textarea name="address" defaultValue={contact?.address} className="w-full min-h-[100px] rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 text-sm bg-zinc-50 dark:bg-zinc-900/50 font-medium focus:ring-2 focus:ring-purple-500 outline-none transition-all resize-y" />
                                             </div>
 
                                             <div className="space-y-3">
-                                                <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Location Link (Map)</Label>
+                                                <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_location_link')}</Label>
                                                 <Input name="location_link" defaultValue={contact?.location_link} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="https://maps.google.com/..." />
                                             </div>
                                         </div>
@@ -281,11 +283,11 @@ function SupplierFormContent() {
                                                         <Truck size={16} />
                                                     </div>
                                                     <h4 className="text-orange-700 dark:text-orange-400 font-bold uppercase tracking-wider text-sm">
-                                                        Shipping Address
+                                                        {t('contacts.section_shipping')}
                                                     </h4>
                                                 </div>
                                                 <label className="flex items-center gap-2 cursor-pointer group">
-                                                    <span className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest group-hover:text-zinc-700 transition-colors">Copy Billing</span>
+                                                    <span className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest group-hover:text-zinc-700 transition-colors">{t('contacts.copy_address_supplier')}</span>
                                                     <div className="relative flex items-center justify-center">
                                                         <input type="checkbox" onChange={handleCopyAddress} className="peer appearance-none w-5 h-5 border-2 border-zinc-300 rounded-md checked:bg-orange-500 checked:border-orange-500 transition-colors outline-none focus:ring-2 focus:ring-orange-500/20 focus:ring-offset-1" />
                                                         <Loader2 className="absolute text-white pointer-events-none opacity-0 peer-checked:opacity-100 w-3 h-3" /> {/* Check icon visually */}
@@ -295,33 +297,33 @@ function SupplierFormContent() {
 
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Country</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_country')}</Label>
                                                     <Input name="shipping_country" defaultValue={contact?.shipping_country} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-orange-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">State</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_state')}</Label>
                                                     <Input name="shipping_state" defaultValue={contact?.shipping_state} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-orange-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">City</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_city')}</Label>
                                                     <Input name="shipping_city" defaultValue={contact?.shipping_city} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-orange-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Postcode</Label>
+                                                    <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_postcode')}</Label>
                                                     <Input name="shipping_postcode" defaultValue={contact?.shipping_postcode} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-orange-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" />
                                                 </div>
                                             </div>
 
                                             <div className="space-y-3">
-                                                <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Address Line</Label>
-                                                <textarea name="shipping_address" defaultValue={contact?.shipping_address} className="w-full min-h-[100px] rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 text-sm bg-zinc-50 dark:bg-zinc-900/50 font-medium focus:ring-2 focus:ring-orange-500 outline-none transition-all resize-y" placeholder="Full street address..." />
+                                                <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_address')}</Label>
+                                                <textarea name="shipping_address" defaultValue={contact?.shipping_address} className="w-full min-h-[100px] rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 text-sm bg-zinc-50 dark:bg-zinc-900/50 font-medium focus:ring-2 focus:ring-orange-500 outline-none transition-all resize-y" />
                                             </div>
 
                                             <div className="space-y-3">
-                                                <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Location Link (Map)</Label>
+                                                <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_location_link')}</Label>
                                                 <Input name="shipping_location_link" defaultValue={contact?.shipping_location_link} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-orange-500 bg-zinc-50 dark:bg-zinc-900/50 transition-all font-medium" placeholder="https://maps.google.com/..." />
                                             </div>
                                         </div>
@@ -335,24 +337,24 @@ function SupplierFormContent() {
                                         <div className="h-10 w-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600">
                                             <Edit2 size={20} />
                                         </div>
-                                        Pricing Settings
+                                        {t('contacts.section_pricing')}
                                     </h4>
 
                                     <div className="space-y-3">
-                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Price Level Type</Label>
+                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_price_level_type')}</Label>
                                         <select name="price_level_type" defaultValue={contact?.price_level_type || "Increase"} className="w-full h-12 rounded-xl border border-zinc-200 dark:border-zinc-800 px-4 text-sm bg-white dark:bg-zinc-900 font-medium focus:ring-2 focus:ring-purple-500 outline-none transition-all shadow-sm">
-                                            <option value="Increase">Increase Price</option>
-                                            <option value="Decrease">Decrease Price (Discount)</option>
+                                            <option value="Increase">{t('contacts.option_increase_price')}</option>
+                                            <option value="Decrease">{t('contacts.option_decrease_price')}</option>
                                         </select>
                                     </div>
 
                                     <div className="space-y-3">
-                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">Price Level (%)</Label>
+                                        <Label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest">{t('contacts.label_price_level')}</Label>
                                         <div className="relative">
                                             <Input name="price_level" type="number" step="0.01" defaultValue={contact?.price_level || 0} className="h-12 rounded-xl border-zinc-200 dark:border-zinc-800 focus:ring-purple-500 bg-white dark:bg-zinc-900 pl-12 transition-all font-medium text-lg font-mono shadow-sm" />
                                             <div className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-purple-500 text-lg">%</div>
                                         </div>
-                                        <p className="text-[10px] text-zinc-500 font-medium mt-1">This percentage will be applied automatically to all catalog items for this supplier.</p>
+                                        <p className="text-[10px] text-zinc-500 font-medium mt-1">{t('contacts.price_level_hint')}</p>
                                     </div>
                                 </div>
                             </TabsContent>
@@ -362,17 +364,17 @@ function SupplierFormContent() {
                                     type="button"
                                     variant="outline"
                                     onClick={() => router.push('/contacts/suppliers')}
-                                    className="h-12 bg-white dark:bg-zinc-900 hover:bg-zinc-100 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 px-8 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95"
+                                    className="h-11 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 border-0 text-zinc-600 dark:text-zinc-300 px-8 rounded-full font-bold uppercase tracking-widest transition-all hover:scale-[1.05] active:scale-95"
                                 >
-                                    Cancel
+                                    {t('common.discard')}
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={submitting}
-                                    className="h-12 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 hover:from-indigo-600 hover:via-purple-700 hover:to-pink-600 text-white px-10 rounded-xl font-black uppercase tracking-tighter shadow-lg shadow-purple-500/25 transition-all hover:scale-105 active:scale-95 border-0"
+                                    className="h-11 bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 text-white px-10 rounded-full font-black uppercase tracking-widest shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.05] active:scale-95 border-0"
                                 >
                                     {submitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
-                                    {contactId ? 'Save Changes' : 'Create Supplier'}
+                                    {contactId ? t('common.save') : t('common.create')}
                                 </Button>
                             </div>
                         </Tabs>

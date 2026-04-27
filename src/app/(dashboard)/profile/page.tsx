@@ -47,12 +47,23 @@ const tabs = [
 
 export default function ProfilePage() {
     return (
-        <div className="max-w-3xl mx-auto space-y-6">
-            <div>
-                <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight">Account Profile</h2>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                    Manage your personal account settings and preferences.
-                </p>
+        <div className="w-full p-4 md:p-6 space-y-6 md:space-y-8 animate-in fade-in duration-700 pb-20">
+            {/* ── Header ── */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-center gap-4 md:gap-6">
+                    <div className="h-12 w-12 md:h-14 md:w-14 rounded-[1.5rem] bg-gradient-to-br from-rose-500 to-orange-600 flex items-center justify-center text-white shadow-2xl shadow-orange-500/30 relative group transition-all duration-500 hover:scale-105">
+                        <User size={24} strokeWidth={2.5} className="relative z-10" />
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-[1.5rem]" />
+                    </div>
+                    <div className="space-y-1">
+                        <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-orange-400 via-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tighter uppercase leading-none">
+                            Account Profile
+                        </h1>
+                        <p className="text-[9px] md:text-[11px] text-zinc-500 dark:text-zinc-400 font-black tracking-[0.2em] uppercase opacity-70">
+                            Manage your personal account settings and preferences.
+                        </p>
+                    </div>
+                </div>
             </div>
 
             <Tabs defaultValue="profile" className="space-y-6">

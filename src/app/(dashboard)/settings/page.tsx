@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AuthService } from "@/lib/auth-service";
 import { useAuthStore } from "@/lib/store";
 import { toast } from "sonner";
+import { useTranslation } from "@/i18n/TranslationContext";
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -36,23 +37,25 @@ type PasswordForm = z.infer<typeof passwordSchema>;
 
 // ─── Tab Config ───────────────────────────────────────────────────────────────
 
-const tabs = [
-    { id: "profile", label: "Profile", icon: User },
-    { id: "password", label: "Password", icon: KeyRound },
-    { id: "appearance", label: "Appearance", icon: Palette },
+const getTabs = (t: any) => [
+    { id: "profile", label: t('settings.tab_profile') || "Profile", icon: User },
+    { id: "password", label: t('settings.tab_password') || "Password", icon: KeyRound },
+    { id: "appearance", label: t('settings.tab_appearance') || "Appearance", icon: Palette },
 ];
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState("profile");
+    const tabs = getTabs(t);
 
     return (
-        <div className="max-w-3xl mx-auto space-y-6">
+        <div className="w-full p-4 md:p-6 space-y-6">
             <div>
-                <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Settings</h2>
+                <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{t('settings.title')}</h2>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                    Manage your account settings and preferences.
+                    {t('settings.subtitle')}
                 </p>
             </div>
 
@@ -86,6 +89,7 @@ export default function SettingsPage() {
 // ─── Profile Tab ──────────────────────────────────────────────────────────────
 
 function ProfileTab() {
+    const { t } = useTranslation();
     const { user, setUser } = useAuthStore();
     const [saving, setSaving] = useState(false);
 
@@ -102,9 +106,9 @@ function ProfileTab() {
         try {
             const updated = await AuthService.updateProfile(data);
             setUser(updated);
-            toast.success("Profile updated successfully!");
+            toast.success(t('settings.success_profile_update') || "Profile updated successfully!");
         } catch (err: any) {
-            const msg = err?.response?.data?.message || "Failed to update profile.";
+            const msg = err?.response?.data?.message || t('settings.error_profile_update') || "Failed to update profile.";
             toast.error(msg);
         } finally {
             setSaving(false);
@@ -118,8 +122,8 @@ function ProfileTab() {
     return (
         <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
             <CardHeader className="pb-4">
-                <CardTitle className="text-zinc-900 dark:text-zinc-100">Profile Information</CardTitle>
-                <CardDescription>Update your name and email address.</CardDescription>
+                <CardTitle className="text-zinc-900 dark:text-zinc-100">{t('settings.profile_title')}</CardTitle>
+                <CardDescription>{t('settings.profile_subtitle')}</CardDescription>
             </CardHeader>
             <CardContent>
                 {/* Avatar */}
@@ -135,7 +139,7 @@ function ProfileTab() {
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                     <div className="space-y-1.5">
-                        <Label htmlFor="name">Full Name</Label>
+                        <Label htmlFor="name">{t('settings.full_name')}</Label>
                         <Input
                             id="name"
                             placeholder="John Doe"
@@ -146,7 +150,7 @@ function ProfileTab() {
                     </div>
 
                     <div className="space-y-1.5">
-                        <Label htmlFor="email">Email Address</Label>
+                        <Label htmlFor="email">{t('settings.email_address')}</Label>
                         <Input
                             id="email"
                             type="email"
@@ -160,7 +164,7 @@ function ProfileTab() {
                     <div className="flex justify-end pt-2">
                         <Button type="submit" disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2">
                             <Save size={15} />
-                            {saving ? "Saving..." : "Save Changes"}
+                            {saving ? t('settings.saving') : t('settings.save_changes')}
                         </Button>
                     </div>
                 </form>
@@ -172,6 +176,7 @@ function ProfileTab() {
 // ─── Password Tab ─────────────────────────────────────────────────────────────
 
 function PasswordTab() {
+    const { t } = useTranslation();
     const [saving, setSaving] = useState(false);
     const [showCurrent, setShowCurrent] = useState(false);
     const [showNew, setShowNew] = useState(false);
@@ -185,10 +190,10 @@ function PasswordTab() {
         setSaving(true);
         try {
             await AuthService.updatePassword(data);
-            toast.success("Password changed successfully!");
+            toast.success(t('settings.success_password_change') || "Password changed successfully!");
             reset();
         } catch (err: any) {
-            const msg = err?.response?.data?.message || "Failed to update password.";
+            const msg = err?.response?.data?.message || t('settings.error_password_update') || "Failed to update password.";
             toast.error(msg);
         } finally {
             setSaving(false);
@@ -198,14 +203,14 @@ function PasswordTab() {
     return (
         <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
             <CardHeader className="pb-4">
-                <CardTitle className="text-zinc-900 dark:text-zinc-100">Change Password</CardTitle>
-                <CardDescription>Choose a strong password to secure your account.</CardDescription>
+                <CardTitle className="text-zinc-900 dark:text-zinc-100">{t('settings.password_title')}</CardTitle>
+                <CardDescription>{t('settings.password_subtitle')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                     {/* Current Password */}
                     <div className="space-y-1.5">
-                        <Label htmlFor="current_password">Current Password</Label>
+                        <Label htmlFor="current_password">{t('settings.current_password')}</Label>
                         <div className="relative">
                             <Input
                                 id="current_password"
@@ -223,7 +228,7 @@ function PasswordTab() {
 
                     {/* New Password */}
                     <div className="space-y-1.5">
-                        <Label htmlFor="password">New Password</Label>
+                        <Label htmlFor="password">{t('settings.new_password')}</Label>
                         <div className="relative">
                             <Input
                                 id="password"
@@ -241,7 +246,7 @@ function PasswordTab() {
 
                     {/* Confirm Password */}
                     <div className="space-y-1.5">
-                        <Label htmlFor="password_confirmation">Confirm New Password</Label>
+                        <Label htmlFor="password_confirmation">{t('settings.confirm_password')}</Label>
                         <div className="relative">
                             <Input
                                 id="password_confirmation"
@@ -260,7 +265,7 @@ function PasswordTab() {
                     <div className="flex justify-end pt-2">
                         <Button type="submit" disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2">
                             <Save size={15} />
-                            {saving ? "Updating..." : "Update Password"}
+                            {saving ? t('settings.updating') : t('settings.update_password')}
                         </Button>
                     </div>
                 </form>
@@ -271,20 +276,22 @@ function PasswordTab() {
 
 // ─── Appearance Tab ───────────────────────────────────────────────────────────
 
-const themes = [
-    { id: "light", label: "Light", icon: Sun, description: "Clean and bright interface" },
-    { id: "dark", label: "Dark", description: "Easy on the eyes at night", icon: Moon },
-    { id: "system", label: "System", description: "Follows your OS preference", icon: Monitor },
+const getThemes = (t: any) => [
+    { id: "light", label: t('settings.theme_light') || "Light", icon: Sun, description: t('settings.theme_light_desc') || "Clean and bright interface" },
+    { id: "dark", label: t('settings.theme_dark') || "Dark", description: t('settings.theme_dark_desc') || "Easy on the eyes at night", icon: Moon },
+    { id: "system", label: t('settings.theme_system') || "System", description: t('settings.theme_system_desc') || "Follows your OS preference", icon: Monitor },
 ];
 
 function AppearanceTab() {
+    const { t } = useTranslation();
+    const themes = getThemes(t);
     const { theme, setTheme } = useTheme();
 
     return (
         <Card className="border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
             <CardHeader className="pb-4">
-                <CardTitle className="text-zinc-900 dark:text-zinc-100">Appearance</CardTitle>
-                <CardDescription>Choose how the dashboard looks and feels.</CardDescription>
+                <CardTitle className="text-zinc-900 dark:text-zinc-100">{t('settings.appearance_title')}</CardTitle>
+                <CardDescription>{t('settings.appearance_subtitle')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
                 {themes.map((t) => {

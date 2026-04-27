@@ -8,6 +8,7 @@ export interface User {
     phone?: string;
     role?: string;
     designation?: string;
+    is_active?: boolean;
     created_at?: string;
     updated_at?: string;
 }
@@ -30,5 +31,10 @@ export const UserService = {
 
     async deleteUser(id: number): Promise<void> {
         await api.delete(`/users/${id}`);
+    },
+
+    async toggleActive(id: number, is_active: boolean): Promise<User> {
+        const response = await api.put(`/users/${id}/toggle-active`, { is_active });
+        return response.data.user;
     },
 };

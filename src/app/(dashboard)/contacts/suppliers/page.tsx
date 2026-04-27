@@ -21,6 +21,7 @@ import {
     FolderKanban,
     ChevronLeft,
     ChevronRight,
+    Users,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,9 +39,11 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useTranslation } from "@/i18n/TranslationContext";
 
 function SuppliersContent() {
     const router = useRouter();
+    const { t } = useTranslation();
     const searchParams = useSearchParams();
     const { currentCompany } = useAuthStore();
     const [contacts, setContacts] = useState<Contact[]>([]);
@@ -51,8 +54,6 @@ function SuppliersContent() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 20;
 
-
-
     const loadContacts = async () => {
         if (!currentCompany) return;
         try {
@@ -60,7 +61,7 @@ function SuppliersContent() {
             const data = await ContactService.getAll(currentCompany.id, 'vendor');
             setContacts(data);
         } catch (error) {
-            toast.error("Failed to load suppliers");
+            toast.error(t('contacts.failed_to_load_suppliers'));
         } finally {
             setLoading(false);
         }
@@ -70,15 +71,13 @@ function SuppliersContent() {
         loadContacts();
     }, [currentCompany]);
 
-
-
     const handleDelete = async (id: number) => {
         try {
             await ContactService.delete(id);
-            toast.success("Supplier deleted successfully");
+            toast.success(t('contacts.supplier_deleted_success'));
             loadContacts();
         } catch (error) {
-            toast.error("Failed to delete supplier");
+            toast.error(t('contacts.failed_to_delete_supplier'));
         }
     };
 
@@ -100,36 +99,39 @@ function SuppliersContent() {
     }, [searchTerm]);
 
     return (
-        <div className="w-full space-y-4 animate-in fade-in duration-700 pb-20 px-8 py-6">
+        <div className="w-full p-4 md:p-6 space-y-6 md:space-y-8 animate-in fade-in duration-700 pb-20">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div className="flex items-center gap-3 md:gap-4">
-                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 transform rotate-3 transition-transform hover:rotate-0">
-                        <Truck size={20} className="md:w-6 md:h-6" />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-center gap-4 md:gap-6">
+                    <div className="h-12 w-12 md:h-14 md:w-14 rounded-[1.5rem] bg-gradient-to-br from-rose-500 to-orange-600 flex items-center justify-center text-white shadow-2xl shadow-orange-500/30 relative group transition-all duration-500 hover:scale-105">
+                        <Truck size={24} strokeWidth={2.5} className="relative z-10" />
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-[1.5rem]" />
                     </div>
-                    <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase py-1 leading-none mb-1">Suppliers</h2>
-                        <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
-                            Manage your vendors and supply chain partners.
+                    <div className="space-y-1">
+                        <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-orange-400 via-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tighter uppercase leading-tight pt-[5px]">
+                            {t('contacts.suppliers_title')}
+                        </h1>
+                        <p className="text-[9px] md:text-[11px] text-zinc-500 dark:text-zinc-400 font-black tracking-[0.2em] uppercase opacity-70">
+                            {t('contacts.suppliers_subtitle')}
                         </p>
                     </div>
                 </div>
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                     {/* Search */}
                     <div className="relative w-full sm:w-80 group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-purple-500 transition-colors" size={20} />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" size={20} />
                         <Input
-                            placeholder="Search suppliers by name, email or phone..."
-                            className="pl-12 h-12 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm focus:ring-2 focus:ring-purple-500 transition-all font-medium"
+                            placeholder={t('contacts.search_suppliers')}
+                            className="pl-12 h-12 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-full shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <Button
                         onClick={() => router.push('/contacts/suppliers/form')}
-                        className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 text-white rounded-xl px-8 h-12 shadow-lg shadow-indigo-500/25 font-black uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0"
+                        className="w-full sm:w-auto bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-full px-10 h-12 shadow-xl shadow-orange-500/20 font-black uppercase tracking-widest text-[10px] transition-all hover:scale-[1.02] active:scale-95 border-0"
                     >
-                        <PlusSquare className="mr-2 h-5 w-5" /> Add Supplier
+                        <PlusSquare size={18} strokeWidth={3} className="mr-2" /> {t('contacts.add_supplier')}
                     </Button>
                 </div>
             </div>
@@ -145,12 +147,12 @@ function SuppliersContent() {
                         <table className="w-full text-sm text-left">
                             <thead className="bg-zinc-50 dark:bg-zinc-900/50 text-black dark:text-white uppercase font-black tracking-widest text-xs">
                                 <tr>
-                                    <th className="px-6 py-4 rounded-tl-xl">Supplier Name</th>
-                                    <th className="px-6 py-4">Mobile No.</th>
-                                    <th className="px-6 py-4">Email ID</th>
-                                    <th className="px-6 py-4 text-center">Opening Balance</th>
-                                    <th className="px-6 py-4">Address</th>
-                                    <th className="px-6 py-4 text-right rounded-tr-xl">Actions</th>
+                                    <th className="px-6 py-4 rounded-tl-xl">{t('contacts.table_supplier_name')}</th>
+                                    <th className="px-6 py-4">{t('contacts.table_mobile')}</th>
+                                    <th className="px-6 py-4">{t('contacts.table_email')}</th>
+                                    <th className="px-6 py-4 text-center">{t('contacts.table_balance')}</th>
+                                    <th className="px-6 py-4">{t('contacts.table_address')}</th>
+                                    <th className="px-6 py-4 text-right rounded-tr-xl">{t('inventory.table_action') || "Actions"}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
@@ -166,7 +168,7 @@ function SuppliersContent() {
                                                     <span>{contact.mobile || contact.phone}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-zinc-400 text-xs">No mobile</span>
+                                                <span className="text-zinc-400 text-xs">{t('contacts.no_mobile')}</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4">
@@ -176,7 +178,7 @@ function SuppliersContent() {
                                                     <span>{contact.email}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-zinc-400 text-xs">No email</span>
+                                                <span className="text-zinc-400 text-xs">{t('contacts.no_email')}</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 text-center">
@@ -191,7 +193,7 @@ function SuppliersContent() {
                                                     <span className="truncate leading-relaxed" title={contact.address}>{contact.address}</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-zinc-400 text-xs">No address</span>
+                                                <span className="text-zinc-400 text-xs">{t('contacts.no_address')}</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 text-right">
@@ -219,14 +221,20 @@ function SuppliersContent() {
                                                             <div className="h-16 w-16 rounded-2xl bg-white/20 flex items-center justify-center mb-4">
                                                                 <Trash2 size={32} />
                                                             </div>
-                                                            <AlertDialogTitle className="text-2xl font-black tracking-tighter uppercase leading-none">Delete Supplier?</AlertDialogTitle>
+                                                            <AlertDialogTitle className="text-2xl font-black tracking-tighter uppercase leading-none">
+                                                                {t('contacts.delete_supplier_title')}
+                                                            </AlertDialogTitle>
                                                             <AlertDialogDescription className="text-red-50 mt-2 font-medium">
-                                                                This action will permanently delete <span className="font-bold underline">{contact.name}</span> and all associated purchase records.
+                                                                {t('contacts.delete_supplier_desc', { name: contact.name })}
                                                             </AlertDialogDescription>
                                                         </div>
                                                         <AlertDialogFooter className="p-6 bg-white dark:bg-zinc-950 gap-3">
-                                                            <AlertDialogCancel className="rounded-xl border-zinc-200 dark:border-zinc-800 font-bold px-8 h-12">Cancel</AlertDialogCancel>
-                                                            <AlertDialogAction onClick={() => handleDelete(contact.id)} className="bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold px-10 h-12 shadow-lg shadow-red-500/20 border-0">Confirm Delete</AlertDialogAction>
+                                                            <AlertDialogCancel className="rounded-xl border-zinc-200 dark:border-zinc-800 font-bold px-8 h-12">
+                                                                {t('common.cancel') || "Cancel"}
+                                                            </AlertDialogCancel>
+                                                            <AlertDialogAction onClick={() => handleDelete(contact.id)} className="bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold px-10 h-12 shadow-lg shadow-red-500/20 border-0">
+                                                                {t('transactions.confirm_delete') || "Confirm Delete"}
+                                                            </AlertDialogAction>
                                                         </AlertDialogFooter>
                                                     </AlertDialogContent>
                                                 </AlertDialog>
@@ -236,21 +244,23 @@ function SuppliersContent() {
                                 ))}
                                 {filteredContacts.length === 0 && (
                                     <tr>
-                                        <td colSpan={4} className="px-6 py-20 text-center">
+                                        <td colSpan={6} className="px-6 py-20 text-center">
                                             <div className="flex flex-col items-center justify-center">
                                                 <div className="h-20 w-20 rounded-3xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-300 mb-6">
                                                     <Truck size={40} />
                                                 </div>
-                                                <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">No suppliers found</h3>
+                                                <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                                                    {t('contacts.no_suppliers_found')}
+                                                </h3>
                                                 <p className="text-zinc-500 dark:text-zinc-400 text-sm max-w-sm mt-2 font-medium leading-relaxed">
-                                                    {searchTerm ? "No suppliers match your search criteria." : "Your supplier directory is currently empty. Click the button above to add your first vendor."}
+                                                    {searchTerm ? t('contacts.no_suppliers_desc') : t('contacts.no_suppliers_empty')}
                                                 </p>
                                                 {!searchTerm && (
                                                     <Button
                                                         onClick={() => router.push('/contacts/suppliers/form')}
                                                         className="mt-8 bg-purple-600 hover:bg-purple-700 text-white rounded-xl h-12 px-8 font-bold shadow-lg shadow-purple-500/20"
                                                     >
-                                                        <PlusSquare className="mr-2 h-5 w-5" /> Add Supplier
+                                                        <PlusSquare className="mr-2 h-5 w-5" /> {t('contacts.add_supplier')}
                                                     </Button>
                                                 )}
                                             </div>
@@ -265,7 +275,11 @@ function SuppliersContent() {
                     {filteredContacts.length > 0 && (
                         <div className="px-8 py-4 bg-zinc-50/50 dark:bg-zinc-900/50 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                             <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest order-2 sm:order-1">
-                                Showing {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredContacts.length)} of {filteredContacts.length} Records
+                                {t('contacts.showing_records', {
+                                    start: (currentPage - 1) * itemsPerPage + 1,
+                                    end: Math.min(currentPage * itemsPerPage, filteredContacts.length),
+                                    total: filteredContacts.length
+                                })}
                             </span>
 
                             <div className="flex items-center gap-2 order-1 sm:order-2">

@@ -19,6 +19,7 @@ import {
     Banknote,
     Coins,
 } from "lucide-react";
+import { useTranslation } from "@/i18n/TranslationContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +38,7 @@ export default function PaymentSettingsPage() {
     const [configs, setConfigs] = useState<PaymentConfiguration[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+    const { t } = useTranslation();
 
     // Modal states
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -65,7 +67,7 @@ export default function PaymentSettingsPage() {
             setConfigs(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("Failed to fetch payment configs:", error);
-            toast.error("Failed to load payment configurations");
+            toast.error(t("payments.error_load"));
         } finally {
             setLoading(false);
         }
@@ -101,11 +103,11 @@ export default function PaymentSettingsPage() {
         try {
             setSubmitting(true);
             await PaymentService.createConfiguration(formData);
-            toast.success("Payment method added successfully");
+            toast.success(t("payments.success_add"));
             setIsAddModalOpen(false);
             fetchConfigs();
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to add payment method");
+            toast.error(error.response?.data?.message || t("payments.error_delete")); // Using fallback
         } finally {
             setSubmitting(false);
         }
@@ -120,24 +122,24 @@ export default function PaymentSettingsPage() {
             if (!updateProps.client_secret) delete updateProps.client_secret;
 
             await PaymentService.updateConfiguration(selectedConfig.id, updateProps);
-            toast.success("Configuration updated successfully");
+            toast.success(t("payments.success_update"));
             setIsEditModalOpen(false);
             fetchConfigs();
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to update configuration");
+            toast.error(error.response?.data?.message || t("payments.error_delete")); // Using fallback
         } finally {
             setSubmitting(false);
         }
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm("Are you sure you want to delete this payment method?")) return;
+        if (!confirm(t("common.confirm_delete_text"))) return;
         try {
             await PaymentService.deleteConfiguration(id);
-            toast.success("Payment method deleted successfully");
+            toast.success(t("payments.success_delete"));
             fetchConfigs();
         } catch (error: any) {
-            toast.error("Failed to delete payment method");
+            toast.error(t("payments.error_delete"));
         }
     };
 
@@ -161,130 +163,94 @@ export default function PaymentSettingsPage() {
             case 'cash': return "from-emerald-400 to-teal-600";
             case 'card': return "from-blue-400 to-indigo-600";
             case 'paypal': return "from-indigo-400 to-purple-600";
-            case 'interac': return "from-amber-400 to-orange-600";
             default: return "from-zinc-400 to-zinc-600";
         }
     };
 
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6 md:space-y-10 animate-in fade-in duration-700">
+        <div className="w-full p-4 md:p-6 space-y-8 animate-in fade-in duration-700">
             {/* Header Section */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div className="flex items-center gap-3 md:gap-4">
-                    <div className="h-10 w-10 md:h-14 md:w-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white shadow-[0_8px_30px_rgb(99,102,241,0.3)] transform rotate-3 transition-transform hover:rotate-0">
-                        <CreditCard size={20} className="md:w-7 md:h-7" />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-rose-500/20">
+                        <CreditCard size={24} />
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-4xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent tracking-tighter uppercase italic py-1 leading-none">
-                            Payment Gateway
-                        </h2>
-                        <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight uppercase tracking-widest mt-1 opacity-60">
-                            Manage POS & Web Payment Methods
-                        </p>
+                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight">{t("payments.title")}</h2>
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("payments.subtitle")}</p>
                     </div>
                 </div>
 
-                <div className="flex flex-row items-center gap-3 md:gap-4">
-                    <div className="relative group min-w-[140px] xs:min-w-[200px]">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
+                <div className="flex flex-row items-center gap-3">
+                    <div className="relative group w-full md:w-80">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                         <Input
-                            placeholder="Filter methods..."
-                            className="pl-12 pr-4 h-12 w-full sm:w-64 md:w-80 rounded-2xl bg-white dark:bg-zinc-900 border-2 border-zinc-100 dark:border-zinc-800 focus:border-indigo-500 dark:focus:border-indigo-500 transition-all font-bold shadow-sm"
+                            placeholder={t("payments.filter_placeholder")}
+                            className="pl-12 h-12 rounded-2xl border-zinc-200 dark:border-zinc-800"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <Button
                         onClick={handleOpenAddModal}
-                        className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl px-4 md:px-8 gap-2 shadow-xl shadow-indigo-500/20 h-12 flex items-center justify-center whitespace-nowrap border-0 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 text-white rounded-full px-6 gap-2 h-11 hover:scale-[1.02] active:scale-95 transition-all shadow-md font-bold border-0"
                     >
-                        <Plus size={20} />
-                        <span className="font-black uppercase tracking-tighter italic">Add Method</span>
+                        <Plus size={18} />
+                        <span className="hidden md:inline">{t("payments.add_btn")}</span>
                     </Button>
                 </div>
             </div>
 
             {/* List Section */}
             {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[1, 2, 3].map(i => (
-                        <div key={i} className="h-80 rounded-[48px] bg-zinc-100 dark:bg-zinc-800 animate-pulse border-2 border-zinc-200 dark:border-zinc-700" />
+                        <div key={i} className="h-64 rounded-2xl bg-zinc-100 dark:bg-zinc-800 animate-pulse border border-zinc-200 dark:border-zinc-700" />
                     ))}
                 </div>
             ) : filteredConfigs.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredConfigs.map(config => (
                         <div
                             key={config.id}
-                            className={cn(
-                                "group relative h-full bg-white dark:bg-zinc-900 rounded-[3rem] border-2 transition-all duration-500 overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 flex flex-col",
-                                config.is_active ? "border-zinc-100 dark:border-zinc-800" : "border-red-100 dark:border-red-900/10 opacity-75 grayscale-[0.8]"
-                            )}
+                            className="group relative bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden transition-all hover:shadow-md"
                         >
-                            <div className={cn(
-                                "h-24 transition-all duration-700 group-hover:h-32 bg-gradient-to-br p-6",
-                                getGradient(config.provider)
-                            )} />
+                            <div className="absolute top-4 right-4 z-10">
+                                <Badge className={cn(
+                                    "rounded-full px-3 py-1 font-bold",
+                                    config.is_active ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30" : "bg-red-100 text-red-700 dark:bg-red-900/30"
+                                )}>
+                                    {config.is_active ? t("payments.enabled") : t("payments.disabled")}
+                                </Badge>
+                            </div>
 
-                            <div className="px-8 pb-8 flex-1 flex flex-col">
-                                <div className="flex justify-between items-start -mt-12 mb-6">
-                                    <div className="h-24 w-24 rounded-[2rem] bg-white dark:bg-zinc-900 shadow-2xl border-4 border-white dark:border-zinc-900 flex items-center justify-center transform group-hover:scale-110 transition-transform duration-500">
+                            <div className="p-6 space-y-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="h-14 w-14 rounded-xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center border border-zinc-100 dark:border-zinc-700 shadow-sm">
                                         {getIcon(config.provider)}
                                     </div>
-                                    <div className="pt-14 flex flex-col items-end gap-2">
-                                        <div className="flex gap-2">
-                                            {config.is_live ? (
-                                                <Badge className="rounded-full px-3 py-1 font-black bg-emerald-500 text-white border-0 shadow-lg shadow-emerald-500/20 text-[10px] uppercase">
-                                                    LIVE
-                                                </Badge>
-                                            ) : (
-                                                <Badge className="rounded-full px-3 py-1 font-black bg-amber-500 text-white border-0 shadow-lg shadow-amber-500/20 text-[10px] uppercase">
-                                                    TEST
-                                                </Badge>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4 flex-1">
                                     <div>
-                                        <h3 className="text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tighter truncate uppercase italic">{config.name}</h3>
-                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mt-0.5">{config.provider} Provider</p>
+                                        <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{config.name}</h3>
+                                        <p className="text-xs text-zinc-500 uppercase font-black tracking-widest">{config.provider}</p>
                                     </div>
-
-                                    {config.client_id && (
-                                        <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
-                                            <span className="text-zinc-400 font-black uppercase text-[9px] tracking-widest block mb-1">Account / App ID</span>
-                                            <span className="font-mono text-[10px] text-zinc-600 dark:text-zinc-400 break-all leading-tight">
-                                                {config.client_id}
-                                            </span>
-                                        </div>
-                                    )}
                                 </div>
 
-                                <div className="pt-8 flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 mt-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className={cn("h-2.5 w-2.5 rounded-full", config.is_active ? "bg-emerald-500 shadow-[0_0_10px_rgb(16,185,129,0.5)] animate-pulse" : "bg-zinc-300")} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{config.is_active ? 'ENABLED' : 'DISABLED'}</span>
-                                    </div>
-                                    <div className="flex gap-1">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => handleOpenEditModal(config)}
-                                            className="h-9 w-9 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-indigo-600 transition-colors"
-                                        >
-                                            <Edit2 size={16} />
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => handleDelete(config.id)}
-                                            className="h-9 w-9 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-zinc-400 hover:text-red-600 transition-colors"
-                                        >
-                                            <Trash2 size={16} />
-                                        </Button>
-                                    </div>
+                                <div className="flex gap-3">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => handleOpenEditModal(config)}
+                                        className="flex-1 rounded-xl border-zinc-200 dark:border-zinc-700 font-bold h-12 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                                    >
+                                        <Edit2 size={16} className="mr-2 text-indigo-500" />
+                                        {t("payments.edit_btn", "Edit")}
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => handleDelete(config.id)}
+                                        className="rounded-xl border-zinc-200 dark:border-zinc-700 text-red-600 hover:bg-red-50 hover:text-red-700 h-12 px-4"
+                                    >
+                                        <Trash2 size={16} />
+                                    </Button>
                                 </div>
                             </div>
                         </div>
@@ -295,13 +261,13 @@ export default function PaymentSettingsPage() {
                     <div className="h-24 w-24 rounded-[32px] bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center text-indigo-300 mb-8 transform rotate-12">
                         <Coins size={48} />
                     </div>
-                    <h3 className="text-3xl font-black italic tracking-tighter text-zinc-900 dark:text-zinc-100 mb-3 uppercase">Empty Vault</h3>
-                    <p className="text-lg text-zinc-500 dark:text-zinc-400 max-w-sm mb-12 font-bold tracking-tight">Set up your payment methods to start accepting sales in Quebec.</p>
+                    <h3 className="text-3xl font-black italic tracking-tighter text-zinc-900 dark:text-zinc-100 mb-3 uppercase">{t("payments.empty_title")}</h3>
+                    <p className="text-lg text-zinc-500 dark:text-zinc-400 max-w-sm mb-12 font-bold tracking-tight">{t("payments.empty_desc")}</p>
                     <Button
                         onClick={handleOpenAddModal}
                         className="bg-indigo-600 text-white rounded-3xl px-12 h-16 font-black text-xl hover:bg-indigo-700 transition-all shadow-2xl shadow-indigo-500/20 border-0"
                     >
-                        INITIALIZE GATEWAY
+                        {t("payments.init_gateway")}
                     </Button>
                 </div>
             )}
@@ -326,12 +292,12 @@ export default function PaymentSettingsPage() {
                         </Button>
                         <DialogTitle className="text-3xl md:text-4xl font-black tracking-tighter flex items-center gap-3 uppercase italic leading-none">
                             {isAddModalOpen ? <Plus size={32} /> : <Edit2 size={32} />}
-                            {isAddModalOpen ? 'Configure Method' : 'Modify Method'}
+                            {isAddModalOpen ? t("payments.config_title") : t("payments.modify_title")}
                         </DialogTitle>
                         <DialogDescription className="text-white/70 text-sm mt-3 font-bold uppercase tracking-widest opacity-80">
                             {isAddModalOpen
-                                ? 'Enable a new payment option for your POS system.'
-                                : `Editing configuration for: ${selectedConfig?.name}`
+                                ? t("payments.config_desc")
+                                : `${t("payments.modify_desc")} ${selectedConfig?.name}`
                             }
                         </DialogDescription>
                     </div>
@@ -341,7 +307,7 @@ export default function PaymentSettingsPage() {
                             <div className="grid grid-cols-1 gap-8">
                                 {/* Provider Selection */}
                                 <div className="space-y-4">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 px-1">Payment Type</label>
+                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 px-1">{t("payments.type_label")}</label>
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                         {[
                                             { id: 'Cash', icon: Banknote, color: 'emerald' },
@@ -374,7 +340,7 @@ export default function PaymentSettingsPage() {
 
                                 {/* Custom Name */}
                                 <div className="space-y-3">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 px-1">Method Label</label>
+                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 px-1">{t("payments.label_label")}</label>
                                     <div className="relative group">
                                         <Layers className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-indigo-500 transition-colors" size={20} />
                                         <Input
@@ -391,7 +357,7 @@ export default function PaymentSettingsPage() {
                                     <>
                                         {/* Client ID */}
                                         <div className="space-y-3">
-                                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 px-1">API Client ID / Email</label>
+                                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 px-1">{t("payments.client_id_label")}</label>
                                             <div className="relative group">
                                                 <Globe className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-purple-500 transition-colors" size={20} />
                                                 <Input
@@ -406,7 +372,7 @@ export default function PaymentSettingsPage() {
 
                                         {/* Client Secret */}
                                         <div className="space-y-3">
-                                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 px-1">API Secret / Password</label>
+                                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 px-1">{t("payments.client_secret_label")}</label>
                                             <div className="relative group">
                                                 <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-pink-500 transition-colors" size={20} />
                                                 <Input
@@ -426,8 +392,8 @@ export default function PaymentSettingsPage() {
                                     {/* Mode Selection */}
                                     <div className="flex items-center justify-between p-6 bg-zinc-50 dark:bg-zinc-900 rounded-3xl border-2 border-zinc-100 dark:border-zinc-800">
                                         <div className="space-y-1">
-                                            <h4 className="text-xs font-black tracking-tight uppercase italic">{formData.is_live ? 'Live Mode' : 'Sandbox'}</h4>
-                                            <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider opacity-60">Production Status</p>
+                                            <h4 className="text-xs font-black tracking-tight uppercase italic">{formData.is_live ? t("payments.live_mode") : t("payments.sandbox")}</h4>
+                                            <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider opacity-60">{t("payments.prod_status")}</p>
                                         </div>
                                         <Switch
                                             checked={formData.is_live}
@@ -439,8 +405,8 @@ export default function PaymentSettingsPage() {
                                     {/* Status Selection */}
                                     <div className="flex items-center justify-between p-6 bg-zinc-50 dark:bg-zinc-900 rounded-3xl border-2 border-zinc-100 dark:border-zinc-800">
                                         <div className="space-y-1">
-                                            <h4 className="text-xs font-black tracking-tight uppercase italic">{!formData.is_active ? 'Disabled' : 'Enabled'}</h4>
-                                            <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider opacity-60">Visibility Switch</p>
+                                            <h4 className="text-xs font-black tracking-tight uppercase italic">{!formData.is_active ? t("payments.disabled") : t("payments.enabled")}</h4>
+                                            <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider opacity-60">{t("payments.visibility_switch")}</p>
                                         </div>
                                         <Switch
                                             checked={formData.is_active}
@@ -460,7 +426,7 @@ export default function PaymentSettingsPage() {
                                 onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }}
                                 className="w-full sm:w-auto rounded-full px-12 font-black uppercase italic tracking-tighter h-14 text-zinc-500 hover:text-zinc-900"
                             >
-                                Discard
+                                {t("payments.discard")}
                             </Button>
                             <Button
                                 type="submit"
@@ -468,7 +434,7 @@ export default function PaymentSettingsPage() {
                                 className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-full px-16 gap-3 shadow-[0_20px_40px_-10px_rgba(99,102,241,0.4)] font-black h-14 uppercase italic tracking-tighter text-xl group transform hover:scale-[1.02] active:scale-95 transition-all border-0"
                             >
                                 {submitting ? <Loader2 className="animate-spin" size={24} /> : <CheckCircle2 size={24} />}
-                                {submitting ? "Processing" : (isAddModalOpen ? 'Create Account' : 'Update Vault')}
+                                {submitting ? t("payments.processing") : (isAddModalOpen ? t("payments.create_account") : t("payments.update_vault"))}
                             </Button>
                         </div>
                     </form>

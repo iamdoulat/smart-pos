@@ -13,6 +13,7 @@ import {
     Globe,
     ArrowUpDown
 } from "lucide-react";
+import { useTranslation } from "@/i18n/TranslationContext";
 import { Currency, CurrencyService } from "@/lib/currency-service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +50,7 @@ export default function CurrenciesPage() {
     const [currencies, setCurrencies] = useState<Currency[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+    const { t } = useTranslation();
 
     // Modal states
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -76,7 +78,7 @@ export default function CurrenciesPage() {
             setCurrencies(data);
         } catch (error) {
             console.error("Failed to fetch currencies:", error);
-            toast.error("Failed to load currencies");
+            toast.error(t("currencies.error_load"));
         } finally {
             setLoading(false);
         }
@@ -105,8 +107,8 @@ export default function CurrenciesPage() {
 
     const handleOpenDeleteModal = (currency: Currency) => {
         if (currency.is_default) {
-            toast.error("Cannot delete default currency", {
-                description: "Primary system currency is required. Change default first."
+            toast.error(t("currencies.error_delete_default"), {
+                description: t("currencies.error_delete_default_desc")
             });
             return;
         }
@@ -119,7 +121,7 @@ export default function CurrenciesPage() {
         try {
             setSubmitting(true);
             await CurrencyService.createCurrency(formData);
-            toast.success("Currency added successfully");
+            toast.success(t("currencies.success_add"));
             setIsAddModalOpen(false);
             fetchCurrencies();
         } catch (error: any) {
@@ -136,7 +138,7 @@ export default function CurrenciesPage() {
         try {
             setSubmitting(true);
             await CurrencyService.updateCurrency(selectedCurrency.id, formData);
-            toast.success("Currency updated successfully");
+            toast.success(t("currencies.success_update"));
             setIsEditModalOpen(false);
             fetchCurrencies();
         } catch (error: any) {
@@ -152,8 +154,8 @@ export default function CurrenciesPage() {
         try {
             setSubmitting(true);
             await CurrencyService.deleteCurrency(selectedCurrency.id);
-            toast.success("Currency deleted", {
-                description: `${selectedCurrency.name} (${selectedCurrency.code}) has been removed.`
+            toast.success(t("currencies.success_delete"), {
+                description: `${selectedCurrency.name} (${selectedCurrency.code}) ${t("common.removed")}.`
             });
             setIsDeleteModalOpen(false);
             fetchCurrencies();
@@ -172,7 +174,7 @@ export default function CurrenciesPage() {
     );
 
     return (
-        <div className="max-w-6xl mx-auto space-y-6 pb-20">
+        <div className="w-full p-4 md:p-6 space-y-8 pb-20">
             {/* Header section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -180,8 +182,8 @@ export default function CurrenciesPage() {
                         <Globe size={24} />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight">Currency Settings</h2>
-                        <p className="text-sm text-zinc-500 dark:text-zinc-400">Manage supported currencies and system exchange rates.</p>
+                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight">{t("currencies.title")}</h2>
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("currencies.subtitle")}</p>
                     </div>
                 </div>
                 <Button
@@ -189,7 +191,7 @@ export default function CurrenciesPage() {
                     className="bg-gradient-to-r from-amber-500 to-indigo-600 text-white rounded-full px-8 gap-2 shadow-lg shadow-orange-500/20 h-11 md:h-12 flex items-center"
                 >
                     <Plus className="h-5 w-5" />
-                    <span className="font-bold tracking-tight">Add Currency</span>
+                    <span className="font-bold tracking-tight">{t("currencies.add_btn")}</span>
                 </Button>
             </div>
 
@@ -201,7 +203,7 @@ export default function CurrenciesPage() {
                             <ArrowUpDown size={20} />
                         </div>
                         <div>
-                            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Total Currencies</p>
+                            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">{t("currencies.total")}</p>
                             <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">{currencies.length}</p>
                         </div>
                     </div>
@@ -209,7 +211,7 @@ export default function CurrenciesPage() {
                 <div className="md:col-span-2 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50 p-6 backdrop-blur-sm flex items-center">
                     <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
                         <DollarSign size={18} className="text-emerald-500" />
-                        <p>Manage all your supported currencies and their exchange rates relative to each other.</p>
+                        <p>{t("currencies.manage_desc")}</p>
                     </div>
                 </div>
             </div>
@@ -220,7 +222,7 @@ export default function CurrenciesPage() {
                     <div className="relative flex-1 max-w-md">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                         <Input
-                            placeholder="Search by name or code..."
+                            placeholder={t("currencies.search_placeholder")}
                             className="pl-10 h-11 bg-zinc-50 dark:bg-zinc-800/50 border-transparent focus:border-indigo-500 rounded-2xl transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -231,18 +233,18 @@ export default function CurrenciesPage() {
                 {loading ? (
                     <div className="p-20 flex flex-col items-center justify-center text-zinc-500 gap-4">
                         <Loader2 className="animate-spin text-indigo-500" size={40} />
-                        <p className="font-medium animate-pulse">Fetching currencies from database...</p>
+                        <p className="font-medium animate-pulse">{t("currencies.loading")}</p>
                     </div>
                 ) : filteredCurrencies.length > 0 ? (
                     <div className="overflow-x-auto">
                         <Table>
                             <TableHeader>
                                 <TableRow className="hover:bg-transparent border-zinc-100 dark:border-zinc-800">
-                                    <TableHead className="w-[100px] pl-8">Symbol</TableHead>
-                                    <TableHead>Currency</TableHead>
-                                    <TableHead>Code</TableHead>
-                                    <TableHead className="text-right">Exchange Rate</TableHead>
-                                    <TableHead className="text-right pr-8">Actions</TableHead>
+                                    <TableHead className="w-[100px] pl-8">{t("currencies.symbol")}</TableHead>
+                                    <TableHead>{t("currencies.currency")}</TableHead>
+                                    <TableHead>{t("currencies.code")}</TableHead>
+                                    <TableHead className="text-right">{t("currencies.rate")}</TableHead>
+                                    <TableHead className="text-right pr-8">{t("currencies.actions")}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -293,15 +295,15 @@ export default function CurrenciesPage() {
                             <DollarSign size={32} />
                         </div>
                         <div className="text-center">
-                            <p className="font-bold text-lg text-zinc-900 dark:text-zinc-100">No currencies found</p>
-                            <p className="text-sm">Start by adding your first system currency.</p>
+                            <p className="font-bold text-lg text-zinc-900 dark:text-zinc-100">{t("currencies.no_found")}</p>
+                            <p className="text-sm">{t("currencies.no_found_desc")}</p>
                         </div>
                         <Button
                             onClick={handleOpenAddModal}
                             variant="outline"
                             className="mt-2 rounded-xl"
                         >
-                            Add New Currency
+                            {t("currencies.add_btn")}
                         </Button>
                     </div>
                 )}
@@ -315,11 +317,11 @@ export default function CurrenciesPage() {
                             <Trash2 size={40} />
                         </div>
                         <AlertDialogTitle className="text-2xl font-black uppercase tracking-tighter italic text-slate-900 dark:text-white leading-none">
-                            Delete<br /><span className="text-rose-600">Currency?</span>
+                            {t("currencies.delete_title")}<br /><span className="text-rose-600">{t("currencies.delete_subtitle")}</span>
                         </AlertDialogTitle>
                         <AlertDialogDescription className="mt-4 text-zinc-500 dark:text-zinc-400 font-medium">
-                            Are you sure you want to delete <span className="font-black text-slate-900 dark:text-white italic">{selectedCurrency?.name} ({selectedCurrency?.code})</span>?
-                            This action cannot be undone and may affect records using this currency.
+                            {t("currencies.delete_desc")} <span className="font-black text-slate-900 dark:text-white italic">{selectedCurrency?.name} ({selectedCurrency?.code})</span>?
+                            {t("currencies.delete_warning")}
                         </AlertDialogDescription>
                     </div>
                     <div className="p-6 bg-zinc-50 dark:bg-zinc-800/50 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row gap-3">
@@ -327,7 +329,7 @@ export default function CurrenciesPage() {
                             className="flex-1 h-12 rounded-2xl border-zinc-200 dark:border-zinc-700 font-bold uppercase tracking-widest text-[10px]"
                             disabled={submitting}
                         >
-                            No, Keep it
+                            {t("currencies.cancel_delete")}
                         </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={(e) => {
@@ -338,7 +340,7 @@ export default function CurrenciesPage() {
                             disabled={submitting}
                         >
                             {submitting ? <Loader2 className="animate-spin mr-2" size={14} /> : <Trash2 className="mr-2" size={14} />}
-                            Yes, Delete
+                            {t("currencies.confirm_delete")}
                         </AlertDialogAction>
                     </div>
                 </AlertDialogContent>
@@ -350,17 +352,17 @@ export default function CurrenciesPage() {
                     <div className="bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 p-6 text-white">
                         <DialogTitle className="text-xl font-extrabold tracking-tight flex items-center gap-2">
                             <Plus size={20} />
-                            Add New Currency
+                            {t("currencies.add_title")}
                         </DialogTitle>
                         <DialogDescription className="text-white/80 text-sm mt-1">
-                            Register a new currency for system-wide use.
+                            {t("currencies.add_desc")}
                         </DialogDescription>
                     </div>
 
                     <form onSubmit={handleCreate}>
                         <div className="p-6 space-y-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Currency Name</label>
+                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("currencies.name_label")}</label>
                                 <Input
                                     placeholder="e.g. US Dollar"
                                     required
@@ -371,7 +373,7 @@ export default function CurrenciesPage() {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">ISO Code</label>
+                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("currencies.iso_label")}</label>
                                     <Input
                                         placeholder="USD"
                                         required
@@ -382,7 +384,7 @@ export default function CurrenciesPage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Symbol</label>
+                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("currencies.symbol_label")}</label>
                                     <Input
                                         placeholder="$"
                                         required
@@ -393,7 +395,7 @@ export default function CurrenciesPage() {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Exchange Rate (1 Default = ?)</label>
+                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("currencies.rate_label")}</label>
                                 <Input
                                     type="number"
                                     step="0.01"
@@ -412,7 +414,7 @@ export default function CurrenciesPage() {
                                 onClick={() => setIsAddModalOpen(false)}
                                 className="rounded-full px-6 font-bold"
                             >
-                                Cancel
+                                {t("common.discard")}
                             </Button>
                             <Button
                                 type="submit"
@@ -420,7 +422,7 @@ export default function CurrenciesPage() {
                                 className="bg-gradient-to-r from-amber-500 to-indigo-600 text-white rounded-full px-8 gap-2 shadow-lg shadow-orange-500/20 font-bold h-11"
                             >
                                 {submitting ? <Loader2 className="animate-spin" size={18} /> : <Plus size={18} />}
-                                {submitting ? "Adding..." : "Add Currency"}
+                                {submitting ? t("currencies.adding") : t("currencies.add_btn")}
                             </Button>
                         </div>
                     </form>
@@ -432,17 +434,17 @@ export default function CurrenciesPage() {
                     <div className="bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 p-6 text-white">
                         <DialogTitle className="text-xl font-extrabold tracking-tight flex items-center gap-2">
                             <Pencil size={20} />
-                            Edit Currency
+                            {t("currencies.edit_title")}
                         </DialogTitle>
                         <DialogDescription className="text-white/80 text-sm mt-1">
-                            Update details for <span className="font-bold underline italic">{selectedCurrency?.name}</span>.
+                            {t("currencies.edit_desc")} <span className="font-bold underline italic">{selectedCurrency?.name}</span>.
                         </DialogDescription>
                     </div>
 
                     <form onSubmit={handleUpdate}>
                         <div className="p-6 space-y-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Currency Name</label>
+                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("currencies.name_label")}</label>
                                 <Input
                                     required
                                     value={formData.name}
@@ -452,7 +454,7 @@ export default function CurrenciesPage() {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">ISO Code</label>
+                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("currencies.iso_label")}</label>
                                     <Input
                                         required
                                         maxLength={10}
@@ -462,7 +464,7 @@ export default function CurrenciesPage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Symbol</label>
+                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("currencies.symbol_label")}</label>
                                     <Input
                                         required
                                         value={formData.symbol}
@@ -472,7 +474,7 @@ export default function CurrenciesPage() {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Exchange Rate</label>
+                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("currencies.rate_label")}</label>
                                 <Input
                                     type="number"
                                     step="0.01"
@@ -491,7 +493,7 @@ export default function CurrenciesPage() {
                                 onClick={() => setIsEditModalOpen(false)}
                                 className="rounded-full px-6 font-bold"
                             >
-                                Discard
+                                {t("common.discard")}
                             </Button>
                             <Button
                                 type="submit"
@@ -499,7 +501,7 @@ export default function CurrenciesPage() {
                                 className="bg-gradient-to-r from-amber-500 to-indigo-600 text-white rounded-full px-8 gap-2 shadow-lg shadow-orange-500/20 font-bold h-11"
                             >
                                 {submitting ? <Loader2 className="animate-spin" size={18} /> : <DollarSign size={18} />}
-                                {submitting ? "Updating..." : "Update Currency"}
+                                {submitting ? t("currencies.updating") : t("currencies.edit_title")}
                             </Button>
                         </div>
                     </form>

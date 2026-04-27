@@ -49,9 +49,11 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useTranslation } from "@/i18n/TranslationContext";
 import { cn } from "@/lib/utils";
 
 export default function EditSalePage() {
+    const { t } = useTranslation();
     const router = useRouter();
     const params = useParams();
     const saleId = Number(params.id);
@@ -166,7 +168,7 @@ export default function EditSalePage() {
 
                 setItems(mappedItems);
             } catch (error) {
-                toast.error("Failed to load sale data");
+                toast.error(t("common.error_occurred"));
             } finally {
                 setInitialLoading(false);
             }
@@ -230,8 +232,12 @@ export default function EditSalePage() {
     };
 
     const addItem = (product: any) => {
+        if (!formData.warehouse_id || !formData.customer_id) {
+            toast.warning(t("sales.select_warehouse_customer_warning") || "Please select warehouse and customer first.");
+            return;
+        }
         if (product.stock_quantity <= 0) {
-            toast.error("Product is out of stock!");
+            toast.error(t("sales.out_of_stock") || "Product is out of stock!");
             return;
         }
         const existing = items.find((i: any) => i.product_id === product.id);
@@ -272,7 +278,7 @@ export default function EditSalePage() {
         e.preventDefault();
         if (!currentCompany) return;
         if (items.length === 0) {
-            toast.error("Please add at least one item");
+            toast.error(t("sales.empty_items"));
             return;
         }
 
@@ -288,7 +294,7 @@ export default function EditSalePage() {
                 items: items,
                 account_id: formData.account_id ? Number(formData.account_id) : undefined,
             });
-            toast.success("Invoice updated successfully");
+            toast.success(t("common.updated_successfully") || "Invoice updated successfully");
 
             // Send WhatsApp notification if enabled
             if (sendWhatsapp && whatsappConfig && selectedCustomer?.mobile) {
@@ -301,9 +307,9 @@ export default function EditSalePage() {
                         sales_date: formData.sales_date,
                         company_name: currentCompany.name,
                     });
-                    toast.success("WhatsApp notification sent!");
+                    toast.success(t("sales.whatsapp_sent") || "WhatsApp notification sent!");
                 } catch {
-                    toast.warning("Invoice saved, but WhatsApp notification failed.");
+                    toast.warning(t("sales.whatsapp_failed") || "Invoice saved, but WhatsApp notification failed.");
                 }
             }
 
@@ -325,15 +331,15 @@ export default function EditSalePage() {
                             total_amount: item.total_amount,
                         })),
                     });
-                    toast.success("Email notification sent!");
+                    toast.success(t("sales.email_sent") || "Email notification sent!");
                 } catch {
-                    toast.warning("Invoice saved, but email notification failed.");
+                    toast.warning(t("sales.email_failed") || "Invoice saved, but email notification failed.");
                 }
             }
 
             router.push("/sales");
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to update invoice");
+            toast.error(error.response?.data?.message || t("common.error_occurred"));
         } finally {
             setLoading(false);
         }
@@ -352,14 +358,14 @@ export default function EditSalePage() {
             <div className="flex h-[60vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="h-12 w-12 animate-spin text-indigo-500" />
-                    <p className="text-zinc-500 font-bold tracking-widest text-sm uppercase">Loading Invoice...</p>
+                    <p className="text-zinc-500 font-bold tracking-widest text-sm uppercase">{t("common.loading")}...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6 max-w-[1400px] mx-auto pb-20">
+        <div className="w-full p-4 md:p-6 space-y-6 pb-20">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                 <div className="flex items-center gap-3 md:gap-4">
@@ -374,7 +380,7 @@ export default function EditSalePage() {
                     <div>
                         <div className="flex items-center gap-3">
                             <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase leading-tight mb-1">
-                                Edit Invoice
+                                {t("sales.edit_title")}
                             </h2>
                             {sale?.sales_code && (
                                 <span className="text-[10px] font-black uppercase tracking-widest bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 px-4 py-1.5 rounded-xl border border-indigo-100 dark:border-indigo-900">
@@ -383,7 +389,7 @@ export default function EditSalePage() {
                             )}
                         </div>
                         <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
-                            Update the sale record and inventory will be adjusted automatically.
+                            {t("sales.edit_subtitle")}
                         </p>
                     </div>
                 </div>
@@ -393,7 +399,7 @@ export default function EditSalePage() {
                         onClick={() => router.back()}
                         className="rounded-full border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest px-6 h-12"
                     >
-                        Cancel
+                        {t("sales.close")}
                     </Button>
                     <Button
                         form="edit-invoice-form"
@@ -401,7 +407,7 @@ export default function EditSalePage() {
                         className="rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-black text-[10px] uppercase tracking-widest px-8 shadow-xl shadow-indigo-500/20 border-0 h-12 transition-all hover:scale-[1.02] active:scale-95"
                     >
                         {loading ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save className="mr-2" size={18} />}
-                        Update Invoice
+                        {t("sales.update_invoice")}
                     </Button>
                 </div>
             </div>
@@ -414,13 +420,13 @@ export default function EditSalePage() {
                         <CardContent className="p-8">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Warehouse*</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">{t("sales.warehouse")}*</Label>
                                     <Select
                                         value={formData.warehouse_id}
                                         onValueChange={(v) => setFormData(prev => ({ ...prev, warehouse_id: v }))}
                                     >
                                         <SelectTrigger className="h-12 bg-zinc-50 dark:bg-zinc-800/50 border-zinc-100 dark:border-zinc-800 rounded-2xl focus:ring-2 focus:ring-violet-500/20 transition-all font-bold">
-                                            <SelectValue placeholder="Select Warehouse" />
+                                            <SelectValue placeholder={t("sales.select_warehouse")} />
                                         </SelectTrigger>
                                         <SelectContent className="rounded-2xl border-zinc-100 dark:border-zinc-800 shadow-2xl">
                                             {warehouses.map(w => (
@@ -432,10 +438,10 @@ export default function EditSalePage() {
 
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Customer Name*</Label>
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">{t("sales.customer_name")}*</Label>
                                         {selectedCustomer && (
                                             <span className="text-[10px] font-black text-red-500 uppercase tracking-tight">
-                                                (Previous Due: ${Number(selectedCustomer.previous_due || 0).toFixed(2)})
+                                                ({t("sales.previous_due")}: {currentCompany?.currency} {Number(selectedCustomer.previous_due || 0).toFixed(2)})
                                             </span>
                                         )}
                                     </div>
@@ -452,7 +458,7 @@ export default function EditSalePage() {
                                         }}
                                     >
                                         <SelectTrigger className="h-12 bg-zinc-50 dark:bg-zinc-800/50 border-zinc-100 dark:border-zinc-800 rounded-2xl focus:ring-2 focus:ring-violet-500/20 transition-all font-bold">
-                                            <SelectValue placeholder="Select Customer" />
+                                            <SelectValue placeholder={t("sales.select_customer")} />
                                         </SelectTrigger>
                                         <SelectContent className="rounded-2xl border-zinc-100 dark:border-zinc-800 shadow-2xl">
                                             {customers.map(c => (
@@ -463,11 +469,11 @@ export default function EditSalePage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Customer Email</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">{t("contacts.customer_email")}</Label>
                                     <div className="relative">
                                         <Input
                                             type="email"
-                                            placeholder="Enter customer email"
+                                            placeholder={t("contacts.email_placeholder")}
                                             value={formData.customer_email}
                                             onChange={(e) => setFormData(prev => ({ ...prev, customer_email: e.target.value }))}
                                             className="h-12 pl-12 bg-zinc-50 dark:bg-zinc-800/50 border-zinc-100 dark:border-zinc-800 rounded-2xl focus:ring-2 focus:ring-violet-500/20 transition-all font-bold"
@@ -477,11 +483,11 @@ export default function EditSalePage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Customer Mobile</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">{t("contacts.customer_mobile")}</Label>
                                     <div className="relative">
                                         <Input
                                             type="text"
-                                            placeholder="Enter customer mobile"
+                                            placeholder={t("contacts.mobile_placeholder")}
                                             value={formData.customer_mobile}
                                             onChange={(e) => setFormData(prev => ({ ...prev, customer_mobile: e.target.value }))}
                                             className="h-12 pl-12 bg-zinc-50 dark:bg-zinc-800/50 border-zinc-100 dark:border-zinc-800 rounded-2xl focus:ring-2 focus:ring-violet-500/20 transition-all font-bold"
@@ -491,7 +497,7 @@ export default function EditSalePage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Sales Date*</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">{t("sales.sales_date")}*</Label>
                                     <div className="relative">
                                         <Input
                                             type="date"
@@ -504,7 +510,7 @@ export default function EditSalePage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Due Date</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">{t("sales.due_date")}</Label>
                                     <div className="relative">
                                         <Input
                                             type="date"
@@ -517,9 +523,9 @@ export default function EditSalePage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Reference No</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">{t("sales.reference_no")}</Label>
                                     <Input
-                                        placeholder="Optional reference number"
+                                        placeholder={t("sales.reference_no")}
                                         value={formData.reference_no}
                                         onChange={(e) => setFormData(prev => ({ ...prev, reference_no: e.target.value }))}
                                         className="h-12 bg-zinc-50 dark:bg-zinc-800/50 border-zinc-100 dark:border-zinc-800 rounded-2xl focus:ring-2 focus:ring-violet-500/20 transition-all font-bold"
@@ -527,7 +533,7 @@ export default function EditSalePage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Status</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">{t("sales.payment_status")}</Label>
                                     <Select
                                         value={formData.status}
                                         onValueChange={(v: any) => setFormData(prev => ({ ...prev, status: v }))}
@@ -552,7 +558,7 @@ export default function EditSalePage() {
                             <div className="p-8 pb-4">
                                 <div className="relative group">
                                     <Input
-                                        placeholder="Scan barcode or search items by name, code..."
+                                        placeholder={t("sales.item_search_placeholder")}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         className="h-14 pl-14 pr-14 bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-lg placeholder:text-zinc-400"
@@ -578,12 +584,12 @@ export default function EditSalePage() {
                                                         </div>
                                                     </div>
                                                     <div className="text-right">
-                                                        <div className="font-black text-violet-600">${p.sales_price}</div>
+                                                        <div className="font-black text-violet-600">{currentCompany?.currency} {p.sales_price}</div>
                                                         <div className={cn(
                                                             "text-[10px] font-bold uppercase tracking-widest",
                                                             p.stock_quantity <= 0 ? "text-red-500" : "text-zinc-400"
                                                         )}>
-                                                            {p.stock_quantity <= 0 ? "Out of Stock" : `Stock: ${p.stock_quantity}`}
+                                                            {p.stock_quantity <= 0 ? t("sales.out_of_stock") : `${t("inventory.table_stock")}: ${p.stock_quantity}`}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -597,12 +603,12 @@ export default function EditSalePage() {
                                 <Table>
                                     <TableHeader className="bg-zinc-50 dark:bg-zinc-900">
                                         <TableRow className="border-b border-zinc-100 dark:border-zinc-800 hover:bg-transparent">
-                                            <TableHead className="pl-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Item Name</TableHead>
-                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-center">Qty</TableHead>
-                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Unit Price</TableHead>
-                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Discount</TableHead>
-                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Tax</TableHead>
-                                            <TableHead className="pr-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Total</TableHead>
+                                            <TableHead className="pl-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t("sales.table_item_name")}</TableHead>
+                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-center">{t("sales.table_qty")}</TableHead>
+                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">{t("sales.table_unit_price")}</TableHead>
+                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">{t("sales.table_discount")}</TableHead>
+                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">{t("sales.table_tax")}</TableHead>
+                                            <TableHead className="pr-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">{t("sales.table_total")}</TableHead>
                                             <TableHead className="w-16"></TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -633,13 +639,13 @@ export default function EditSalePage() {
                                                     />
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    <div className="font-bold text-zinc-400">${item.discount_amount}</div>
+                                                    <div className="font-bold text-zinc-400">{currentCompany?.currency} {item.discount_amount}</div>
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    <div className="font-bold text-zinc-400">${item.tax_amount}</div>
+                                                    <div className="font-bold text-zinc-400">{currentCompany?.currency} {item.tax_amount}</div>
                                                 </TableCell>
                                                 <TableCell className="pr-8 text-right">
-                                                    <div className="font-black text-violet-600">${Number(item.total_amount).toFixed(2)}</div>
+                                                    <div className="font-black text-violet-600">{currentCompany?.currency} {Number(item.total_amount).toFixed(2)}</div>
                                                 </TableCell>
                                                 <TableCell className="pr-8">
                                                     <Button
@@ -659,7 +665,7 @@ export default function EditSalePage() {
                                                 <TableCell colSpan={7} className="h-40 text-center">
                                                     <div className="flex flex-col items-center gap-3 text-zinc-400">
                                                         <ShoppingCart size={32} className="opacity-20" />
-                                                        <span className="font-bold uppercase tracking-widest text-xs">Search and add products to update the invoice.</span>
+                                                        <span className="font-bold uppercase tracking-widest text-xs">{t("sales.empty_items")}</span>
                                                     </div>
                                                 </TableCell>
                                             </TableRow>
@@ -672,17 +678,17 @@ export default function EditSalePage() {
 
                     {/* Previous Payments Information */}
                     <div className="space-y-3">
-                        <Label className="text-sm font-black text-zinc-500 uppercase tracking-widest pl-2">Previous Payments Information :</Label>
+                        <Label className="text-sm font-black text-zinc-500 uppercase tracking-widest pl-2">{t("sales.recorded_payments") || "Previous Payments Information"} :</Label>
                         <Card className="border-0 bg-white dark:bg-zinc-900 shadow-xl shadow-black/5 rounded-2xl overflow-hidden">
                             <Table>
                                 <TableHeader className="bg-zinc-50 dark:bg-zinc-900">
                                     <TableRow className="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800">
                                         <TableHead className="py-4 font-black text-xs text-black dark:text-white w-12 text-center uppercase tracking-widest">#</TableHead>
-                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Date</TableHead>
-                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Payment Type</TableHead>
-                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Payment Note</TableHead>
-                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white text-right uppercase tracking-widest">Payment</TableHead>
-                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white text-center uppercase tracking-widest">Action</TableHead>
+                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t("common.date")}</TableHead>
+                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t("sales.payment_type")}</TableHead>
+                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t("sales.payment_note")}</TableHead>
+                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white text-right uppercase tracking-widest">{t("sales.paid_amount")}</TableHead>
+                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white text-center uppercase tracking-widest">{t("common.action")}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -693,7 +699,7 @@ export default function EditSalePage() {
                                                 <TableCell className="font-medium text-zinc-600">{p.date}</TableCell>
                                                 <TableCell className="font-medium text-zinc-600">{p.payment_type}</TableCell>
                                                 <TableCell className="text-zinc-400">{p.note}</TableCell>
-                                                <TableCell className="text-right font-black text-violet-600">${Number(p.amount).toFixed(2)}</TableCell>
+                                                <TableCell className="text-right font-black text-violet-600">{currentCompany?.currency} {Number(p.amount).toFixed(2)}</TableCell>
                                                 <TableCell className="text-center">
                                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500">
                                                         <Trash2 size={14} />
@@ -704,7 +710,7 @@ export default function EditSalePage() {
                                     ) : (
                                         <TableRow className="hover:bg-transparent border-0">
                                             <TableCell colSpan={6} className="h-16 text-center text-sm font-black text-zinc-400 uppercase tracking-widest">
-                                                Payments Pending!!
+                                                {t("sales.payments_pending")}!!
                                             </TableCell>
                                         </TableRow>
                                     )}
@@ -716,12 +722,12 @@ export default function EditSalePage() {
                     {/* Terms and Conditions */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <Label className="text-sm font-bold text-zinc-700 dark:text-zinc-300">Invoice Terms and Conditions</Label>
+                            <Label className="text-sm font-bold text-zinc-700 dark:text-zinc-300">{t("sales.terms_title")}</Label>
                             <div className="h-px flex-1 bg-violet-500/20 mx-4" />
                         </div>
                         <textarea
                             className="w-full min-h-[120px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 font-mono text-sm text-zinc-600 dark:text-zinc-400 focus:ring-4 focus:ring-violet-500/5 focus:border-violet-500/20 transition-all outline-none resize-none shadow-inner"
-                            placeholder="Type your terms and conditions here..."
+                            placeholder={t("sales.terms_placeholder")}
                             value={formData.terms_and_conditions}
                             onChange={(e) => setFormData(prev => ({ ...prev, terms_and_conditions: e.target.value }))}
                         />
@@ -730,7 +736,7 @@ export default function EditSalePage() {
                     {/* Payment Section */}
                     <div className="space-y-4">
                         <div className="space-y-4">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Payment Status</Label>
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">{t("sales.payment_status") || "Payment Status"}</Label>
                             <div className="flex gap-4">
                                 <Button
                                     type="button"
@@ -742,7 +748,7 @@ export default function EditSalePage() {
                                             : "bg-white dark:bg-zinc-900 border text-zinc-400"
                                     )}
                                 >
-                                    PAID
+                                    {t("sales.paid")}
                                 </Button>
                                 <Button
                                     type="button"
@@ -757,7 +763,7 @@ export default function EditSalePage() {
                                             : "bg-white dark:bg-zinc-900 border text-zinc-400"
                                     )}
                                 >
-                                    PARTIAL
+                                    {t("sales.partial")}
                                 </Button>
                                 <Button
                                     type="button"
@@ -769,22 +775,22 @@ export default function EditSalePage() {
                                             : "bg-white dark:bg-zinc-900 border text-zinc-400"
                                     )}
                                 >
-                                    UNPAID
+                                    {t("sales.unpaid")}
                                 </Button>
                             </div>
                         </div>
 
-                        <Label className="text-lg font-black text-violet-600 block pt-4">Payment</Label>
-                        <div className="text-xs font-bold text-zinc-500 mb-2">Advance: 0.00</div>
+                        <Label className="text-lg font-black text-violet-600 block pt-4">{t("sales.payment_title")}</Label>
+                        <div className="text-xs font-bold text-zinc-500 mb-2">{t("sales.advance")}: 0.00</div>
 
                         <div className="flex items-center gap-2 mb-4">
                             <input type="checkbox" id="adjust-advance" className="h-4 w-4 rounded border-zinc-300 text-violet-600 focus:ring-violet-500" />
-                            <label htmlFor="adjust-advance" className="text-xs font-bold text-zinc-600">Adjust Advance Payment</label>
+                            <label htmlFor="adjust-advance" className="text-xs font-bold text-zinc-600">{t("sales.adjust_advance")}</label>
                         </div>
 
                         <div className="bg-zinc-100 dark:bg-zinc-800/40 rounded-2xl p-8 grid grid-cols-1 md:grid-cols-3 gap-8 border border-zinc-200/50 dark:border-zinc-800">
                             <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Amount</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">{t("common.amount") || "Amount"}</Label>
                                 <div className="relative">
                                     <Input
                                         id="paid-amount-input"
@@ -793,18 +799,18 @@ export default function EditSalePage() {
                                         onChange={(e) => setFormData(prev => ({ ...prev, paid_amount: Number(e.target.value) }))}
                                         className="h-12 text-right font-black text-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-violet-500/20"
                                     />
-                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-bold">$</div>
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-bold">{currentCompany?.currency}</div>
                                 </div>
                             </div>
 
                             <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Payment Type</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">{t("sales.payment_type")}</Label>
                                 <Select
                                     value={formData.payment_type}
                                     onValueChange={(v) => setFormData(prev => ({ ...prev, payment_type: v }))}
                                 >
                                     <SelectTrigger className="h-12 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-xl font-bold">
-                                        <SelectValue placeholder="-Select-" />
+                                        <SelectValue placeholder={t("common.select")} />
                                     </SelectTrigger>
                                     <SelectContent className="rounded-xl border-zinc-200 dark:border-zinc-800">
                                         <SelectItem value="Cash">Cash</SelectItem>
@@ -816,13 +822,13 @@ export default function EditSalePage() {
                             </div>
 
                             <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Account</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">{t("sales.account")}</Label>
                                 <Select
                                     value={formData.account_id}
                                     onValueChange={(v) => setFormData(prev => ({ ...prev, account_id: v }))}
                                 >
                                     <SelectTrigger className="h-12 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-xl font-bold">
-                                        <SelectValue placeholder="Select Account" />
+                                        <SelectValue placeholder={t("sales.select_account")} />
                                     </SelectTrigger>
                                     <SelectContent className="rounded-xl border-zinc-200 dark:border-zinc-800">
                                         {accounts.map(acc => (
@@ -833,10 +839,10 @@ export default function EditSalePage() {
                             </div>
 
                             <div className="md:col-span-3 space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Payment Note</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">{t("sales.payment_note")}</Label>
                                 <textarea
                                     className="w-full min-h-[80px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 font-medium focus:ring-4 focus:ring-violet-500/5 focus:border-violet-500/20 transition-all outline-none resize-none"
-                                    placeholder="Write any payment related notes..."
+                                    placeholder={t("sales.payment_note_placeholder")}
                                     value={formData.payment_note}
                                     onChange={(e) => setFormData(prev => ({ ...prev, payment_note: e.target.value }))}
                                 />
@@ -850,7 +856,7 @@ export default function EditSalePage() {
                             <div className="flex items-center gap-3">
                                 <input type="checkbox" id="send-whatsapp-edit" checked={sendWhatsapp} onChange={(e) => setSendWhatsapp(e.target.checked)} className="h-5 w-5 rounded border-green-500 cursor-pointer accent-green-500" />
                                 <label htmlFor="send-whatsapp-edit" className="text-sm font-bold text-zinc-600 dark:text-zinc-300 flex items-center gap-2 cursor-pointer">
-                                    <MessageCircle size={16} className="text-green-500" /> WhatsApp Notification
+                                    <MessageCircle size={16} className="text-green-500" /> {t("sales.whatsapp_notif")}
                                 </label>
                             </div>
                             {sendWhatsapp && !whatsappConfig && (<span className="text-[10px] font-bold text-amber-500 italic">(No active gateway)</span>)}
@@ -862,7 +868,7 @@ export default function EditSalePage() {
                             <div className="flex items-center gap-3">
                                 <input type="checkbox" id="send-email-edit" checked={sendEmail} onChange={(e) => setSendEmail(e.target.checked)} className="h-5 w-5 rounded border-indigo-500 cursor-pointer accent-indigo-500" />
                                 <label htmlFor="send-email-edit" className="text-sm font-bold text-zinc-600 dark:text-zinc-300 flex items-center gap-2 cursor-pointer">
-                                    <Mail size={16} className="text-indigo-500" /> Email Notification
+                                    <Mail size={16} className="text-indigo-500" /> {t("sales.email_notif")}
                                 </label>
                             </div>
                             {sendEmail && !emailConfig && (<span className="text-[10px] font-bold text-amber-500 italic">(No active email config)</span>)}
@@ -878,7 +884,7 @@ export default function EditSalePage() {
                             className="flex-1 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-black uppercase tracking-widest h-14 shadow-xl shadow-violet-500/20 border-0"
                         >
                             {loading ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" />}
-                            Update Invoice
+                            {t("sales.update_invoice")}
                         </Button>
                         <Button
                             type="button"
@@ -886,7 +892,7 @@ export default function EditSalePage() {
                             variant="outline"
                             className="flex-1 rounded-xl font-black uppercase tracking-widest h-14"
                         >
-                            Cancel
+                            {t("sales.close")}
                         </Button>
                     </div>
                 </div>
@@ -896,18 +902,18 @@ export default function EditSalePage() {
                     <Card className="border-0 bg-violet-600 dark:bg-violet-700 shadow-2xl shadow-violet-500/20 rounded-[32px] overflow-hidden sticky top-24">
                         <CardContent className="p-8 space-y-8 text-white">
                             <div className="space-y-2">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-white/60 italic">Grand Total</p>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-white/60 italic">{t("sales.grand_total")}</p>
                                 <h3 className={cn(
                                     "font-black tracking-tighter transition-all duration-300",
-                                    getDynamicFontSize(`$ ${Number(totals.grandTotal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 'grandTotal')
+                                    getDynamicFontSize(`${currentCompany?.currency} ${Number(totals.grandTotal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 'grandTotal')
                                 )}>
-                                    $ {Number(totals.grandTotal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    {currentCompany?.currency} {Number(totals.grandTotal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </h3>
                             </div>
 
                             <div className="space-y-6 pt-6 border-t border-white/10">
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-white/60">Discount on All</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-white/60">{t("sales.discount_on_all")}</Label>
                                     <div className="flex gap-2">
                                         <Input
                                             type="number"
@@ -924,14 +930,14 @@ export default function EditSalePage() {
                                             </SelectTrigger>
                                             <SelectContent className="rounded-xl border-zinc-100 dark:border-zinc-800">
                                                 <SelectItem value="Percentage" className="rounded-lg">%</SelectItem>
-                                                <SelectItem value="Fixed" className="rounded-lg">$</SelectItem>
+                                                <SelectItem value="Fixed" className="rounded-lg">{currentCompany?.currency}</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-white/60">Paid Amount</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-white/60">{t("sales.paid_amount")}</Label>
                                     <Input
                                         type="number"
                                         value={formData.paid_amount}
@@ -941,17 +947,15 @@ export default function EditSalePage() {
                                             getDynamicFontSize(formData.paid_amount.toString(), 'paidAmount')
                                         )}
                                     />
-                                </div>
-
-                                <div className="p-6 rounded-3xl bg-black/10 backdrop-blur-md space-y-4">
+                                </div>                                 <div className="p-6 rounded-3xl bg-black/10 backdrop-blur-md space-y-4">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 italic">Balance Due</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 italic">{t("sales.balance_due")}</span>
                                         <span className={cn(
                                             "font-black px-4 py-1 rounded-full transition-all duration-300 whitespace-nowrap",
-                                            getDynamicFontSize(`$ ${Number(totals.balance).toFixed(2)}`, 'balanceDue'),
+                                            getDynamicFontSize(`${currentCompany?.currency} ${Number(totals.balance).toFixed(2)}`, 'balanceDue'),
                                             totals.balance > 0 ? "bg-red-500/20 text-red-200" : "bg-emerald-500/20 text-emerald-200"
                                         )}>
-                                            $ {Number(totals.balance).toFixed(2)}
+                                            {currentCompany?.currency} {Number(totals.balance).toFixed(2)}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/30 italic">

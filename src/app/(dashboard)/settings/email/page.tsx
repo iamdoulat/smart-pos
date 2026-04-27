@@ -15,10 +15,13 @@ import {
     Shield,
     Activity,
     ChevronDown,
+    Edit2,
 } from "lucide-react";
+import { useTranslation } from "@/i18n/TranslationContext";
 import { EmailConfiguration, EmailService } from "@/lib/email-service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
     Dialog,
     DialogContent,
@@ -34,14 +37,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 export default function EmailSettingsPage() {
     const [configs, setConfigs] = useState<EmailConfiguration[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+    const { t } = useTranslation();
 
     // Modal states
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -78,7 +82,7 @@ export default function EmailSettingsPage() {
             setConfigs(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("Failed to fetch email configs:", error);
-            toast.error("Failed to load email configurations");
+            toast.error(t("email.error_load"));
         } finally {
             setLoading(false);
         }
@@ -128,7 +132,7 @@ export default function EmailSettingsPage() {
         try {
             setSubmitting(true);
             await EmailService.createConfiguration(formData);
-            toast.success("Email service added successfully");
+            toast.success(t("email.success_add"));
             setIsAddModalOpen(false);
             fetchConfigs();
         } catch (error: any) {
@@ -147,7 +151,7 @@ export default function EmailSettingsPage() {
             if (!updateProps.password) delete updateProps.password; // Don't overwrite if empty
 
             await EmailService.updateConfiguration(selectedConfig.id, updateProps);
-            toast.success("Configuration updated successfully");
+            toast.success(t("email.success_update"));
             setIsEditModalOpen(false);
             fetchConfigs();
         } catch (error: any) {
@@ -158,13 +162,13 @@ export default function EmailSettingsPage() {
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm("Are you sure you want to delete this email service?")) return;
+        if (!confirm(t("email.confirm_delete"))) return;
         try {
             await EmailService.deleteConfiguration(id);
-            toast.success("Service deleted successfully");
+            toast.success(t("email.success_delete"));
             fetchConfigs();
         } catch (error: any) {
-            toast.error("Failed to delete service");
+            toast.error(t("email.error_delete"));
         }
     };
 
@@ -178,7 +182,7 @@ export default function EmailSettingsPage() {
                 toast.error(result.message);
             }
         } catch (error) {
-            toast.error("Connection test failed");
+            toast.error(t("email.error_test"));
         } finally {
             setTestingId(null);
         }
@@ -210,144 +214,122 @@ export default function EmailSettingsPage() {
     );
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8 pb-20 p-6 md:p-8">
-            {/* Header section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="w-full p-4 md:p-6 space-y-8">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                     <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-rose-500/20">
                         <Mail size={24} />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight">Email Settings</h2>
-                        <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium">Manage your SMTP servers and API service providers.</p>
+                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight">{t("email.title")}</h2>
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("email.subtitle")}</p>
                     </div>
                 </div>
+
                 <div className="flex items-center gap-3">
+                    <div className="relative group">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                        <Input
+                            placeholder={t("email.search_placeholder")}
+                            className="pl-10 h-11 w-full md:w-64 rounded-xl border-zinc-200"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
                     <Button
                         onClick={handleOpenAddModal}
-                        className="bg-gradient-to-r from-amber-500 to-indigo-600 text-white rounded-full px-8 gap-2 shadow-lg shadow-orange-500/20 py-6 h-auto"
+                        className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-full px-6 gap-2 h-11 shadow-md"
                     >
-                        <Plus className="h-5 w-5" />
-                        <span className="font-bold">Add New Service</span>
+                        <Plus size={18} />
+                        <span className="font-bold">{t("email.add_service")}</span>
                     </Button>
                 </div>
             </div>
 
-            {/* Toolbar section */}
-            <div className="relative max-w-md">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
-                <Input
-                    placeholder="Search providers..."
-                    className="pl-12 h-14 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm focus:ring-2 focus:ring-blue-500/20 transition-all"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
-
-            {/* Content Section */}
+            {/* List Section */}
             {loading ? (
-                <div className="h-64 flex flex-col items-center justify-center text-zinc-500 gap-4">
-                    <Loader2 className="animate-spin text-blue-500" size={40} />
-                    <p className="font-semibold animate-pulse">Loading configurations...</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[1, 2, 3].map(i => (
+                        <div key={i} className="h-64 rounded-2xl bg-zinc-100 dark:bg-zinc-800 animate-pulse border border-zinc-200 dark:border-zinc-700" />
+                    ))}
                 </div>
             ) : filteredConfigs.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {filteredConfigs.map((config) => (
-                        <div key={config.id} className="relative group bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] p-8 shadow-sm hover:shadow-xl hover:shadow-zinc-200/50 dark:hover:shadow-none transition-all duration-300">
-                            {/* Active Badge */}
-                            {config.is_active && (
-                                <div className="absolute top-6 right-6">
-                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-green-100 dark:border-green-500/20">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                        Active
-                                    </div>
-                                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredConfigs.map(config => (
+                        <div
+                            key={config.id}
+                            className={cn(
+                                "group relative h-full bg-white dark:bg-zinc-900 rounded-2xl border transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md flex flex-col",
+                                config.is_active ? "border-zinc-200 dark:border-zinc-800" : "border-red-100 dark:border-red-900/30 opacity-75 grayscale-[0.5]"
                             )}
+                        >
+                            {/* Card Decorative Top */}
+                            <div className={cn(
+                                "h-2 bg-gradient-to-r",
+                                config.is_active ? "from-indigo-500 to-purple-600" : "from-zinc-400 to-zinc-500"
+                            )} />
 
-                            <div className="space-y-6">
-                                {/* Service Info */}
-                                <div className="flex items-start gap-4">
-                                    <div className="h-14 w-14 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:bg-blue-50 group-hover:text-blue-500 dark:group-hover:bg-blue-500/10 transition-colors">
-                                        {config.provider === 'smtp' ? <Server size={28} /> : <Activity size={28} />}
+                            <div className="p-6 flex-1 flex flex-col">
+                                <div className="flex justify-between items-start mb-6">
+                                    <div className="h-12 w-12 rounded-xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center border border-zinc-100 dark:border-zinc-700 shadow-sm">
+                                        <Mail className={cn(config.is_active ? "text-indigo-500" : "text-zinc-400")} size={24} />
                                     </div>
-                                    <div>
-                                        <h3 className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight">{config.name}</h3>
-                                        <p className="text-sm font-bold text-zinc-400 uppercase tracking-tighter">
-                                            {config.provider === 'smtp' ? 'Standard SMTP Server' : 'Resend.com API Service'}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Details Grid */}
-                                <div className="space-y-3 py-4 border-y border-zinc-100 dark:border-zinc-800">
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-zinc-500 font-medium">From:</span>
-                                        <span className="text-zinc-900 dark:text-zinc-100 font-bold text-right truncate max-w-[200px]">
-                                            {config.from_name} &lt;{config.from_address}&gt;
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-zinc-500 font-medium">Host:</span>
-                                        <span className="text-zinc-900 dark:text-zinc-100 font-black tracking-tight">
-                                            {config.provider === 'smtp' ? `${config.host}:${config.port}` : 'api.resend.com'}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-zinc-500 font-medium">Related ID:</span>
-                                        <span className="text-zinc-300 font-mono text-[10px] uppercase">
-                                            {btoa(config.id.toString()).substring(0, 16)}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Usage Section */}
-                                <div className="space-y-3">
-                                    <div className="flex justify-between items-end">
-                                        <span className="text-sm font-bold text-zinc-500">Daily Usage:</span>
-                                        <div className="flex items-center gap-2">
-                                            <span className="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-full text-xs font-black text-blue-600 dark:text-blue-400">
-                                                {config.daily_usage} / {config.daily_limit || '∞'}
-                                            </span>
-                                            <Mail size={14} className="text-zinc-300" />
+                                    <div className="flex flex-col items-end gap-2">
+                                        <Badge className={cn(
+                                            "rounded-full px-2.5 py-0.5 font-bold text-[10px] uppercase tracking-wider",
+                                            config.is_active ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30" : "bg-red-100 text-red-700 dark:bg-red-900/30"
+                                        )}>
+                                            {config.is_active ? t("email.active") : t("email.disabled")}
+                                        </Badge>
+                                        <div className="flex gap-1">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleOpenEditModal(config)}
+                                                className="h-8 w-8 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900"
+                                            >
+                                                <Edit2 size={14} />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleDelete(config.id)}
+                                                className="h-8 w-8 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 text-zinc-400 hover:text-red-600"
+                                            >
+                                                <Trash2 size={14} />
+                                            </Button>
                                         </div>
                                     </div>
-                                    <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-1000 ease-out"
-                                            style={{ width: `${Math.min((config.daily_usage / (config.daily_limit || 100)) * 100, 100)}%` }}
-                                        />
-                                    </div>
-                                    <p className="text-[10px] text-zinc-400 text-center font-medium italic">Counts emails sent within the current 24h period</p>
                                 </div>
 
-                                {/* Actions */}
-                                <div className="pt-4 flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800">
-                                    <div className="flex items-center gap-2">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => handleOpenEditModal(config)}
-                                            className="h-10 w-10 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 font-bold"
-                                        >
-                                            <Pencil size={18} />
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => handleDelete(config.id)}
-                                            className="h-10 w-10 rounded-xl hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/30 text-rose-500"
-                                        >
-                                            <Trash2 size={18} />
-                                        </Button>
+                                <div className="space-y-4 flex-1">
+                                    <div>
+                                        <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 truncate">{config.name}</h3>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500">{config.host}</p>
                                     </div>
+
+                                    <div className="space-y-2 pt-2">
+                                        <div className="flex justify-between items-center text-xs">
+                                            <span className="text-zinc-500 font-bold uppercase tracking-tight">Username:</span>
+                                            <span className="font-semibold text-zinc-900 dark:text-zinc-200">{config.username}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-xs">
+                                            <span className="text-zinc-500 font-bold uppercase tracking-tight">Port:</span>
+                                            <span className="font-semibold text-zinc-900 dark:text-zinc-200">{config.port}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="pt-6">
                                     <Button
                                         onClick={() => handleOpenTestModal(config)}
-                                        disabled={testingId === config.id || !config.is_active}
+                                        disabled={!config.is_active}
                                         variant="outline"
-                                        className="rounded-xl font-bold border-zinc-200 dark:border-zinc-700 h-10 px-4 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                                        className="w-full rounded-xl font-bold border-zinc-200 dark:border-zinc-800 h-11 hover:bg-zinc-900 dark:hover:bg-zinc-100 hover:text-white dark:hover:text-zinc-900 transition-all text-xs"
                                     >
                                         <Send className="mr-2" size={14} />
-                                        Test Connection
+                                        {t("email.test_connection")}
                                     </Button>
                                 </div>
                             </div>
@@ -359,13 +341,13 @@ export default function EmailSettingsPage() {
                     <div className="h-20 w-20 rounded-full bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center text-zinc-300 mb-6">
                         <Mail size={40} />
                     </div>
-                    <h3 className="text-2xl font-black text-zinc-900 dark:text-zinc-100 mb-2">No Email Services Integrated</h3>
-                    <p className="text-zinc-500 dark:text-zinc-400 max-w-sm mb-8 font-medium">Add a standard SMTP server or Resend.com API to enable email notifications and reporting.</p>
+                    <h3 className="text-2xl font-black text-zinc-900 dark:text-zinc-100 mb-2">{t("email.no_services")}</h3>
+                    <p className="text-zinc-500 dark:text-zinc-400 max-w-sm mb-8 font-medium">{t("email.no_services_desc")}</p>
                     <Button
                         onClick={handleOpenAddModal}
                         className="bg-zinc-900 dark:bg-zinc-50 text-white dark:text-zinc-900 rounded-2xl px-8 h-12 font-bold hover:opacity-90"
                     >
-                        + Add Your First Provider
+                        {t("email.add_first")}
                     </Button>
                 </div>
             )}
@@ -376,20 +358,20 @@ export default function EmailSettingsPage() {
                     <div className="bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 p-6 text-white">
                         <DialogTitle className="text-xl font-extrabold tracking-tight flex items-center gap-2">
                             <Send size={20} />
-                            Send Test Email
+                            {t("email.send_test")}
                         </DialogTitle>
                         <DialogDescription className="text-white/80 text-sm mt-1">
-                            Verify configuration for <span className="font-bold underline">"{selectedConfig?.name}"</span>.
+                            {t("email.send_test_desc")} <span className="font-bold underline">"{selectedConfig?.name}"</span>.
                         </DialogDescription>
                     </div>
 
                     <form onSubmit={handleSendTestEmail}>
                         <div className="p-6 space-y-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Recipient Email Address</label>
+                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("email.recipient")}</label>
                                 <Input
                                     type="email"
-                                    placeholder="e.g. hello@example.com"
+                                    placeholder={t("email.recipient_placeholder")}
                                     required
                                     value={testEmail}
                                     onChange={e => setTestEmail(e.target.value)}
@@ -405,7 +387,7 @@ export default function EmailSettingsPage() {
                                 onClick={() => setIsTestModalOpen(false)}
                                 className="rounded-full px-6 font-bold"
                             >
-                                Cancel
+                                {t("common.discard")}
                             </Button>
                             <Button
                                 type="submit"
@@ -413,7 +395,7 @@ export default function EmailSettingsPage() {
                                 className="bg-gradient-to-r from-amber-500 to-indigo-600 text-white rounded-full px-8 gap-2 shadow-lg shadow-orange-500/20 font-bold h-11"
                             >
                                 {sendingTest ? <Loader2 className="animate-spin" size={18} /> : <Mail size={18} />}
-                                {sendingTest ? "Sending..." : "Send Test Email"}
+                                {sendingTest ? t("email.sending") : t("email.send_test")}
                             </Button>
                         </div>
                     </form>
@@ -434,12 +416,12 @@ export default function EmailSettingsPage() {
                     <div className="bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 p-6 text-white">
                         <DialogTitle className="text-xl font-extrabold tracking-tight flex items-center gap-2">
                             <Mail size={20} />
-                            {isAddModalOpen ? 'Connect New Email Service' : 'Update Email Configuration'}
+                            {isAddModalOpen ? t("email.connect_title") : t("email.update_title")}
                         </DialogTitle>
                         <DialogDescription className="text-white/80 text-sm mt-1">
                             {isAddModalOpen
-                                ? 'Configure your SMTP or API delivery settings.'
-                                : `Modifying configuration for ${selectedConfig?.name}`
+                                ? t("email.connect_desc")
+                                : `${t("email.update_desc")} ${selectedConfig?.name}`
                             }
                         </DialogDescription>
                     </div>
@@ -448,7 +430,7 @@ export default function EmailSettingsPage() {
                         <div className="p-8 space-y-6 max-h-[60vh] overflow-y-auto pr-4 scrollbar-thin">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2 col-span-1 md:col-span-2">
-                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Configuration Name</label>
+                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("email.config_name")}</label>
                                     <Input
                                         placeholder="e.g. Resend SMTP"
                                         required
@@ -459,13 +441,13 @@ export default function EmailSettingsPage() {
                                 </div>
 
                                 <div className="space-y-2 col-span-1 md:col-span-2">
-                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Service Provider</label>
+                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("email.service_provider")}</label>
                                     <Select
                                         value={formData.provider}
                                         onValueChange={(v: any) => setFormData({ ...formData, provider: v })}
                                     >
                                         <SelectTrigger className="h-12 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700/50 focus:border-indigo-500 font-bold">
-                                            <SelectValue placeholder="Select Provider" />
+                                            <SelectValue placeholder={t("email.select_provider")} />
                                         </SelectTrigger>
                                         <SelectContent className="rounded-2xl border-zinc-200 dark:border-zinc-800 font-bold">
                                             <SelectItem value="smtp">Standard SMTP</SelectItem>
@@ -475,7 +457,7 @@ export default function EmailSettingsPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">From Email Name</label>
+                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("email.from_name")}</label>
                                     <Input
                                         placeholder="e.g. Acme Corp"
                                         required
@@ -486,7 +468,7 @@ export default function EmailSettingsPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">From Address</label>
+                                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("email.from_address")}</label>
                                     <Input
                                         type="email"
                                         placeholder="e.g. hello@acme.com"
@@ -500,7 +482,7 @@ export default function EmailSettingsPage() {
                                 {formData.provider === 'smtp' && (
                                     <>
                                         <div className="space-y-2 flex-grow">
-                                            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">SMTP Host</label>
+                                            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("email.smtp_host")}</label>
                                             <Input
                                                 placeholder="smtp.example.com"
                                                 required={formData.provider === 'smtp'}
@@ -510,7 +492,7 @@ export default function EmailSettingsPage() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Port</label>
+                                            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("email.port")}</label>
                                             <Input
                                                 type="number"
                                                 placeholder="465"
@@ -521,7 +503,7 @@ export default function EmailSettingsPage() {
                                             />
                                         </div>
                                         <div className="space-y-2 col-span-1 md:col-span-2">
-                                            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Username / Email</label>
+                                            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("email.username")}</label>
                                             <Input
                                                 placeholder="Your SMTP username"
                                                 required={formData.provider === 'smtp'}
@@ -535,7 +517,7 @@ export default function EmailSettingsPage() {
 
                                 <div className="space-y-2 col-span-1 md:col-span-2">
                                     <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">
-                                        {formData.provider === 'smtp' ? 'Password' : 'API Key'}
+                                        {formData.provider === 'smtp' ? t("email.password") : t("email.api_key")}
                                     </label>
                                     <Input
                                         type="password"
@@ -545,7 +527,7 @@ export default function EmailSettingsPage() {
                                         onChange={e => setFormData({ ...formData, password: e.target.value })}
                                         className="h-12 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700/50 focus:border-indigo-500 transition-all font-bold"
                                     />
-                                    {isEditModalOpen && <p className="text-[10px] text-zinc-400 font-bold italic px-1">Leave empty to keep existing password.</p>}
+                                    {isEditModalOpen && <p className="text-[10px] text-zinc-400 font-bold italic px-1">{t("email.password_help")}</p>}
                                 </div>
 
                                 <div className="space-y-2">
@@ -561,8 +543,8 @@ export default function EmailSettingsPage() {
 
                                 <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800/30 rounded-2xl col-span-1 md:col-span-2 border border-zinc-100 dark:border-zinc-800 mt-2">
                                     <div>
-                                        <p className="text-sm font-bold tracking-tight">Active Status</p>
-                                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Enable or disable service</p>
+                                        <p className="text-sm font-bold tracking-tight">{t("email.active_status")}</p>
+                                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{t("email.status_desc")}</p>
                                     </div>
                                     <Switch
                                         checked={formData.is_active}
@@ -579,15 +561,15 @@ export default function EmailSettingsPage() {
                                 onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }}
                                 className="rounded-full px-6 font-bold"
                             >
-                                Discard
+                                {t("common.discard")}
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={submitting}
-                                className="bg-gradient-to-r from-amber-500 to-indigo-600 text-white rounded-full px-8 gap-2 shadow-lg shadow-orange-500/20 font-bold h-11"
+                                className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-full px-8 gap-2 h-11 shadow-md font-bold"
                             >
                                 {submitting ? <Loader2 className="animate-spin" size={18} /> : (isAddModalOpen ? <Plus size={18} /> : <Check size={18} />)}
-                                {submitting ? "Saving..." : (isAddModalOpen ? 'Connect Service' : 'Update Configuration')}
+                                {submitting ? t("common.saving") : (isAddModalOpen ? t("email.connect_btn") : t("email.update_btn"))}
                             </Button>
                         </div>
                     </form>

@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { ImportShipmentService } from "@/lib/accounting-import-service";
 import { useAuthStore } from "@/lib/store";
+import { useTranslation } from "@/i18n/TranslationContext";
 import { Button } from "@/components/ui/button";
 import {
     Plus,
@@ -474,6 +475,7 @@ function ShipmentDialog({ open, onClose, onSuccess, companyId, shipment }: { ope
 // ── Main Page ─────────────────────────────────────────────────
 export default function ImportsPage() {
     const { currentCompany } = useAuthStore();
+    const { t } = useTranslation();
     const [shipments, setShipments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
@@ -529,74 +531,75 @@ export default function ImportsPage() {
     }
 
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6 md:space-y-10 animate-in fade-in duration-700 pb-20">
+        <div className="w-full p-4 md:p-6 space-y-4 animate-in fade-in duration-700 pb-20">
             {/* ── Header ── */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-blue-600 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 transform rotate-3 hover:rotate-0 transition-transform">
-                        <Container size={24} />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-center gap-4 md:gap-6">
+                    <div className="h-12 w-12 md:h-14 md:w-14 rounded-[1.5rem] bg-gradient-to-br from-rose-500 to-orange-600 flex items-center justify-center text-white shadow-2xl shadow-orange-500/30 relative group transition-all duration-500 hover:scale-105">
+                        <Container size={24} strokeWidth={2.5} className="relative z-10" />
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-[1.5rem]" />
                     </div>
-                    <div>
-                        <h2 className="text-2xl md:text-4xl font-black bg-gradient-to-r from-indigo-500 via-blue-600 to-violet-500 bg-clip-text text-transparent tracking-tighter uppercase leading-none mb-2">
-                            Import &amp; Shipping
-                        </h2>
-                        <p className="text-xs md:text-base text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
-                            Track containers and manage landed cost distributions.
+                    <div className="space-y-1">
+                        <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-orange-400 via-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tighter uppercase leading-tight pt-[5px]">
+                            {t('imports.title')}
+                        </h1>
+                        <p className="text-[9px] md:text-[11px] text-zinc-500 dark:text-zinc-400 font-black tracking-[0.2em] uppercase opacity-70">
+                            {t('imports.desc')}
                         </p>
                     </div>
                 </div>
                 <Button
                     onClick={() => setShowNewDialog(true)}
-                    className="bg-gradient-to-r from-orange-400 to-indigo-500 text-white rounded-full px-8 h-14 font-black text-lg shadow-[0_8px_20px_-6px_rgba(251,146,60,0.5)] transition-all hover:scale-[1.02] active:scale-95 border-0 whitespace-nowrap gap-2"
+                    className="w-full sm:w-auto bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-full px-10 h-12 shadow-xl shadow-orange-500/20 font-black uppercase tracking-widest text-[10px] transition-all hover:scale-[1.02] active:scale-95 border-0"
                 >
-                    <Plus size={20} strokeWidth={3} /> Add Shipment
+                    <Plus size={18} strokeWidth={3} className="mr-2" /> {t('imports.add_shipment')}
                 </Button>
             </div>
 
             {/* ── Stat Cards ── */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatCard
-                    label="Active Shipments"
-                    value={`${activeShipments} In Motion`}
+                    label={t("imports.active_shipments")}
+                    value={t("imports.in_transit").replace("{{count}}", activeShipments.toString())}
                     icon={Ship}
                     iconBg="bg-indigo-50 dark:bg-indigo-900/20"
                     iconText="text-indigo-500 dark:text-indigo-400"
                     gradientFrom="from-indigo-500"
                     gradientTo="to-blue-500"
-                    description="Shipments currently in transit or arrived and awaiting clearance."
+                    description={t("imports.active_desc")}
                 />
                 <StatCard
-                    label="Total Freight Cost"
+                    label={t("imports.total_freight")}
                     value={`$${totalShipping.toLocaleString("en-CA", { minimumFractionDigits: 2 })}`}
                     icon={Truck}
                     iconBg="bg-amber-50 dark:bg-amber-900/20"
                     iconText="text-amber-500 dark:text-amber-400"
                     gradientFrom="from-amber-400"
                     gradientTo="to-orange-500"
-                    description="Cumulative shipping costs across all import shipments."
+                    description={t("imports.freight_desc")}
                 />
                 <StatCard
-                    label="Total Duty & Tax"
+                    label={t("imports.total_duty")}
                     value={`$${totalDuties.toLocaleString("en-CA", { minimumFractionDigits: 2 })}`}
                     icon={DollarSign}
                     iconBg="bg-emerald-50 dark:bg-emerald-900/20"
                     iconText="text-emerald-500 dark:text-emerald-400"
                     gradientFrom="from-emerald-500"
                     gradientTo="to-teal-500"
-                    description="Cumulative customs duty and import tax obligations."
+                    description={t("imports.duty_desc")}
                 />
             </div>
 
             {/* ── Search & Status Filter ── */}
             <div className="flex flex-col md:flex-row items-center gap-4">
-                <div className="flex-1 flex items-center gap-4 bg-white dark:bg-zinc-900/50 p-2 rounded-full border border-zinc-200 dark:border-zinc-800 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all w-full">
+                <div className="flex-1 flex items-center gap-4 bg-white dark:bg-zinc-900/50 p-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all w-full">
                     <div className="relative flex-1">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-400" size={20} />
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                         <Input
-                            placeholder="Search by container number..."
+                            placeholder={t("imports.search_container")}
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
-                            className="bg-transparent border-none py-7 pl-16 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-lg font-medium"
+                            className="bg-transparent border-none h-12 pl-14 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-base font-medium"
                         />
                     </div>
                 </div>
@@ -614,13 +617,13 @@ export default function ImportsPage() {
                                         : "bg-white dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:border-zinc-300"
                                 )}
                             >
-                                {s}
+                                {t(`imports.status_${s}`)}
                             </button>
                         );
                     })}
                     {selectedStatus && (
                         <button onClick={() => setSelectedStatus(null)} className="px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border bg-white dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-700 text-indigo-500 hover:text-indigo-700 transition-all">
-                            Clear
+                            {t("imports.clear")}
                         </button>
                     )}
                 </div>
@@ -652,12 +655,12 @@ export default function ImportsPage() {
                         </div>
                         <div className="space-y-2 text-center">
                             <h3 className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight">
-                                {shipments.length === 0 ? "No Active Shipments" : "No Matching Shipments"}
+                                {shipments.length === 0 ? t("imports.no_active") : t("imports.no_matching")}
                             </h3>
                             <p className="text-zinc-500 dark:text-zinc-400 text-sm max-w-xs mx-auto font-medium">
                                 {shipments.length === 0
-                                    ? "Create a shipment to track containers from vessel to warehouse and distribute landed costs."
-                                    : "Try adjusting your search or status filter."}
+                                    ? t("imports.empty_desc")
+                                    : t("imports.try_adjusting")}
                             </p>
                         </div>
                         {shipments.length === 0 && (
@@ -665,7 +668,7 @@ export default function ImportsPage() {
                                 onClick={() => setShowNewDialog(true)}
                                 className="bg-gradient-to-r from-orange-400 to-indigo-500 text-white rounded-full px-10 h-14 font-black text-lg shadow-[0_8px_20px_-6px_rgba(251,146,60,0.5)] transition-all hover:scale-[1.02] active:scale-95 border-0 gap-2"
                             >
-                                <Plus size={20} strokeWidth={3} /> Add First Shipment
+                                <Plus size={20} strokeWidth={3} /> {t("imports.add_first")}
                             </Button>
                         )}
                     </div>

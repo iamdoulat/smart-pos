@@ -18,6 +18,7 @@ import {
     Globe,
     Layers
 } from "lucide-react";
+import { useTranslation } from "@/i18n/TranslationContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,7 @@ export default function WhatsappSettingsPage() {
     const [configs, setConfigs] = useState<WhatsappConfiguration[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+    const { t } = useTranslation();
 
     // Modal states
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -67,7 +69,7 @@ export default function WhatsappSettingsPage() {
             setConfigs(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("Failed to fetch WhatsApp configs:", error);
-            toast.error("Failed to load WhatsApp configurations");
+            toast.error(t("whatsapp.error_load"));
         } finally {
             setLoading(false);
         }
@@ -108,7 +110,7 @@ export default function WhatsappSettingsPage() {
         try {
             setSubmitting(true);
             await WhatsappService.createConfiguration(formData);
-            toast.success("WhatsApp service added successfully");
+            toast.success(t("whatsapp.success_add"));
             setIsAddModalOpen(false);
             fetchConfigs();
         } catch (error: any) {
@@ -129,7 +131,7 @@ export default function WhatsappSettingsPage() {
             if (!updateProps.api_secret) delete updateProps.api_secret;
 
             await WhatsappService.updateConfiguration(selectedConfig.id, updateProps);
-            toast.success("Configuration updated successfully");
+            toast.success(t("whatsapp.success_update"));
             setIsEditModalOpen(false);
             fetchConfigs();
         } catch (error: any) {
@@ -142,13 +144,13 @@ export default function WhatsappSettingsPage() {
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm("Are you sure you want to delete this WhatsApp service?")) return;
+        if (!confirm(t("common.confirm_delete_text"))) return;
         try {
             await WhatsappService.deleteConfiguration(id);
-            toast.success("Service deleted successfully");
+            toast.success(t("whatsapp.success_delete"));
             fetchConfigs();
         } catch (error: any) {
-            toast.error("Failed to delete service");
+            toast.error(t("whatsapp.error_delete"));
         }
     };
 
@@ -167,7 +169,7 @@ export default function WhatsappSettingsPage() {
             }
         } catch (error: any) {
             console.error("Test Error Details:", error.response?.data);
-            toast.error(error.response?.data?.message || "Failed to send test message");
+            toast.error(error.response?.data?.message || t("whatsapp.error_test"));
         } finally {
             setSendingTest(false);
         }
@@ -179,98 +181,90 @@ export default function WhatsappSettingsPage() {
     );
 
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6 md:space-y-10 animate-in fade-in duration-700">
+        <div className="w-full p-4 md:p-6 space-y-8">
             {/* Header Section */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-green-500/20 transform -rotate-3 transition-transform hover:rotate-0">
-                        <MessageCircle size={20} className="md:w-6 md:h-6" />
+                    <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-rose-500/20">
+                        <MessageCircle size={24} />
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-emerald-500 via-green-600 to-teal-500 bg-clip-text text-transparent tracking-tight">WhatsApp Settings</h2>
-                        <p className="text-xs md:text-sm text-zinc-500 dark:text-zinc-400 font-medium">
-                            Manage your WhatsApp API gateways (bipsms.com).
-                        </p>
+                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight">{t("whatsapp.title")}</h2>
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("whatsapp.subtitle")}</p>
                     </div>
                 </div>
 
-                <div className="flex flex-row items-center gap-3 md:gap-4">
-                    <div className="relative group min-w-[140px] xs:min-w-[200px]">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-900 dark:group-focus-within:text-zinc-100 transition-colors" size={16} />
+                <div className="flex items-center gap-3">
+                    <div className="relative group">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                         <Input
-                            placeholder="Search gateways..."
-                            className="pl-11 pr-4 h-10 md:h-12 w-full sm:w-64 md:w-80 rounded-2xl bg-white dark:bg-zinc-900 border-2 border-zinc-100 dark:border-zinc-800 focus:border-emerald-500 dark:focus:border-emerald-500 transition-all font-bold shadow-sm"
+                            placeholder={t("whatsapp.search_placeholder")}
+                            className="pl-10 h-11 w-full md:w-64 rounded-xl border-zinc-200"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <Button
                         onClick={handleOpenAddModal}
-                        className="bg-emerald-600 text-white rounded-full px-4 md:px-8 gap-2 shadow-lg shadow-emerald-500/20 h-10 md:h-12 flex items-center justify-center whitespace-nowrap"
+                        className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-full px-6 gap-2 h-11 shadow-md"
                     >
                         <Plus size={18} />
-                        <span className="font-bold hidden xs:inline">Add Gateway</span>
-                        <span className="font-bold inline xs:hidden">Add</span>
+                        <span className="font-bold">{t("whatsapp.add_btn")}</span>
                     </Button>
                 </div>
             </div>
 
             {/* List Section */}
             {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[1, 2, 3].map(i => (
-                        <div key={i} className="h-64 md:h-80 rounded-[40px] bg-zinc-100 dark:bg-zinc-800 animate-pulse border-2 border-zinc-200 dark:border-zinc-700" />
+                        <div key={i} className="h-64 rounded-2xl bg-zinc-100 dark:bg-zinc-800 animate-pulse border border-zinc-200 dark:border-zinc-700" />
                     ))}
                 </div>
             ) : filteredConfigs.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredConfigs.map(config => (
                         <div
                             key={config.id}
                             className={cn(
-                                "group relative h-full bg-white dark:bg-zinc-900 rounded-[2rem] md:rounded-[2.5rem] border-2 transition-all duration-500 overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 flex flex-col",
-                                config.is_active ? "border-emerald-100 dark:border-emerald-900/30" : "border-zinc-100 dark:border-zinc-800 opacity-75 grayscale-[0.5]"
+                                "group relative h-full bg-white dark:bg-zinc-900 rounded-2xl border transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md flex flex-col",
+                                config.is_active ? "border-zinc-200 dark:border-zinc-800" : "border-red-100 dark:border-red-900/30 opacity-75 grayscale-[0.5]"
                             )}
                         >
+                            {/* Card Decorative Top */}
                             <div className={cn(
-                                "h-16 md:h-24 transition-all duration-500 group-hover:h-20 md:group-hover:h-28",
-                                config.is_active
-                                    ? "bg-gradient-to-br from-emerald-500 to-green-600"
-                                    : "bg-gradient-to-br from-zinc-400 to-zinc-500"
+                                "h-2 bg-gradient-to-r",
+                                config.is_active ? "from-emerald-500 to-green-600" : "from-zinc-400 to-zinc-500"
                             )} />
 
-                            <div className="px-6 md:px-8 pb-6 md:pb-8 flex-1 flex flex-col">
-                                <div className="flex justify-between items-start -mt-8 md:-mt-10 mb-4 md:mb-6">
-                                    <div className="h-16 w-16 md:h-20 md:w-20 rounded-2xl md:rounded-3xl bg-white dark:bg-zinc-800 shadow-xl border-4 border-zinc-50 dark:border-zinc-950 flex items-center justify-center p-3 md:p-4">
-                                        <MessageCircle className={cn(config.is_active ? "text-emerald-500" : "text-zinc-400")} size={28} />
+                            <div className="p-6 flex-1 flex flex-col">
+                                <div className="flex justify-between items-start mb-6">
+                                    <div className="h-12 w-12 rounded-xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center border border-zinc-100 dark:border-zinc-700 shadow-sm">
+                                        <MessageCircle className={cn(config.is_active ? "text-emerald-500" : "text-zinc-400")} size={24} />
                                     </div>
-                                    <div className="pt-10 md:pt-12 flex flex-col items-end gap-2">
-                                        {config.is_active && (
-                                            <Badge className="rounded-full px-2 md:px-3 py-0.5 md:py-1 font-bold bg-emerald-500 text-white border-0 shadow-lg shadow-emerald-500/20 text-[10px] md:text-xs">
-                                                <CheckCircle2 size={10} className="mr-1" /> ACTIVE
-                                            </Badge>
-                                        )}
-                                        {!config.is_active && (
-                                            <Badge className="rounded-full px-2 md:px-3 py-0.5 md:py-1 font-bold bg-red-100 text-red-700 border-0 text-[10px] md:text-xs">
-                                                DISABLED
-                                            </Badge>
-                                        )}
+                                    <div className="flex flex-col items-end gap-2">
+                                        <Badge className={cn(
+                                            "rounded-full px-2.5 py-0.5 font-bold text-[10px] uppercase tracking-wider",
+                                            config.is_active ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30" : "bg-red-100 text-red-700 dark:bg-red-900/30"
+                                        )}>
+                                            {config.is_active ? t("whatsapp.active") : t("whatsapp.disabled")}
+                                        </Badge>
                                         <div className="flex gap-1">
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleOpenEditModal(config)}
-                                                className="h-7 w-7 md:h-8 md:w-8 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900 shadow-sm"
+                                                className="h-8 w-8 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-900"
                                             >
-                                                <Edit2 size={12} />
+                                                <Edit2 size={14} />
                                             </Button>
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleDelete(config.id)}
-                                                className="h-7 w-7 md:h-8 md:w-8 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 text-zinc-400 hover:text-red-600 shadow-sm"
+                                                className="h-8 w-8 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 text-zinc-400 hover:text-red-600"
                                             >
-                                                <Trash2 size={12} />
+                                                <Trash2 size={14} />
                                             </Button>
                                         </div>
                                     </div>
@@ -278,41 +272,42 @@ export default function WhatsappSettingsPage() {
 
                                 <div className="space-y-4 flex-1">
                                     <div>
-                                        <h3 className="text-xl md:text-2xl font-black text-zinc-900 dark:text-zinc-50 tracking-tighter truncate">{config.name}</h3>
-                                        <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-emerald-500">WHATSAPP GATEWAY</p>
+                                        <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 truncate">{config.name}</h3>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500">{t("whatsapp.gateway")}</p>
                                     </div>
 
-                                    <div className="space-y-3 pt-1 md:pt-2">
-                                        <div className="flex flex-col text-sm">
-                                            <span className="text-zinc-400 font-bold uppercase text-[9px] md:text-[10px] tracking-widest">ID:</span>
-                                            <span className="font-mono text-[10px] md:text-[11px] text-zinc-600 dark:text-zinc-400 break-all leading-tight mt-1">
+                                    <div className="space-y-2 pt-2">
+                                        <div className="flex flex-col text-xs">
+                                            <span className="text-zinc-500 font-bold uppercase tracking-tight text-[10px]">{t("whatsapp.id")}</span>
+                                            <span className="font-mono text-[10px] text-zinc-600 dark:text-zinc-400 break-all leading-tight mt-1">
                                                 {config.account_id}
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div className="pt-4 md:pt-6 space-y-2 md:space-y-3">
-                                        <div className="flex justify-between items-end">
-                                            <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-zinc-400">Daily Usage: <span className="text-zinc-900 dark:text-zinc-100">{config.daily_usage} / {config.daily_limit === 0 ? '∞' : config.daily_limit}</span></span>
+                                    <div className="pt-4 space-y-2">
+                                        <div className="flex justify-between items-end text-[10px]">
+                                            <span className="font-bold text-zinc-400 uppercase">{t("whatsapp.daily_usage")}</span>
+                                            <span className="font-bold text-zinc-900 dark:text-zinc-100">{config.daily_usage} / {config.daily_limit === 0 ? '∞' : config.daily_limit}</span>
                                         </div>
-                                        <div className="h-1.5 md:h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                                        <div className="h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                                             <div
-                                                className="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-emerald-400 to-green-600"
+                                                className="h-full bg-emerald-500 transition-all duration-1000"
                                                 style={{ width: config.daily_limit === 0 ? (config.daily_usage > 0 ? '100%' : '0%') : `${Math.min((config.daily_usage / config.daily_limit) * 100, 100)}%` }}
                                             />
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="pt-6 md:pt-8 flex gap-3">
+                                <div className="pt-6">
                                     <Button
                                         onClick={() => handleOpenTestModal(config)}
                                         disabled={!config.is_active}
                                         variant="outline"
-                                        className="flex-1 rounded-xl md:rounded-2xl font-bold border-2 border-zinc-100 dark:border-zinc-800 h-11 md:h-14 hover:bg-emerald-500 hover:text-white transition-all uppercase tracking-tight text-sm md:text-base group/btn"
+                                        className="w-full rounded-xl font-bold border-zinc-200 dark:border-zinc-800 h-11 hover:bg-zinc-900 dark:hover:bg-zinc-100 hover:text-white dark:hover:text-zinc-900 transition-all text-xs"
                                     >
-                                        <Send className="mr-2 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" size={14} />
-                                        Test Gateway
+                                        <Send className="mr-2" size={14} />
+                                        {t("whatsapp.test_btn")}
                                     </Button>
                                 </div>
                             </div>
@@ -324,13 +319,13 @@ export default function WhatsappSettingsPage() {
                     <div className="h-16 w-16 md:h-24 md:w-24 rounded-2xl md:rounded-[32px] bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-emerald-300 dark:text-emerald-700 mb-6 md:mb-8 border-2 border-emerald-100 dark:border-emerald-900/50">
                         <MessageCircle size={32} className="md:w-12 md:h-12" />
                     </div>
-                    <h3 className="text-2xl md:text-3xl font-black italic tracking-tighter text-zinc-900 dark:text-zinc-100 mb-2 md:mb-3 uppercase">No Gateway Found</h3>
-                    <p className="text-sm md:text-lg text-zinc-500 dark:text-zinc-400 max-w-sm mb-8 md:mb-10 font-bold tracking-tight">Connect your bipsms.com WhatsApp account to start sending messages reliably.</p>
+                    <h3 className="text-2xl md:text-3xl font-black italic tracking-tighter text-zinc-900 dark:text-zinc-100 mb-2 md:mb-3 uppercase">{t("whatsapp.no_found")}</h3>
+                    <p className="text-sm md:text-lg text-zinc-500 dark:text-zinc-400 max-w-sm mb-8 md:mb-10 font-bold tracking-tight">{t("whatsapp.no_found_desc")}</p>
                     <Button
                         onClick={handleOpenAddModal}
                         className="bg-emerald-500 text-white rounded-2xl md:rounded-3xl px-8 md:px-12 h-14 md:h-16 font-bold md:text-xl hover:bg-emerald-600 transition-all shadow-2xl shadow-emerald-500/20 transform -rotate-1 hover:rotate-0"
                     >
-                        CONNECT ACCOUNT NOW
+                        {t("whatsapp.connect_now")}
                     </Button>
                 </div>
             )}
@@ -347,10 +342,10 @@ export default function WhatsappSettingsPage() {
                         </Button>
                         <DialogTitle className="text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2 uppercase">
                             <Send size={20} />
-                            Test Connection
+                            {t("whatsapp.test_title")}
                         </DialogTitle>
                         <DialogDescription className="text-emerald-50/90 text-[10px] md:text-xs mt-1 font-bold">
-                            Send a test WhatsApp message using <span className="text-white underline underline-offset-4 decoration-2">"{selectedConfig?.name}"</span>.
+                            {t("whatsapp.test_desc")} <span className="text-white underline underline-offset-4 decoration-2">"{selectedConfig?.name}"</span>.
                         </DialogDescription>
                     </div>
 
@@ -359,7 +354,7 @@ export default function WhatsappSettingsPage() {
                             <div className="space-y-2">
                                 <label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 flex items-center gap-2 px-1">
                                     <Smartphone size={10} className="md:w-[12px] md:h-[12px]" />
-                                    Recipient Phone Number
+                                    {t("whatsapp.recipient_label")}
                                 </label>
                                 <div className="relative group">
                                     <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
@@ -377,7 +372,7 @@ export default function WhatsappSettingsPage() {
                             <div className="space-y-2">
                                 <label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 flex items-center gap-2 px-1">
                                     <MessageCircle size={10} className="md:w-[12px] md:h-[12px]" />
-                                    Message Text
+                                    {t("whatsapp.message_label")}
                                 </label>
                                 <textarea
                                     className="w-full rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border-2 border-zinc-100 dark:border-zinc-800 focus:border-emerald-500 dark:focus:border-emerald-500 transition-all font-bold p-4 text-xs md:text-sm min-h-[100px] md:min-h-[120px] resize-none outline-none"
@@ -396,7 +391,7 @@ export default function WhatsappSettingsPage() {
                                 onClick={() => setIsTestModalOpen(false)}
                                 className="w-full md:w-auto rounded-full px-8 font-black uppercase italic tracking-tighter hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500"
                             >
-                                Cancel
+                                {t("common.discard")}
                             </Button>
                             <Button
                                 type="submit"
@@ -404,7 +399,7 @@ export default function WhatsappSettingsPage() {
                                 className="w-full md:w-auto bg-gradient-to-r from-orange-400 via-orange-500 to-indigo-600 text-white rounded-full px-10 gap-2 shadow-xl shadow-indigo-500/20 font-black h-12 md:h-14 uppercase italic tracking-tighter text-base md:text-lg"
                             >
                                 {sendingTest ? <Loader2 className="animate-spin" size={18} /> : <CheckCircle2 size={18} />}
-                                {sendingTest ? "Sending..." : "Execute Test"}
+                                {sendingTest ? t("whatsapp.sending") : t("whatsapp.execute_test")}
                             </Button>
                         </div>
                     </form>
@@ -431,12 +426,12 @@ export default function WhatsappSettingsPage() {
                             <X size={16} />
                         </Button>
                         <DialogTitle className="text-2xl md:text-3xl font-black tracking-tighter flex items-center gap-2 uppercase italic">
-                            {isAddModalOpen ? 'Connect Gateway' : 'Update Gateway'}
+                            {isAddModalOpen ? t("whatsapp.connect_title") : t("whatsapp.update_title")}
                         </DialogTitle>
                         <DialogDescription className="text-white/80 text-xs md:text-sm mt-1 font-bold">
                             {isAddModalOpen
-                                ? 'Enter details to automate your WhatsApp messaging flow.'
-                                : `Modifying configuration for gateway: ${selectedConfig?.name}`
+                                ? t("whatsapp.connect_desc")
+                                : `${t("whatsapp.update_desc")} ${selectedConfig?.name}`
                             }
                         </DialogDescription>
                     </div>
@@ -446,7 +441,7 @@ export default function WhatsappSettingsPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                                 {/* Gateway Name */}
                                 <div className="space-y-2 md:col-span-2">
-                                    <label className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400 px-1">Gateway Name</label>
+                                    <label className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400 px-1">{t("whatsapp.name_label")}</label>
                                     <div className="relative group">
                                         <Layers className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-indigo-500 transition-colors" size={18} />
                                         <Input
@@ -461,7 +456,7 @@ export default function WhatsappSettingsPage() {
 
                                 {/* Account ID */}
                                 <div className="space-y-2 md:col-span-2">
-                                    <label className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400 px-1">Account Unique ID</label>
+                                    <label className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400 px-1">{t("whatsapp.account_id_label")}</label>
                                     <div className="relative group">
                                         <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-pink-500 transition-colors" size={18} />
                                         <Input
@@ -476,7 +471,7 @@ export default function WhatsappSettingsPage() {
 
                                 {/* API Secret */}
                                 <div className="space-y-2">
-                                    <label className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400 px-1">API Secret Key</label>
+                                    <label className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400 px-1">{t("whatsapp.api_secret_label")}</label>
                                     <div className="relative group">
                                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-orange-500 transition-colors" size={18} />
                                         <Input
@@ -492,7 +487,7 @@ export default function WhatsappSettingsPage() {
 
                                 {/* Daily Limit */}
                                 <div className="space-y-2">
-                                    <label className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400 px-1">Daily Message Limit</label>
+                                    <label className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] text-zinc-400 px-1">{t("whatsapp.daily_limit_label")}</label>
                                     <div className="relative group">
                                         <Activity className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-emerald-500 transition-colors" size={18} />
                                         <Input
@@ -513,9 +508,9 @@ export default function WhatsappSettingsPage() {
                             {/* Status Toggle Area */}
                             <div className="flex items-center justify-between p-4 md:p-6 bg-zinc-50 dark:bg-zinc-800/30 rounded-[1.2rem] md:rounded-[1.5rem] border-2 border-zinc-100 dark:border-zinc-800">
                                 <div className="space-y-0.5">
-                                    <h4 className="text-sm md:text-base font-black tracking-tight uppercase italic">{!formData.is_active ? 'Gateway Disabled' : 'Gateway Enabled'}</h4>
+                                    <h4 className="text-sm md:text-base font-black tracking-tight uppercase italic">{!formData.is_active ? t("whatsapp.gateway_disabled") : t("whatsapp.gateway_enabled")}</h4>
                                     <p className="text-[9px] md:text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
-                                        Toggle to activate or deactivate this service.
+                                        {t("whatsapp.toggle_desc")}
                                     </p>
                                 </div>
                                 <Switch
@@ -534,7 +529,7 @@ export default function WhatsappSettingsPage() {
                                 onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }}
                                 className="w-full md:w-auto rounded-full px-10 font-black uppercase italic tracking-tighter h-12 md:h-14 text-zinc-500"
                             >
-                                Cancel
+                                {t("common.discard")}
                             </Button>
                             <Button
                                 type="submit"
@@ -542,7 +537,7 @@ export default function WhatsappSettingsPage() {
                                 className="w-full md:w-auto bg-gradient-to-r from-orange-400 via-indigo-500 to-indigo-600 text-white rounded-full px-12 gap-2 shadow-2xl shadow-indigo-500/40 font-black h-12 md:h-14 uppercase italic tracking-tighter text-lg group"
                             >
                                 {submitting ? <Loader2 className="animate-spin" size={20} /> : <CheckCircle2 size={20} />}
-                                {submitting ? "Processing..." : (isAddModalOpen ? 'Connect Gateway' : 'Save Changes')}
+                                {submitting ? t("whatsapp.processing") : (isAddModalOpen ? t("whatsapp.connect_title") : t("whatsapp.save_changes"))}
                             </Button>
                         </div>
                     </form>

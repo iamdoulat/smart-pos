@@ -17,6 +17,7 @@ import {
     XCircle,
     Info
 } from "lucide-react";
+import { useTranslation } from "@/i18n/TranslationContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +49,7 @@ export default function SmsSettingsPage() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isTestModalOpen, setIsTestModalOpen] = useState(false);
     const [selectedConfig, setSelectedConfig] = useState<SmsConfiguration | null>(null);
+    const { t } = useTranslation();
 
     // Form states
     const [formData, setFormData] = useState<Partial<SmsConfiguration>>({
@@ -74,7 +76,7 @@ export default function SmsSettingsPage() {
             setConfigs(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("Failed to fetch SMS configs:", error);
-            toast.error("Failed to load SMS configurations");
+            toast.error(t("sms.error_load"));
         } finally {
             setLoading(false);
         }
@@ -118,11 +120,11 @@ export default function SmsSettingsPage() {
         try {
             setSubmitting(true);
             await SmsService.createConfiguration(formData);
-            toast.success("SMS service added successfully");
+            toast.success(t("sms.success_add"));
             setIsAddModalOpen(false);
             fetchConfigs();
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to add SMS service");
+            toast.error(error.response?.data?.message || t("sms.error_load"));
         } finally {
             setSubmitting(false);
         }
@@ -137,24 +139,24 @@ export default function SmsSettingsPage() {
             if (!updateProps.auth_token) delete updateProps.auth_token;
 
             await SmsService.updateConfiguration(selectedConfig.id, updateProps);
-            toast.success("Configuration updated successfully");
+            toast.success(t("sms.success_update"));
             setIsEditModalOpen(false);
             fetchConfigs();
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to update configuration");
+            toast.error(error.response?.data?.message || t("sms.error_load"));
         } finally {
             setSubmitting(false);
         }
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm("Are you sure you want to delete this SMS service?")) return;
+        if (!confirm(t("sms.confirm_delete"))) return;
         try {
             await SmsService.deleteConfiguration(id);
-            toast.success("Service deleted successfully");
+            toast.success(t("sms.success_delete"));
             fetchConfigs();
         } catch (error: any) {
-            toast.error("Failed to delete service");
+            toast.error(t("sms.error_load"));
         }
     };
 
@@ -172,7 +174,7 @@ export default function SmsSettingsPage() {
                 toast.error(result.message);
             }
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to send test SMS");
+            toast.error(error.response?.data?.message || t("sms.error_load"));
         } finally {
             setSendingTest(false);
         }
@@ -184,71 +186,73 @@ export default function SmsSettingsPage() {
     );
 
     return (
-        <div className="p-8 max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700">
+        <div className="w-full p-4 md:p-6 space-y-8">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-rose-500/20 transform -rotate-3 transition-transform hover:rotate-0">
+                    <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-rose-500/20">
                         <MessageSquare size={24} />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight">SMS Settings</h2>
-                        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                            Configure Twilio and other SMS gateways for notifications.
-                        </p>
+                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight">{t("sms.title")}</h2>
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("sms.subtitle")}</p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                     <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-900 dark:group-focus-within:text-zinc-100 transition-colors" size={18} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                         <Input
-                            placeholder="Search gateways..."
-                            className="pl-12 pr-6 h-12 w-full md:w-80 rounded-2xl bg-white dark:bg-zinc-900 border-2 border-zinc-100 dark:border-zinc-800 focus:border-zinc-900 dark:focus:border-zinc-100 transition-all font-bold shadow-sm"
+                            placeholder={t("sms.search_placeholder")}
+                            className="pl-10 h-11 w-full md:w-64 rounded-xl border-zinc-200"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <Button
                         onClick={handleOpenAddModal}
-                        className="bg-gradient-to-r from-amber-500 to-indigo-600 text-white rounded-full px-8 gap-2 shadow-lg shadow-orange-500/20 py-6 h-auto"
+                        className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-full px-6 gap-2 h-11 shadow-md"
                     >
                         <Plus size={18} />
-                        <span className="font-bold">Add Gateway</span>
+                        <span className="font-bold">{t("sms.add_gateway")}</span>
                     </Button>
                 </div>
             </div>
 
             {/* List Section */}
             {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[1, 2, 3].map(i => (
-                        <div key={i} className="h-80 rounded-[40px] bg-zinc-100 dark:bg-zinc-800 animate-pulse border-2 border-zinc-200 dark:border-zinc-700" />
+                        <div key={i} className="h-64 rounded-2xl bg-zinc-100 dark:bg-zinc-800 animate-pulse border border-zinc-200 dark:border-zinc-700" />
                     ))}
                 </div>
             ) : filteredConfigs.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredConfigs.map(config => (
                         <div
                             key={config.id}
-                            className={`group relative h-full bg-white dark:bg-zinc-900 rounded-[40px] border-2 transition-all duration-500 overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 flex flex-col ${config.is_active ? 'border-zinc-100 dark:border-zinc-800' : 'border-red-100 dark:border-red-900/30 opacity-75 grayscale-[0.5]'
-                                }`}
+                            className={cn(
+                                "group relative h-full bg-white dark:bg-zinc-900 rounded-2xl border transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md flex flex-col",
+                                config.is_active ? "border-zinc-200 dark:border-zinc-800" : "border-red-100 dark:border-red-900/30 opacity-75 grayscale-[0.5]"
+                            )}
                         >
-                            {/* Card Header Gradient */}
-                            <div className={`h-24 transition-all duration-500 group-hover:h-28 ${config.provider === 'twilio'
-                                ? 'bg-gradient-to-br from-red-500 to-red-600'
-                                : 'bg-gradient-to-br from-zinc-800 to-zinc-900'
-                                }`} />
+                            {/* Card Decorative Top */}
+                            <div className={cn(
+                                "h-2 bg-gradient-to-r",
+                                config.provider === 'twilio' ? "from-red-500 to-rose-600" : "from-zinc-400 to-zinc-500"
+                            )} />
 
-                            <div className="px-8 pb-8 flex-1 flex flex-col">
-                                {/* Provider Icon & Name */}
-                                <div className="flex justify-between items-start -mt-10 mb-6">
-                                    <div className="h-20 w-20 rounded-3xl bg-white dark:bg-zinc-800 shadow-xl border-4 border-zinc-50 dark:border-zinc-950 flex items-center justify-center p-4">
-                                        <Smartphone className={config.provider === 'twilio' ? 'text-red-500' : 'text-zinc-900 dark:text-zinc-100 text-white'} size={32} />
+                            <div className="p-6 flex-1 flex flex-col">
+                                <div className="flex justify-between items-start mb-6">
+                                    <div className="h-12 w-12 rounded-xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center border border-zinc-100 dark:border-zinc-700 shadow-sm">
+                                        <Smartphone className={cn(config.is_active ? "text-red-500" : "text-zinc-400")} size={24} />
                                     </div>
-                                    <div className="pt-12 flex flex-col items-end gap-2">
-                                        <Badge className={`rounded-full px-3 py-1 font-bold ${config.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
-                                            {config.is_active ? 'ACTIVE' : 'DISABLED'}
+                                    <div className="flex flex-col items-end gap-2">
+                                        <Badge className={cn(
+                                            "rounded-full px-2.5 py-0.5 font-bold text-[10px] uppercase tracking-wider",
+                                            config.is_active ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30" : "bg-red-100 text-red-700 dark:bg-red-900/30"
+                                        )}>
+                                            {config.is_active ? t("sms.active") : t("sms.disabled")}
                                         </Badge>
                                         <div className="flex gap-1">
                                             <Button
@@ -273,49 +277,45 @@ export default function SmsSettingsPage() {
 
                                 <div className="space-y-4 flex-1">
                                     <div>
-                                        <h3 className="text-2xl font-black text-zinc-900 dark:text-zinc-50 uppercase italic tracking-tighter truncate">{config.name}</h3>
-                                        <p className="text-xs font-black uppercase tracking-widest text-red-500">{config.provider.replace('_', ' ')} SERVICE</p>
+                                        <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 truncate">{config.name}</h3>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-red-500">{config.provider.replace('_', ' ')}</p>
                                     </div>
 
-                                    <div className="space-y-3 pt-2">
-                                        <div className="flex justify-between items-center text-sm">
+                                    <div className="space-y-2 pt-2">
+                                        <div className="flex justify-between items-center text-xs">
                                             <span className="text-zinc-500 font-bold uppercase tracking-tight">SID:</span>
-                                            <span className="font-black text-zinc-900 dark:text-zinc-200">
-                                                {config.account_sid.substring(0, 10)}...
-                                            </span>
+                                            <span className="font-semibold text-zinc-900 dark:text-zinc-200">{config.account_sid.substring(0, 12)}...</span>
                                         </div>
-                                        <div className="flex justify-between items-center text-sm">
-                                            <span className="text-zinc-500 font-bold uppercase tracking-tight">From:</span>
-                                            <span className="font-black text-zinc-900 dark:text-zinc-200 truncate max-w-[150px]">{config.from_number}</span>
+                                        <div className="flex justify-between items-center text-xs">
+                                            <span className="text-zinc-500 font-bold uppercase tracking-tight">{t("sms.from_number")}:</span>
+                                            <span className="font-semibold text-zinc-900 dark:text-zinc-200">{config.from_number}</span>
                                         </div>
                                     </div>
 
-                                    {/* Usage Tracker */}
-                                    <div className="pt-6 space-y-3">
-                                        <div className="flex justify-between items-end">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Daily Progress</span>
-                                            <span className="text-sm font-black text-zinc-900 dark:text-zinc-100 italic">{config.daily_usage} <span className="text-zinc-400">/ {config.daily_limit}</span></span>
+                                    {/* Usage Progress */}
+                                    <div className="pt-4 space-y-2">
+                                        <div className="flex justify-between items-end text-[10px]">
+                                            <span className="font-bold text-zinc-400 uppercase">{t("sms.daily_usage")}</span>
+                                            <span className="font-bold text-zinc-900 dark:text-zinc-100">{config.daily_usage} / {config.daily_limit}</span>
                                         </div>
-                                        <div className="h-4 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden p-1 border border-zinc-50 dark:border-zinc-850">
+                                        <div className="h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                                             <div
-                                                className="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-red-500 to-rose-600"
+                                                className="h-full bg-red-500 transition-all duration-1000"
                                                 style={{ width: `${Math.min((config.daily_usage / config.daily_limit) * 100, 100)}%` }}
                                             />
                                         </div>
-                                        <p className="text-[10px] text-zinc-400 font-medium text-center italic">Resets every 24 hours</p>
                                     </div>
                                 </div>
 
-                                {/* Active Configuration Actions */}
-                                <div className="pt-8">
+                                <div className="pt-6">
                                     <Button
                                         onClick={() => handleOpenTestModal(config)}
                                         disabled={!config.is_active}
                                         variant="outline"
-                                        className="w-full rounded-2xl font-black border-2 border-zinc-100 dark:border-zinc-800 h-14 hover:bg-zinc-900 dark:hover:bg-zinc-100 hover:text-white dark:hover:text-zinc-900 transition-all uppercase italic tracking-tighter text-lg group/btn"
+                                        className="w-full rounded-xl font-bold border-zinc-200 dark:border-zinc-800 h-11 hover:bg-zinc-900 dark:hover:bg-zinc-100 hover:text-white dark:hover:text-zinc-900 transition-all text-xs"
                                     >
-                                        <Send className="mr-2 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" size={18} />
-                                        Send Test SMS
+                                        <Send className="mr-2" size={14} />
+                                        {t("sms.send_test")}
                                     </Button>
                                 </div>
                             </div>
@@ -327,13 +327,13 @@ export default function SmsSettingsPage() {
                     <div className="h-24 w-24 rounded-[32px] bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center text-zinc-300 mb-8 border-2 border-zinc-100 dark:border-zinc-700">
                         <Smartphone size={48} />
                     </div>
-                    <h3 className="text-3xl font-black italic tracking-tighter text-zinc-900 dark:text-zinc-100 mb-3 uppercase">No Gateways Configured</h3>
-                    <p className="text-zinc-500 dark:text-zinc-400 max-w-sm mb-10 font-bold text-lg leading-tight tracking-tight">Sync your Twilio account to start sending automated SMS alerts today.</p>
+                    <h3 className="text-3xl font-black italic tracking-tighter text-zinc-900 dark:text-zinc-100 mb-3 uppercase">{t("sms.no_gateways")}</h3>
+                    <p className="text-zinc-500 dark:text-zinc-400 max-w-sm mb-10 font-bold text-lg leading-tight tracking-tight">{t("sms.no_gateways_desc")}</p>
                     <Button
                         onClick={handleOpenAddModal}
                         className="bg-zinc-900 dark:bg-zinc-50 text-white dark:text-zinc-900 rounded-3xl px-12 h-16 font-black text-xl hover:opacity-90 transform -rotate-2 hover:rotate-0 transition-all shadow-2xl shadow-zinc-900/20"
                     >
-                        CONNECT TWILIO NOW
+                        {t("sms.connect_twilio")}
                     </Button>
                 </div>
             )}
@@ -344,17 +344,17 @@ export default function SmsSettingsPage() {
                     <div className="bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 p-6 text-white">
                         <DialogTitle className="text-xl font-extrabold tracking-tight flex items-center gap-2">
                             <Send size={20} />
-                            Test SMS Gateway
+                            {t("sms.test_gateway_title")}
                         </DialogTitle>
                         <DialogDescription className="text-white/80 text-sm mt-1">
-                            Verify connectivity for <span className="font-bold underline">"{selectedConfig?.name}"</span>.
+                            {t("sms.test_gateway_desc")} <span className="font-bold underline">"{selectedConfig?.name}"</span>.
                         </DialogDescription>
                     </div>
 
                     <form onSubmit={handleSendTestSms}>
                         <div className="p-6 space-y-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Recipient Phone Number</label>
+                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("sms.recipient_phone")}</label>
                                 <Input
                                     type="text"
                                     placeholder="+1 234 567 8900"
@@ -373,7 +373,7 @@ export default function SmsSettingsPage() {
                                 onClick={() => setIsTestModalOpen(false)}
                                 className="rounded-full px-6 font-bold"
                             >
-                                Cancel
+                                {t("sms.discard")}
                             </Button>
                             <Button
                                 type="submit"
@@ -381,7 +381,7 @@ export default function SmsSettingsPage() {
                                 className="bg-gradient-to-r from-amber-500 to-indigo-600 text-white rounded-full px-8 gap-2 shadow-lg shadow-orange-500/20 font-bold h-11"
                             >
                                 {sendingTest ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />}
-                                {sendingTest ? "Sending..." : "Send Test SMS"}
+                                {sendingTest ? t("common.sending") : t("sms.send_test")}
                             </Button>
                         </div>
                     </form>
@@ -402,12 +402,12 @@ export default function SmsSettingsPage() {
                     <div className="bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 p-6 text-white">
                         <DialogTitle className="text-xl font-extrabold tracking-tight flex items-center gap-2">
                             <Smartphone size={20} />
-                            {isAddModalOpen ? 'Connect New Gateway' : 'Update SMS Service'}
+                            {isAddModalOpen ? t("sms.connect_new_title") : t("sms.update_service_title")}
                         </DialogTitle>
                         <DialogDescription className="text-white/80 text-sm mt-1">
                             {isAddModalOpen
-                                ? 'Add your Twilio credentials to start sending SMS alerts.'
-                                : `Modifying configuration for ${selectedConfig?.name}`
+                                ? t("sms.add_gateway_desc")
+                                : `${t("sms.test_gateway_desc")} ${selectedConfig?.name}`
                             }
                         </DialogDescription>
                     </div>
@@ -423,7 +423,7 @@ export default function SmsSettingsPage() {
                                     </h4>
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Friendly Name</label>
+                                            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("sms.friendly_name")}</label>
                                             <Input
                                                 placeholder="e.g. Twilio Primary"
                                                 required
@@ -433,7 +433,7 @@ export default function SmsSettingsPage() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Daily Limit</label>
+                                            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("sms.daily_limit")}</label>
                                             <Input
                                                 type="number"
                                                 required
@@ -453,7 +453,7 @@ export default function SmsSettingsPage() {
                                     </h4>
                                     <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Account SID</label>
+                                            <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("sms.account_sid")}</label>
                                             <Input
                                                 placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                                 required
@@ -464,10 +464,10 @@ export default function SmsSettingsPage() {
                                         </div>
                                         <div className="grid grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">Auth Token</label>
+                                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("sms.auth_token")}</label>
                                                 <Input
                                                     type="password"
-                                                    placeholder={isEditModalOpen ? "••••••••••••••••" : "Auth Token"}
+                                                    placeholder={isEditModalOpen ? "••••••••••••••••" : t("sms.auth_token")}
                                                     required={isAddModalOpen}
                                                     value={formData.auth_token}
                                                     onChange={e => setFormData({ ...formData, auth_token: e.target.value })}
@@ -475,7 +475,7 @@ export default function SmsSettingsPage() {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">From Number</label>
+                                                <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-1">{t("sms.from_number")}</label>
                                                 <Input
                                                     placeholder="+1234567890"
                                                     required
@@ -491,8 +491,8 @@ export default function SmsSettingsPage() {
 
                             <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800/30 rounded-2xl border border-zinc-100 dark:border-zinc-800">
                                 <div className="space-y-0.5">
-                                    <h4 className="text-sm font-bold tracking-tight">Active Status</h4>
-                                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Enable or disable gateway</p>
+                                    <h4 className="text-sm font-bold tracking-tight">{t("sms.active_status")}</h4>
+                                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{t("sms.enable_disable")}</p>
                                 </div>
                                 <Switch
                                     checked={formData.is_active}
@@ -508,7 +508,7 @@ export default function SmsSettingsPage() {
                                 onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }}
                                 className="rounded-full px-6 font-bold"
                             >
-                                Discard
+                                {t("sms.discard")}
                             </Button>
                             <Button
                                 type="submit"
@@ -516,7 +516,7 @@ export default function SmsSettingsPage() {
                                 className="bg-gradient-to-r from-amber-500 to-indigo-600 text-white rounded-full px-8 gap-2 shadow-lg shadow-orange-500/20 font-bold h-11"
                             >
                                 {submitting ? <Loader2 className="animate-spin" size={18} /> : <CheckCircle2 size={18} />}
-                                {submitting ? "Saving..." : (isAddModalOpen ? 'Connect Gateway' : 'Update Service')}
+                                {submitting ? t("common.saving") : (isAddModalOpen ? t("sms.connect_gateway") : t("sms.update_service"))}
                             </Button>
                         </div>
                     </form>

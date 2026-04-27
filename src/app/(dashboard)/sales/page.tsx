@@ -73,8 +73,10 @@ import {
     DialogFooter,
     DialogDescription,
 } from "@/components/ui/dialog";
+import { useTranslation } from "@/i18n/TranslationContext";
 
 export default function SalesPage() {
+    const { t } = useTranslation();
     const router = useRouter();
     const { currentCompany } = useAuthStore();
     const [sales, setSales] = useState<Sale[]>([]);
@@ -103,7 +105,7 @@ export default function SalesPage() {
             setSales(data);
         } catch (error) {
             console.error("Failed to load sales", error);
-            toast.error("Failed to load sales data");
+            toast.error(t('sales.failed_load_data'));
         } finally {
             setLoading(false);
         }
@@ -112,30 +114,30 @@ export default function SalesPage() {
     const handleDelete = async (id: number) => {
         try {
             await SaleService.delete(id);
-            toast.success("Invoice deleted and stock reverted");
+            toast.success(t('sales.delete_success'));
             loadSales();
         } catch (error) {
-            toast.error("Failed to delete invoice");
+            toast.error(t('sales.delete_failed'));
         }
     };
 
     const handleMarkAsPaid = async (id: number) => {
         try {
             await SaleService.markAsPaid(id);
-            toast.success("Invoice marked as fully paid");
+            toast.success(t('sales.mark_paid_success'));
             loadSales();
         } catch (error) {
-            toast.error("Failed to update payment status");
+            toast.error(t('sales.mark_paid_failed'));
         }
     };
 
     const handleDownload = async (sale: Sale) => {
         try {
-            toast.loading("Generating PDF...", { id: "pdf-gen" });
+            toast.loading(t('sales.generating_pdf'), { id: "pdf-gen" });
             await SaleService.downloadPdf(sale.id!, sale.sales_code);
-            toast.success("PDF downloaded successfully", { id: "pdf-gen" });
+            toast.success(t('sales.pdf_success'), { id: "pdf-gen" });
         } catch (error) {
-            toast.error("Failed to generate PDF", { id: "pdf-gen" });
+            toast.error(t('sales.pdf_failed'), { id: "pdf-gen" });
         }
     };
 
@@ -151,12 +153,12 @@ export default function SalesPage() {
         }
 
         try {
-            toast.loading("Sending email...", { id: "email-send" });
+            toast.loading(t('sales.sending_email'), { id: "email-send" });
             await SaleService.sendEmail(id, emailOverride);
-            toast.success("Invoice sent to " + (emailOverride || currentEmail), { id: "email-send" });
+            toast.success(t('sales.email_success_to') + (emailOverride || currentEmail), { id: "email-send" });
             setShowEmailDialog(false);
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to send email", { id: "email-send" });
+            toast.error(error.response?.data?.message || t('sales.email_failed'), { id: "email-send" });
         }
     };
 
@@ -186,41 +188,52 @@ export default function SalesPage() {
         return { totalSales, totalReceived, totalPending, count: sales.length };
     }, [sales]);
 
+    const formatPaymentStatus = (status?: string) => {
+        if (!status) return t('sales.payment_due');
+        switch (status) {
+            case 'Paid': return t('sales.payment_paid');
+            case 'Partial': return t('sales.payment_partial');
+            case 'Due': return t('sales.payment_due');
+            default: return status;
+        }
+    };
+
     if (loading && sales.length === 0) {
         return (
             <div className="flex h-[400px] items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="h-12 w-12 animate-spin text-indigo-500" />
-                    <p className="text-zinc-500 font-medium animate-pulse">Loading your sales universe...</p>
+                    <p className="text-zinc-500 font-medium animate-pulse">{t('sales.loading_universe')}</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-8 max-w-[1600px] mx-auto pb-10">
+        <div className="w-full p-4 md:p-6 space-y-8 pb-10 mt-[5px]">
             {/* Header section with glass effect */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div className="flex items-center gap-3 md:gap-4">
-                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 transform rotate-3 transition-transform hover:rotate-0">
-                        <ShoppingCart size={20} className="md:w-6 md:h-6" />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-center gap-4 md:gap-6">
+                    <div className="h-12 w-12 md:h-14 md:w-14 rounded-[1.5rem] bg-gradient-to-br from-rose-500 to-orange-600 flex items-center justify-center text-white shadow-2xl shadow-orange-500/30 relative group transition-all duration-500 hover:scale-105">
+                        <ShoppingCart size={24} strokeWidth={2.5} className="relative z-10" />
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-[1.5rem]" />
                     </div>
-                    <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase pr-4 leading-tight mb-1">
-                            Sales & Invoicing
-                        </h2>
-                        <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
-                            Manage your revenue stream and customer transactions elegantly.
+                    <div className="space-y-1">
+                        <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-orange-400 via-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tighter uppercase leading-tight pt-[5px]">
+                            {t('sales.title')}
+                        </h1>
+                        <p className="text-[9px] md:text-[11px] text-zinc-500 dark:text-zinc-400 font-black tracking-[0.2em] uppercase opacity-70">
+                            {t('sales.subtitle')}
                         </p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <Button variant="outline" className="rounded-full border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest px-6 h-12 hover:bg-zinc-50 dark:hover:bg-zinc-800">
-                        <Download className="mr-2 h-4 w-4" /> Export
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <Button variant="outline" className="w-full sm:w-auto rounded-full border-zinc-200 dark:border-zinc-800 font-black text-[10px] uppercase tracking-widest px-8 h-11 shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all">
+                        <Download className="mr-2 h-4 w-4" /> {t('sales.export')}
                     </Button>
-                    <Link href="/sales/new">
-                        <Button className="rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-black text-[10px] uppercase tracking-widest px-8 shadow-xl shadow-indigo-500/20 border-0 h-12 transition-all hover:scale-[1.02] active:scale-95">
-                            <Plus className="mr-2 h-5 w-5" /> New Invoice
+                    <Link href="/sales/new" className="w-full sm:w-auto">
+                        <Button className="w-full rounded-full bg-gradient-to-r from-rose-500 to-orange-500 text-white font-black text-[10px] uppercase tracking-widest px-10 shadow-xl shadow-orange-500/20 border-0 h-11 transition-all hover:scale-[1.02] active:scale-95">
+                            <Plus className="mr-2 h-5 w-5" /> {t('sales.new_invoice')}
                         </Button>
                     </Link>
                 </div>
@@ -229,28 +242,28 @@ export default function SalesPage() {
             {/* Stats Overview */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 <ModernStatCard
-                    title="Gross Revenue"
+                    title={t('sales.gross_revenue')}
                     value={`$${Number(stats.totalSales).toLocaleString()}`}
-                    description="+12.5% vs last month"
+                    description={`+12.5% ${t('dashboard.vs_last_month')}`}
                     icon={TrendingUp}
                     color="indigo"
                 />
                 <ModernStatCard
-                    title="Total Collected"
+                    title={t('sales.total_collected')}
                     value={`$${Number(stats.totalReceived).toLocaleString()}`}
                     description="Steady cashflow"
                     icon={ArrowUpRight}
                     color="emerald"
                 />
                 <ModernStatCard
-                    title="Outstanding"
+                    title={t('sales.outstanding')}
                     value={`$${Number(stats.totalPending).toLocaleString()}`}
                     description="Needs follow-up"
                     icon={FileText}
                     color="amber"
                 />
                 <ModernStatCard
-                    title="Total Invoices"
+                    title={t('sales.total_invoices')}
                     value={stats.count.toString()}
                     description="High volume sales"
                     icon={ShoppingCart}
@@ -264,7 +277,7 @@ export default function SalesPage() {
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="relative w-full md:w-96 group">
                             <Input
-                                placeholder="Search invoices, clients, references..."
+                                placeholder={t('sales.search_placeholder')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="h-12 pl-12 bg-zinc-50 dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-full focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
@@ -273,7 +286,7 @@ export default function SalesPage() {
                         </div>
                         <div className="flex items-center gap-2">
                             <Button variant="outline" className="h-10 px-6 rounded-full border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest">
-                                <Filter size={14} className="mr-2" /> More Filters
+                                <Filter size={14} className="mr-2" /> {t('sales.more_filters')}
                             </Button>
                         </div>
                     </div>
@@ -283,12 +296,12 @@ export default function SalesPage() {
                         <Table>
                             <TableHeader className="bg-zinc-50/50 dark:bg-zinc-900/50">
                                 <TableRow className="border-b border-zinc-100 dark:border-zinc-800 hover:bg-transparent">
-                                    <TableHead className="pl-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Invoice</TableHead>
-                                    <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Customer</TableHead>
-                                    <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Date</TableHead>
-                                    <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Payment</TableHead>
-                                    <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Grand Total</TableHead>
-                                    <TableHead className="pr-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Actions</TableHead>
+                                    <TableHead className="pl-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('sales.table_invoice')}</TableHead>
+                                    <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('sales.table_customer')}</TableHead>
+                                    <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('sales.table_date')}</TableHead>
+                                    <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('sales.table_payment')}</TableHead>
+                                    <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">{t('sales.table_grand_total')}</TableHead>
+                                    <TableHead className="pr-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">{t('sales.table_actions')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -316,7 +329,7 @@ export default function SalesPage() {
                                                             "text-[10px] font-bold uppercase tracking-tighter",
                                                             sale.reference_no === 'POS' ? "text-orange-600 dark:text-orange-400" : "text-zinc-400"
                                                         )}>
-                                                            Ref: {sale.reference_no}
+                                                            {t('sales.ref')}: {sale.reference_no}
                                                         </div>
                                                     )}
                                                 </div>
@@ -327,7 +340,7 @@ export default function SalesPage() {
                                                 <div className="h-8 w-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-bold text-zinc-500">
                                                     {(sale as any).customer?.name?.[0] || "?"}
                                                 </div>
-                                                <div className="font-bold text-zinc-700 dark:text-zinc-300">{(sale as any).customer?.name || "Walk-in Customer"}</div>
+                                                <div className="font-bold text-zinc-700 dark:text-zinc-300">{(sale as any).customer?.name || t('sales.walk_in_customer')}</div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
@@ -346,7 +359,7 @@ export default function SalesPage() {
                                                             "bg-red-500/10 text-red-600 dark:text-red-400"
                                                 )}
                                             >
-                                                {sale.payment_status}
+                                                {formatPaymentStatus(sale.payment_status)}
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="text-right">
@@ -354,7 +367,7 @@ export default function SalesPage() {
                                                 ${Number(sale.grand_total).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </div>
                                             <div className="text-[10px] text-zinc-400 font-bold uppercase italic">
-                                                Balance: ${(Number(sale.grand_total) - Number(sale.paid_amount || 0)).toFixed(2)}
+                                                {t('sales.balance')}: ${(Number(sale.grand_total) - Number(sale.paid_amount || 0)).toFixed(2)}
                                             </div>
                                         </TableCell>
                                         <TableCell className="pr-8 text-right">
@@ -394,28 +407,28 @@ export default function SalesPage() {
                                                             onClick={() => router.push(`/sales/edit/${sale.id}`)}
                                                             className="rounded-xl font-bold text-zinc-600 dark:text-zinc-400"
                                                         >
-                                                            <Edit2 size={16} className="mr-2" /> Edit Invoice
+                                                            <Edit2 size={16} className="mr-2" /> {t('sales.edit_invoice')}
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             onClick={() => handleMarkAsPaid(sale.id!)}
                                                             className="rounded-xl font-bold text-zinc-600 dark:text-zinc-400"
                                                         >
-                                                            <CheckCircle2 size={16} className="mr-2" /> Mark as Paid
+                                                            <CheckCircle2 size={16} className="mr-2" /> {t('sales.mark_as_paid')}
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             onClick={() => handleSendEmail(sale.id!)}
                                                             className="rounded-xl font-bold text-zinc-600 dark:text-zinc-400"
                                                         >
-                                                            <Mail size={16} className="mr-2" /> Send via Email
+                                                            <Mail size={16} className="mr-2" /> {t('sales.send_via_email')}
                                                         </DropdownMenuItem>
                                                         <DropdownMenuSeparator className="my-1 bg-zinc-100 dark:bg-zinc-800 opacity-50" />
                                                         <AlertDialog>
                                                             <AlertDialogTrigger asChild>
-                                                                <DropdownMenuItem
+                                                                 <DropdownMenuItem
                                                                     onSelect={(e) => e.preventDefault()}
                                                                     className="rounded-xl font-bold text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10"
                                                                 >
-                                                                    <Trash2 size={16} className="mr-2" /> Delete Forever
+                                                                    <Trash2 size={16} className="mr-2" /> {t('sales.delete_forever')}
                                                                 </DropdownMenuItem>
                                                             </AlertDialogTrigger>
                                                             <AlertDialogContent className="rounded-xl border-0 shadow-2xl p-0 overflow-hidden max-w-md">
@@ -427,21 +440,21 @@ export default function SalesPage() {
                                                                         <Trash2 size={28} />
                                                                     </div>
                                                                     <AlertDialogTitle className="text-3xl font-black tracking-tighter uppercase leading-none mb-2">
-                                                                        Delete Invoice?
+                                                                        {t('sales.delete_confirm_title')}
                                                                     </AlertDialogTitle>
                                                                     <AlertDialogDescription className="text-red-50 font-bold text-sm leading-relaxed opacity-90">
-                                                                        This will permanently delete invoice <span className="underline decoration-2">{sale.sales_code}</span> and revert the product stock levels. This action cannot be undone.
+                                                                        {t('sales.delete_confirm_desc', { code: sale.sales_code })}
                                                                     </AlertDialogDescription>
                                                                 </div>
                                                                 <AlertDialogFooter className="p-8 bg-white dark:bg-zinc-950 gap-3">
                                                                     <AlertDialogCancel className="rounded-full border-zinc-200 dark:border-zinc-800 font-black uppercase tracking-widest text-[10px] px-8 h-12 hover:bg-zinc-50 transition-all">
-                                                                        Cancel
+                                                                        {t('common.cancel')}
                                                                     </AlertDialogCancel>
                                                                     <AlertDialogAction
                                                                         onClick={() => handleDelete(sale.id!)}
                                                                         className="bg-red-600 hover:bg-red-700 text-white rounded-full font-black uppercase tracking-widest text-[10px] px-10 h-12 shadow-xl shadow-red-500/25 border-0 transition-all hover:scale-[1.02] active:scale-95"
                                                                     >
-                                                                        Confirm Delete
+                                                                        {t('common.confirm_delete')}
                                                                     </AlertDialogAction>
                                                                 </AlertDialogFooter>
                                                             </AlertDialogContent>
@@ -461,12 +474,12 @@ export default function SalesPage() {
                                                     <ShoppingCart size={40} />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <p className="text-xl font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tighter">No sales found</p>
-                                                    <p className="text-sm text-zinc-500 font-bold">Add your first invoice to see it here.</p>
+                                                    <p className="text-xl font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tighter">{t('sales.no_sales_found')}</p>
+                                                    <p className="text-sm text-zinc-500 font-bold">{t('sales.add_first_invoice')}</p>
                                                 </div>
                                                 <Link href="/sales/new">
                                                     <Button className="rounded-full bg-indigo-600/10 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all font-black uppercase text-[10px] tracking-widest h-11 px-8 border-0">
-                                                        Start Invoicing
+                                                        {t('sales.start_invoicing')}
                                                     </Button>
                                                 </Link>
                                             </div>
@@ -479,7 +492,11 @@ export default function SalesPage() {
                     {filteredSales.length > 0 && (
                         <div className="px-8 py-4 bg-zinc-50/50 dark:bg-zinc-900/50 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                             <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest order-2 sm:order-1">
-                                Showing {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredSales.length)} of {filteredSales.length} Records
+                                {t('sales.showing_records', {
+                                    start: (currentPage - 1) * itemsPerPage + 1,
+                                    end: Math.min(currentPage * itemsPerPage, filteredSales.length),
+                                    total: filteredSales.length
+                                })}
                             </span>
 
                             {/* Pagination Controls */}
@@ -544,21 +561,21 @@ export default function SalesPage() {
                         </div>
                         <DialogHeader>
                             <DialogTitle className="text-3xl font-black tracking-tighter uppercase leading-none mb-2">
-                                Send via Email
+                                {t('sales.send_via_email')}
                             </DialogTitle>
                             <DialogDescription className="text-indigo-100 font-bold text-sm leading-relaxed opacity-90">
-                                Enter the recipient email address for invoice <span className="underline decoration-2">{selectedSale?.sales_code}</span>.
+                                {t('sales.email_dialog_desc', { code: selectedSale?.sales_code }) || `Enter the recipient email address for invoice ${selectedSale?.sales_code}.`}
                             </DialogDescription>
                         </DialogHeader>
                     </div>
                     <div className="p-8 space-y-6 bg-white dark:bg-zinc-950">
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 pl-1">Recipient Email</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 pl-1">{t('sales.recipient_email_label')}</label>
                             <div className="relative group/email">
                                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within/email:text-indigo-500 transition-colors" size={18} />
                                 <Input
                                     type="email"
-                                    placeholder="customer@example.com"
+                                    placeholder={t('sales.recipient_email_placeholder')}
                                     value={overrideEmail}
                                     onChange={(e) => setOverrideEmail(e.target.value)}
                                     className="h-14 pl-12 rounded-2xl border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 font-bold focus:ring-4 focus:ring-indigo-500/10 transition-all"
@@ -571,13 +588,13 @@ export default function SalesPage() {
                                 onClick={() => setShowEmailDialog(false)}
                                 className="flex-1 h-12 rounded-full border-zinc-200 dark:border-zinc-800 font-black uppercase tracking-widest text-[10px] px-8"
                             >
-                                Cancel
+                                {t('common.cancel')}
                             </Button>
                             <Button
                                 onClick={() => selectedSale && handleSendEmail(selectedSale.id!, overrideEmail)}
                                 className="flex-[2] h-12 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase tracking-widest text-[10px] px-8 shadow-xl shadow-indigo-500/20"
                             >
-                                <Mail className="mr-2" size={16} /> Send Invoice
+                                <Mail className="mr-2" size={16} /> {t('sales.send_invoice')}
                             </Button>
                         </div>
                     </div>

@@ -1,0 +1,15 @@
+{
+  "purchases.title": "ক্রয় এবং বিল",
+  "purchases.subtitle": "আপনার বিক্রেতার বিল এবং ব্যবসার খরচ পরিচালনা করুন।",
+  "purchases.record_bill": "বিল রেকর্ড করুন",
+  "purchases.total_purchases": "মোট ক্রয়",
+  "purchases.bills_recorded": "রেকর্ড করা বিল",
+  "purchases.avg_bill_amount": "গড় বিলের পরিমাণ",
+  "purchases.table_bill_no": "বিল #",
+  "purchases.table_vendor": "বিক্রেতা",
+  "purchases.table_category": "ক্যাটাগরি",
+  "purchases.table_date": "তারিখ",
+  "purchases.table_amount": "পরিমাণ",
+  "purchases.no_records": "কোনো ক্রয়ের রেকর্ড পাওয়া যায়নি।",
+  "purchases.general_expense": "সাধারণ খরচ"
+}

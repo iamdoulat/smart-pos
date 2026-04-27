@@ -46,6 +46,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from "lucide-react";
+import { useTranslation } from "@/i18n/TranslationContext";
 
 /* ─── Types & Extended Interface ─────────────────────────────────────────── */
 interface ExtendedCategory extends Category {
@@ -54,6 +55,7 @@ interface ExtendedCategory extends Category {
 }
 
 export default function CategoriesPage() {
+    const { t } = useTranslation();
     const { currentCompany } = useAuthStore();
     const [categories, setCategories] = useState<ExtendedCategory[]>([]);
     const [loading, setLoading] = useState(true);
@@ -77,7 +79,6 @@ export default function CategoriesPage() {
         if (!currentCompany) return;
         try {
             setLoading(true);
-            // Assuming the API returns enough for now, or we map it
             const data = await CategoryService.getAll(currentCompany.id);
             const mapped = data.map(c => ({
                 ...c,
@@ -86,7 +87,7 @@ export default function CategoriesPage() {
             }));
             setCategories(mapped as ExtendedCategory[]);
         } catch {
-            toast.error("Failed to load categories");
+            toast.error(t('inventory.load_categories_failed'));
         } finally {
             setLoading(false);
         }
@@ -104,7 +105,6 @@ export default function CategoriesPage() {
         currentPage * itemsPerPage
     );
 
-    // Reset pagination when searching
     useEffect(() => {
         setCurrentPage(1);
     }, [search]);
@@ -128,20 +128,20 @@ export default function CategoriesPage() {
             const payload = {
                 ...form,
                 company_id: currentCompany.id,
-                type: 'income' as const // Default required field in Category interface
+                type: 'income' as const 
             };
 
             if (editingId) {
                 await CategoryService.update(editingId, payload);
-                toast.success("Category updated");
+                toast.success(t('inventory.save_category_success'));
             } else {
                 await CategoryService.create(payload);
-                toast.success("Category created");
+                toast.success(t('inventory.save_category_success'));
             }
             setDrawerOpen(false);
             load();
         } catch {
-            toast.error("Failed to save category");
+            toast.error(t('inventory.save_category_failed'));
         } finally {
             setSaving(false);
         }
@@ -150,46 +150,46 @@ export default function CategoriesPage() {
     const handleDelete = async (id: number) => {
         try {
             await CategoryService.delete(id);
-            toast.success("Category deleted");
+            toast.success(t('inventory.delete_category_success'));
             load();
         } catch {
-            toast.error("Failed to delete category");
+            toast.error(t('inventory.delete_category_failed'));
         }
     };
 
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-700">
+        <div className="p-4 md:p-6 w-full space-y-8 animate-in fade-in duration-700">
             {/* ── Header ── */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/20 transform rotate-3">
-                        <List size={22} />
+                    <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-rose-500/20 flex-shrink-0">
+                        <List size={24} />
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase leading-none mb-1">
-                            Categories List
+                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight leading-tight uppercase pr-4 pt-[5px]">
+                            {t('inventory.categories_title')}
                         </h2>
-                        <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
-                            Manage and organize your item categories.
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
+                            {t('inventory.categories_subtitle')}
                         </p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-purple-500 transition-colors" size={16} />
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <div className="relative w-full sm:w-80 group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
                         <Input
-                            placeholder="Find category…"
+                            placeholder={t('inventory.find_category')}
+                            className="pl-12 h-11 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all font-medium text-sm"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="pl-10 h-11 w-48 md:w-64 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-full shadow-sm focus:ring-2 focus:ring-purple-500 transition-all font-medium text-sm"
                         />
                     </div>
                     <Button
                         onClick={openAdd}
-                        className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-full px-6 h-11 font-bold transition-all hover:scale-[1.02] active:scale-95 border-0 shadow-lg"
+                        className="w-full sm:w-auto bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 text-white rounded-full px-8 h-11 shadow-lg shadow-indigo-500/20 font-black uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0 whitespace-nowrap"
                     >
-                        <Plus size={18} className="mr-2" /> New Category
+                        <Plus className="mr-2 h-5 w-5" /> {t('inventory.new_category')}
                     </Button>
                 </div>
             </div>
@@ -200,10 +200,10 @@ export default function CategoriesPage() {
                     <Table>
                         <TableHeader className="bg-zinc-50 dark:bg-zinc-900/50">
                             <TableRow className="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800">
-                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Category Name</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Description</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Status</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-left w-[120px]">Action</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('inventory.table_category_name')}</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest max-w-[150px]">{t('inventory.description')}</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('inventory.table_status')}</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-left w-[120px]">{t('inventory.table_action')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody className="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -216,7 +216,7 @@ export default function CategoriesPage() {
                             ) : filtered.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={4} className="px-6 py-20 text-center text-zinc-400 font-medium">
-                                        No categories found. Adding one might help!
+                                        {t('inventory.no_categories_found')}
                                     </TableCell>
                                 </TableRow>
                             ) : (
@@ -225,7 +225,7 @@ export default function CategoriesPage() {
                                         <TableCell className="px-6 py-4 font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-tight">
                                             {c.name}
                                         </TableCell>
-                                        <TableCell className="px-6 py-4 text-zinc-500 dark:text-zinc-400 font-medium">
+                                        <TableCell className="px-6 py-4 text-zinc-500 dark:text-zinc-400 font-medium max-w-[150px] truncate">
                                             {c.description || "-"}
                                         </TableCell>
                                         <TableCell className="px-6 py-4">
@@ -235,35 +235,35 @@ export default function CategoriesPage() {
                                                     ? "bg-emerald-500 text-white"
                                                     : "bg-zinc-200 text-zinc-600"
                                             )}>
-                                                {c.status}
+                                                {c.status === "Active" ? t('inventory.active') : t('inventory.inactive')}
                                             </span>
                                         </TableCell>
                                         <TableCell className="px-6 py-4">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="default" className="bg-[#4192B3] hover:bg-[#367a96] text-white rounded-md h-9 px-4 flex items-center gap-2 font-bold text-xs uppercase border-0">
-                                                        Action <ChevronDown size={14} />
+                                                        {t('inventory.table_action')} <ChevronDown size={14} />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl p-2 min-w-[140px]">
                                                     <DropdownMenuItem onClick={() => openEdit(c)} className="rounded-lg h-10 gap-3 font-bold text-xs uppercase tracking-tighter cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors">
-                                                        <Edit2 size={14} className="text-indigo-500" /> Edit
+                                                        <Edit2 size={14} className="text-indigo-500" /> {t('inventory.edit')}
                                                     </DropdownMenuItem>
                                                     <AlertDialog>
                                                         <AlertDialogTrigger asChild>
                                                             <div className="flex items-center gap-3 px-2 py-2 rounded-lg font-bold text-xs uppercase tracking-tighter cursor-pointer hover:bg-red-50 dark:hover:bg-red-950/20 text-red-500 transition-colors">
-                                                                <Trash2 size={14} /> Delete
+                                                                <Trash2 size={14} /> {t('inventory.delete')}
                                                             </div>
                                                         </AlertDialogTrigger>
                                                         <AlertDialogContent className="rounded-xl border-0 shadow-2xl p-0 overflow-hidden">
                                                             <div className="bg-red-500 p-8 text-white">
                                                                 <div className="h-14 w-14 rounded-2xl bg-white/20 flex items-center justify-center mb-4"><Trash2 size={28} /></div>
-                                                                <AlertDialogTitle className="text-2xl font-black tracking-tighter uppercase leading-none">Delete Category?</AlertDialogTitle>
-                                                                <AlertDialogDescription className="text-red-50 mt-2 font-medium">Permanently remove <span className="font-bold underline">{c.name}</span>.</AlertDialogDescription>
+                                                                <AlertDialogTitle className="text-2xl font-black tracking-tighter uppercase leading-none">{t('inventory.delete_category_confirm_title')}</AlertDialogTitle>
+                                                                <AlertDialogDescription className="text-red-50 mt-2 font-medium">{t('inventory.delete_category_confirm_desc', { name: c.name })}</AlertDialogDescription>
                                                             </div>
                                                             <AlertDialogFooter className="p-6 bg-white dark:bg-zinc-950 gap-3">
-                                                                <AlertDialogCancel className="rounded-full border-zinc-200 font-bold px-8 h-12">Cancel</AlertDialogCancel>
-                                                                <AlertDialogAction onClick={() => handleDelete(c.id)} className="bg-red-600 hover:bg-red-700 text-white rounded-full font-bold px-10 h-12 border-0">Delete</AlertDialogAction>
+                                                                <AlertDialogCancel className="rounded-full border-zinc-200 font-bold px-8 h-12">{t('inventory.cancel')}</AlertDialogCancel>
+                                                                <AlertDialogAction onClick={() => handleDelete(c.id)} className="bg-red-600 hover:bg-red-700 text-white rounded-full font-bold px-10 h-12 border-0">{t('inventory.confirm_delete')}</AlertDialogAction>
                                                             </AlertDialogFooter>
                                                         </AlertDialogContent>
                                                     </AlertDialog>
@@ -281,7 +281,11 @@ export default function CategoriesPage() {
                 {filtered.length > 0 && (
                     <div className="px-8 py-4 bg-zinc-50/50 dark:bg-zinc-900/50 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest order-2 sm:order-1">
-                            Showing {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filtered.length)} of {filtered.length} Categories
+                            {t('inventory.showing_categories', { 
+                                start: (currentPage - 1) * itemsPerPage + 1, 
+                                end: Math.min(currentPage * itemsPerPage, filtered.length),
+                                total: filtered.length
+                            })}
                         </span>
 
                         <div className="flex items-center gap-3 order-1 sm:order-2">
@@ -339,23 +343,23 @@ export default function CategoriesPage() {
                         <div className="p-8 space-y-8 flex-1">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-2xl font-black tracking-tighter uppercase leading-none bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">
-                                    {editingId ? "Edit Category" : "New Category"}
+                                    {editingId ? t('inventory.edit_category') : t('inventory.create_category')}
                                 </h3>
                                 <button onClick={() => setDrawerOpen(false)} className="h-8 w-8 rounded-full hover:bg-zinc-100 flex items-center justify-center text-zinc-400"><X size={20} /></button>
                             </div>
 
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">Category Name</label>
+                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">{t('inventory.category_name_label')}</label>
                                     <Input
-                                        placeholder="e.g. SEWING MACHINE"
+                                        placeholder={t('inventory.category_name_placeholder')}
                                         value={form.name}
                                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                                         className="rounded-2xl h-12 bg-zinc-50 border-transparent focus:border-purple-500/50"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">Description</label>
+                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">{t('inventory.description')}</label>
                                     <textarea
                                         rows={3}
                                         value={form.description}
@@ -364,7 +368,7 @@ export default function CategoriesPage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">Status</label>
+                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">{t('inventory.table_status')}</label>
                                     <div className="grid grid-cols-2 gap-2">
                                         {(['Active', 'Inactive'] as const).map(s => (
                                             <button
@@ -377,7 +381,7 @@ export default function CategoriesPage() {
                                                         : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500"
                                                 )}
                                             >
-                                                {s}
+                                                {s === 'Active' ? t('inventory.active') : t('inventory.inactive')}
                                             </button>
                                         ))}
                                     </div>
@@ -392,7 +396,7 @@ export default function CategoriesPage() {
                                 className="w-full rounded-2xl h-14 font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-500 text-white border-0 shadow-xl shadow-purple-500/25 uppercase tracking-tighter hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
                             >
                                 {saving ? <Loader2 className="animate-spin h-5 w-5" /> : <Check className="h-5 w-5" />}
-                                {editingId ? "Save Changes" : "Create Category"}
+                                {editingId ? t('inventory.save_changes') : t('inventory.create_category')}
                             </Button>
                         </div>
                     </div>

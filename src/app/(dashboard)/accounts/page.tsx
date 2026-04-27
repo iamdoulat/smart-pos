@@ -272,37 +272,38 @@ export default function ChartOfAccountsPage() {
     }
 
     return (
-        <div className="p-4 md:pt-0 pt-0 md:px-8 md:pb-8 max-w-7xl mx-auto space-y-6 md:space-y-10 animate-in fade-in duration-700 pb-20">
+        <div className="w-full p-4 md:p-6 space-y-6 md:space-y-10 animate-in fade-in duration-700 pb-20">
             {/* ── Header ── */}
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
-                <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-500 to-emerald-700 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 transform rotate-3 hover:rotate-0 transition-transform">
-                        <BookOpen size={24} />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-center gap-4 md:gap-6">
+                    <div className="h-12 w-12 md:h-14 md:w-14 rounded-[1.5rem] bg-gradient-to-br from-rose-500 to-orange-600 flex items-center justify-center text-white shadow-2xl shadow-orange-500/30 relative group transition-all duration-500 hover:scale-105">
+                        <BookOpen size={24} strokeWidth={2.5} className="relative z-10" />
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-[1.5rem]" />
                     </div>
-                    <div>
-                        <h2 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 bg-clip-text text-transparent tracking-tighter uppercase leading-none mb-1">
+                    <div className="space-y-1">
+                        <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-orange-400 via-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tighter uppercase leading-none">
                             Chart of Accounts
-                        </h2>
-                        <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
+                        </h1>
+                        <p className="text-[9px] md:text-[11px] text-zinc-500 dark:text-zinc-400 font-black tracking-[0.2em] uppercase opacity-70">
                             Manage your general ledger and financial structure.
                         </p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-emerald-500 transition-colors" size={16} />
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <div className="relative w-full sm:w-80 group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" size={20} />
                         <Input
                             placeholder="Search accounts..."
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
-                            className="pl-12 h-12 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-full shadow-sm focus:ring-2 focus:ring-emerald-500 transition-all font-medium text-sm"
+                            className="pl-12 h-12 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-full shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
                         />
                     </div>
                     <Button
                         onClick={() => setShowNewDialog(true)}
-                        className="bg-gradient-to-r from-emerald-500 via-teal-500 to-teal-400 text-white rounded-xl px-6 h-12 shadow-lg shadow-emerald-500/25 font-black uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0 whitespace-nowrap text-sm gap-2"
+                        className="w-full sm:w-auto bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-full px-10 h-12 shadow-xl shadow-orange-500/20 font-black uppercase tracking-widest text-[10px] transition-all hover:scale-[1.02] active:scale-95 border-0"
                     >
-                        <Plus size={18} strokeWidth={3} /> New Account
+                        <Plus size={18} strokeWidth={3} className="mr-2" /> New Account
                     </Button>
                 </div>
             </div>

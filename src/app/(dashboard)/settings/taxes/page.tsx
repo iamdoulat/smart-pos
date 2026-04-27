@@ -33,22 +33,28 @@ import {
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/i18n/TranslationContext";
 
 const COLOR_MAP = {
-    indigo: {
-        bg: "from-indigo-500 to-blue-500",
-        icon: "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500",
-        text: "text-indigo-600 dark:text-indigo-400",
+    blue: {
+        bg: "bg-gradient-to-br from-blue-600 to-indigo-700",
+        iconBg: "bg-white/20",
+        shadow: "shadow-blue-500/30",
     },
     emerald: {
-        bg: "from-emerald-400 to-teal-500",
-        icon: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500",
-        text: "text-emerald-600 dark:text-emerald-400",
+        bg: "bg-gradient-to-br from-emerald-400 to-teal-600",
+        iconBg: "bg-white/20",
+        shadow: "shadow-emerald-500/30",
     },
-    amber: {
-        bg: "from-amber-400 to-orange-500",
-        icon: "bg-amber-50 dark:bg-amber-900/20 text-amber-500",
-        text: "text-amber-600 dark:text-amber-400",
+    purple: {
+        bg: "bg-gradient-to-br from-purple-500 to-indigo-600",
+        iconBg: "bg-white/20",
+        shadow: "shadow-purple-500/30",
+    },
+    orange: {
+        bg: "bg-gradient-to-br from-orange-500 to-rose-600",
+        iconBg: "bg-white/20",
+        shadow: "shadow-orange-500/30",
     },
 };
 
@@ -57,36 +63,58 @@ function SummaryCard({
     value,
     icon: Icon,
     color,
-    description,
+    trend,
 }: {
     label: string;
     value: string;
     icon: React.ElementType;
     color: keyof typeof COLOR_MAP;
-    description: string;
+    trend: string;
 }) {
     const c = COLOR_MAP[color];
     return (
-        <Card className="bg-white dark:bg-zinc-900/60 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-lg p-6 flex flex-col gap-4 hover:shadow-xl transition-all group">
-            <div className="flex items-center gap-4">
-                <div className={cn("h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500", c.icon)}>
-                    <Icon size={24} />
+        <motion.div
+            whileHover={{ y: -5 }}
+            transition={{ type: "spring", stiffness: 300 }}
+        >
+            <Card className={cn(
+                "relative overflow-hidden border-0 rounded-[32px] p-6 text-white shadow-2xl transition-all duration-500 group h-full",
+                c.bg,
+                c.shadow
+            )}>
+                {/* Decorative background circle */}
+                <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-500" />
+                
+                <div className="relative z-10 flex flex-col h-full justify-between gap-6">
+                    <div className="flex items-start justify-between">
+                        <div className="space-y-1">
+                            <p className="text-[13px] font-medium text-white/80 tracking-wide">
+                                {label}
+                            </p>
+                            <h3 className="text-3xl font-black tracking-tight">
+                                {value}
+                            </h3>
+                        </div>
+                        <div className={cn(
+                            "h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 shadow-inner group-hover:rotate-12 transition-transform duration-500",
+                            c.iconBg
+                        )}>
+                            <Icon size={28} className="text-white" strokeWidth={2.5} />
+                        </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 text-xs font-bold text-white/90 bg-white/10 w-fit px-3 py-1.5 rounded-full backdrop-blur-sm">
+                        <ArrowUpRight size={14} strokeWidth={3} />
+                        <span>{trend}</span>
+                    </div>
                 </div>
-                <div className="min-w-0">
-                    <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-black uppercase tracking-widest mb-1 truncate">
-                        {label}
-                    </p>
-                    <p className={cn("text-xl font-black truncate", c.text)}>{value}</p>
-                </div>
-            </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed line-clamp-2">
-                {description}
-            </p>
-        </Card>
+            </Card>
+        </motion.div>
     );
 }
 
 export default function TaxesPage() {
+    const { t } = useTranslation();
     const [taxes, setTaxes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
@@ -121,194 +149,143 @@ export default function TaxesPage() {
                     className="flex flex-col items-center gap-4"
                 >
                     <Loader2 className="h-10 w-10 animate-spin text-indigo-500" />
-                    <p className="text-zinc-500 font-bold text-sm tracking-tight">Syncing tax records...</p>
+                    <p className="text-zinc-500 font-bold text-sm tracking-tight">{t('taxes.syncing')}</p>
                 </motion.div>
             </div>
         );
     }
 
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6 md:space-y-10 animate-in fade-in duration-700 pb-20">
-            {/* ── Header ── */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 transform rotate-3 transition-transform hover:rotate-0">
+        <div className="w-full p-4 md:p-6 space-y-8">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-rose-500/20">
                         <BarChart3 size={24} />
                     </div>
                     <div>
-                        <h2 className="text-2xl md:text-4xl font-black bg-gradient-to-r from-indigo-500 via-blue-600 to-indigo-400 bg-clip-text text-transparent tracking-tighter uppercase italic leading-none mb-2">
-                            Tax Management
-                        </h2>
-                        <p className="text-xs md:text-base text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
-                            Manage multi-jurisdictional tax compliance and registry entries.
-                        </p>
+                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight">{t("taxes.title")}</h2>
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("taxes.subtitle")}</p>
                     </div>
                 </div>
-
                 <Link href="/settings/taxes/new">
-                    <Button className="bg-gradient-to-r from-indigo-500 via-blue-600 to-blue-500 text-white rounded-full px-8 h-14 shadow-lg shadow-indigo-500/25 font-black uppercase italic tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0 whitespace-nowrap text-base gap-3">
-                        <Plus size={20} strokeWidth={3} /> Add Tax Rate
+                    <Button
+                        className="bg-gradient-to-r from-amber-500 to-indigo-600 text-white rounded-full px-6 gap-2 shadow-lg shadow-orange-500/20 py-6"
+                    >
+                        <Plus size={18} />
+                        <span className="font-bold">{t("taxes.add_tax")}</span>
                     </Button>
                 </Link>
             </div>
 
-            {/* ── Summary Cards ── */}
+            {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <SummaryCard
-                    label="Compliance Ready"
-                    value="Presets Enabled"
+                    label={t("taxes.card_compliance")}
+                    value={t("taxes.card_compliance_value")}
                     icon={ShieldCheck}
-                    color="indigo"
-                    description="Automated provincial tax presets (GST, PST, HST) for Canadian reporting."
+                    color="blue"
+                    trend={`+12.5% ${t("dashboard.vs_last_month")}`}
                 />
                 <SummaryCard
-                    label="Liability Tracking"
-                    value="Real-time Sync"
+                    label={t("taxes.card_liability")}
+                    value={t("taxes.card_liability_value")}
                     icon={Scale}
                     color="emerald"
-                    description="Direct accumulation of tax payable across all commercial transactions."
+                    trend={`+4.2% ${t("dashboard.vs_last_month")}`}
                 />
                 <SummaryCard
-                    label="CRA Registration"
-                    value="Secure Ledger"
+                    label={t("taxes.card_registration")}
+                    value={t("taxes.card_registration_value")}
                     icon={ArrowUpRight}
-                    color="amber"
-                    description="Digital management of business registration numbers (BN/NE) for PDF export."
+                    color="purple"
+                    trend={t("dashboard.steady_this_month")}
                 />
             </div>
 
-            {/* ── Search & Filters ── */}
-            <div className="flex flex-col md:flex-row items-center gap-4 bg-white dark:bg-zinc-900/50 p-2 rounded-[2rem] border border-zinc-200 dark:border-zinc-800 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
-                <div className="relative flex-1 w-full">
-                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-400" size={20} />
+            {/* Actions Bar */}
+            <div className="flex items-center gap-4 bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                     <Input
-                        placeholder="Search tax labels or registration IDs..."
+                        placeholder={t("taxes.search_placeholder")}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="bg-transparent border-none py-7 pl-16 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-lg font-medium w-full"
+                        className="pl-10 rounded-xl border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 focus:ring-amber-500"
                     />
                 </div>
-                <Button variant="ghost" className="h-12 w-12 rounded-2xl flex items-center justify-center text-zinc-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all mr-2">
-                    <Filter size={22} />
-                </Button>
             </div>
 
-            {/* ── Table View ── */}
-            <div className="bg-white dark:bg-zinc-900/50 rounded-[2.5rem] border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden relative">
-                <div className="h-1.5 absolute top-0 left-0 right-0 bg-gradient-to-r from-indigo-500 via-blue-600 to-indigo-400" />
-
-                <div className="overflow-x-auto mt-1.5">
-                    <Table>
-                        <TableHeader className="bg-zinc-50 dark:bg-zinc-900/80">
-                            <TableRow className="hover:bg-transparent border-zinc-100 dark:border-zinc-800">
-                                <TableHead className="text-zinc-500 font-black text-[10px] uppercase tracking-widest pl-10 py-5">Tax Identifier</TableHead>
-                                <TableHead className="text-zinc-500 font-black text-[10px] uppercase tracking-widest py-5">Territory</TableHead>
-                                <TableHead className="text-zinc-500 font-black text-[10px] uppercase tracking-widest py-5">Valuation</TableHead>
-                                <TableHead className="text-zinc-500 font-black text-[10px] uppercase tracking-widest py-5">Scope</TableHead>
-                                <TableHead className="text-zinc-500 font-black text-[10px] uppercase tracking-widest py-5">Registration</TableHead>
-                                <TableHead className="text-zinc-500 font-black text-[10px] uppercase tracking-widest text-right pr-10 py-5">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                            <AnimatePresence mode="popLayout">
-                                {filteredTaxes.map((tax, index) => (
-                                    <motion.tr
-                                        layout
-                                        key={tax.id}
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, scale: 0.95 }}
-                                        transition={{ delay: index * 0.05, duration: 0.3 }}
-                                        className="border-zinc-100 dark:border-zinc-800 group hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
-                                    >
-                                        <TableCell className="py-6 pl-10">
-                                            <div className="flex items-center gap-4">
-                                                <div className="h-11 w-11 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex items-center justify-center text-indigo-500 shrink-0 group-hover:scale-110 transition-transform">
-                                                    <Percent size={18} strokeWidth={2.5} />
+            {/* Taxes Table */}
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/50">
+                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">{t("taxes.table_identifier")}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">{t("taxes.table_territory")}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">{t("taxes.table_valuation")}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">{t("taxes.table_scope")}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">{t("taxes.table_registration")}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-wider text-right">{t("common.actions")}</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                            {filteredTaxes.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} className="px-6 py-12 text-center text-zinc-500">
+                                        {t("taxes.no_records")}
+                                    </td>
+                                </tr>
+                            ) : (
+                                filteredTaxes.map((tax) => (
+                                    <tr key={tax.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors group">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-9 w-9 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
+                                                    <Percent size={16} />
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-zinc-900 dark:text-zinc-100 text-lg leading-tight">{tax.name}</p>
-                                                    <p className="text-[10px] text-zinc-400 font-black uppercase tracking-[0.15em] mt-1">ID: INT-{tax.id.toString().padStart(4, '0')}</p>
+                                                    <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{tax.name}</p>
+                                                    <p className="text-[10px] text-zinc-400 font-medium">ID: INT-{tax.id}</p>
                                                 </div>
                                             </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2">
-                                                <span className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
-                                                <span className="text-zinc-600 dark:text-zinc-300 font-bold">{tax.province || "Federal"}</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tighter">
-                                                {tax.type === 'percentage' ? `${tax.rate}%` : `$${parseFloat(tax.rate).toFixed(2)}`}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className={cn(
-                                                "inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border",
-                                                tax.tax_category === 'both' ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-900/30" :
-                                                    tax.tax_category === 'sales' ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30" :
-                                                        "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-900/30"
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-zinc-500 dark:text-zinc-400 font-medium">
+                                            {tax.province || t("taxes.federal")}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                                            {tax.type === "percentage" ? `${tax.rate}%` : `$${parseFloat(tax.rate).toFixed(2)}`}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={cn(
+                                                "px-2.5 py-1 rounded-full text-xs font-bold tracking-tight uppercase",
+                                                tax.tax_category === "both" ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400" :
+                                                    tax.tax_category === "sales" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" :
+                                                        "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
                                             )}>
                                                 {tax.tax_category}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="font-mono text-xs bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded-xl text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
-                                                {tax.tax_number || "U/S REG"}
                                             </span>
-                                        </TableCell>
-                                        <TableCell className="text-right pr-10">
-                                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl bg-white dark:bg-zinc-800 text-zinc-400 hover:text-indigo-600 shadow-sm border border-zinc-100 dark:border-zinc-700">
-                                                    <Edit2 size={16} />
+                                        </td>
+                                        <td className="px-6 py-4 text-sm font-mono text-zinc-500">
+                                            {tax.tax_number || "U/S REG"}
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex justify-end gap-2">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                                                    <Edit2 size={14} className="text-indigo-500" />
                                                 </Button>
-                                                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl bg-white dark:bg-zinc-800 text-zinc-400 hover:text-rose-600 shadow-sm border border-zinc-100 dark:border-zinc-700">
-                                                    <Trash2 size={16} />
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500">
+                                                    <Trash2 size={14} />
                                                 </Button>
                                             </div>
-                                        </TableCell>
-                                    </motion.tr>
-                                ))}
-                            </AnimatePresence>
-
-                            {filteredTaxes.length === 0 && (
-                                <TableRow>
-                                    <TableCell colSpan={6} className="py-24 text-center">
-                                        <div className="flex flex-col items-center gap-6">
-                                            <div className="h-20 w-20 rounded-3xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
-                                                <Info size={40} className="text-indigo-400" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <h3 className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight">No Records Found</h3>
-                                                <p className="text-zinc-500 dark:text-zinc-400 text-sm max-w-xs mx-auto font-medium">
-                                                    We couldn't find any tax profiles matching your query.
-                                                </p>
-                                            </div>
-                                            <Link href="/settings/taxes/new">
-                                                <Button className="rounded-full bg-indigo-600 text-white font-bold h-12 px-8">
-                                                    Add New Entry
-                                                </Button>
-                                            </Link>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
+                                        </td>
+                                    </tr>
+                                ))
                             )}
-                        </TableBody>
-                    </Table>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-
-            {/* ── Footer ── */}
-            <div className="pt-10 flex flex-col items-center gap-4 text-center">
-                <div className="flex items-center gap-4 text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em]">
-                    <div className="h-[1px] w-12 bg-zinc-200 dark:bg-zinc-800" />
-                    Secure Fiscal Ledger
-                    <div className="h-[1px] w-12 bg-zinc-200 dark:bg-zinc-800" />
-                </div>
-                <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">
-                    v2.1.0 • Canadian Regulatory Compliance Module
-                </p>
             </div>
         </div>
     );

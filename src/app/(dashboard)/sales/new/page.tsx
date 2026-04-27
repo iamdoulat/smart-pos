@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
 import { SaleService, SaleItem } from "@/lib/sales-purchase-service";
-import { WarehouseService, Warehouse } from "@/lib/warehouse-service";
+import { WarehouseService, type Warehouse } from "@/lib/warehouse-service";
 import { ContactService } from "@/lib/contact-service";
 import { ProductService } from "@/lib/product-service";
 import { TaxService } from "@/lib/tax-bank-service";
@@ -42,14 +42,29 @@ import {
     ShoppingCart,
     Minus,
     MessageCircle,
-    Mail
+    Mail,
+    FileText,
+    CheckCircle2,
+    Clock,
+    AlertCircle,
+    Wallet,
+    ShieldCheck,
+    MessageSquare,
+    Calculator,
+    Warehouse as WarehouseIcon,
+    Users
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n/TranslationContext";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 
 export default function NewSalePage() {
     const router = useRouter();
+    const { t } = useTranslation();
     const { currentCompany } = useAuthStore();
     const [loading, setLoading] = useState(false);
     const [sendWhatsapp, setSendWhatsapp] = useState(true);
@@ -83,6 +98,8 @@ export default function NewSalePage() {
         payment_type: 'Cash',
         account_id: "",
         payment_note: "",
+        payment_status: 'Unpaid' as 'Paid' | 'Partial' | 'Unpaid',
+        use_advance: false
     });
 
     const [items, setItems] = useState<any[]>([]);
@@ -184,8 +201,12 @@ export default function NewSalePage() {
     };
 
     const addItem = (product: any) => {
+        if (!formData.warehouse_id || !formData.customer_id) {
+            toast.warning(t("sales.select_warehouse_customer_warning") || "Please select warehouse and customer first.");
+            return;
+        }
         if (product.stock_quantity <= 0) {
-            toast.error("Product is out of stock!");
+            toast.error(t("sales.out_of_stock") || "Product is out of stock!");
             return;
         }
         const existing = items.find(i => i.product_id === product.id);
@@ -225,234 +246,203 @@ export default function NewSalePage() {
         setItems(items.filter((_, i) => i !== index));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!currentCompany) return;
-        if (items.length === 0) {
-            toast.error("Please add at least one item");
+    const handleSubmit = async (isDraft: boolean) => {
+        if (!formData.warehouse_id || !formData.customer_id) {
+            toast.error(t("common.warning"));
             return;
         }
-
+        if (items.length === 0) {
+            toast.error(t("sales.empty_items"));
+            return;
+        }
         setLoading(true);
         try {
             const saleResult = await SaleService.create({
                 ...formData,
-                company_id: currentCompany.id,
+                company_id: currentCompany?.id || 0,
                 warehouse_id: Number(formData.warehouse_id),
                 customer_id: Number(formData.customer_id),
                 subtotal: totals.subtotal,
                 grand_total: totals.grandTotal,
                 items: items,
-                terms_and_conditions: formData.terms_and_conditions,
+                status: isDraft ? 'Quotation' : 'Final',
                 account_id: formData.account_id ? Number(formData.account_id) : undefined,
-                payment_type: formData.payment_type,
-                payment_note: formData.payment_note
             });
-            toast.success("Invoice created successfully");
+            
+            toast.success(t("common.created_successfully"));
 
-            // Send WhatsApp notification if enabled
+            // Notification Logic (Simplified)
             if (sendWhatsapp && whatsappConfig && selectedCustomer?.mobile) {
-                try {
-                    await WhatsappService.sendInvoiceNotification(whatsappConfig.id, selectedCustomer.mobile, {
-                        sales_code: saleResult?.sales_code || formData.sales_code || 'N/A',
-                        customer_name: selectedCustomer.name,
-                        grand_total: totals.grandTotal,
-                        paid_amount: formData.paid_amount,
-                        sales_date: formData.sales_date,
-                        company_name: currentCompany.name,
-                    });
-                    toast.success("WhatsApp notification sent!");
-                } catch {
-                    toast.warning("Invoice saved, but WhatsApp notification failed.");
-                }
-            }
-
-            // Send Email notification if enabled
-            if (sendEmail && emailConfig && selectedCustomer?.email) {
-                try {
-                    await EmailService.sendInvoiceEmail(emailConfig.id, selectedCustomer.email, {
-                        sales_code: saleResult?.sales_code || formData.sales_code || 'N/A',
-                        customer_name: selectedCustomer.name,
-                        grand_total: totals.grandTotal,
-                        paid_amount: formData.paid_amount,
-                        balance_due: totals.grandTotal - formData.paid_amount,
-                        sales_date: formData.sales_date,
-                        company_name: currentCompany.name,
-                        items: items.map((item: any) => ({
-                            name: item.name,
-                            quantity: item.quantity,
-                            unit_price: item.unit_price,
-                            total_amount: item.total_amount,
-                        })),
-                    });
-                    toast.success("Email notification sent!");
-                } catch {
-                    toast.warning("Invoice saved, but email notification failed.");
-                }
+                WhatsappService.sendInvoiceNotification(whatsappConfig.id, selectedCustomer.mobile, {
+                    sales_code: saleResult?.sales_code || 'N/A',
+                    customer_name: selectedCustomer.name,
+                    grand_total: totals.grandTotal,
+                    paid_amount: formData.paid_amount,
+                    sales_date: formData.sales_date,
+                    company_name: currentCompany?.name || "",
+                }).catch(() => { });
             }
 
             router.push("/sales");
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to create invoice");
+            toast.error(t("common.error_occurred"));
         } finally {
             setLoading(false);
         }
     };
 
-    const filteredProducts = searchQuery.length > 0
-        ? products.filter(p =>
-            p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.item_code?.toLowerCase().includes(searchQuery.toLowerCase())
-        ).slice(0, 5)
-        : [];
+    const filteredProducts = useMemo(() => {
+        if (!searchQuery) return [];
+        return products.filter(p => 
+            p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            p.sku?.toLowerCase().includes(searchQuery.toLowerCase())
+        ).slice(0, 5);
+    }, [products, searchQuery]);
 
     return (
-        <div className="space-y-6 max-w-[1400px] mx-auto pb-20">
+        <div className="w-full p-4 md:p-6 space-y-6 pb-20">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div className="flex items-center gap-3 md:gap-4">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => router.back()}
-                        className="rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-800 h-10 w-10 md:h-12 md:w-12"
-                    >
+                <div className="flex items-center gap-3">
+                    <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-xl">
                         <ArrowLeft size={20} />
                     </Button>
-                    <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase pr-4 leading-tight mb-1">
-                            Create Invoice
-                        </h2>
-                        <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
-                            Generate a new sale record and update inventory.
+                    <div className="flex flex-col gap-1">
+                        <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-orange-400 via-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tighter uppercase leading-tight pt-[5px]">
+                            {t("sales.create_title")}
+                        </h1>
+                        <p className="text-[9px] md:text-[11px] text-zinc-500 dark:text-zinc-400 font-black tracking-[0.2em] uppercase opacity-70">
+                            {t("sales.create_subtitle")}
                         </p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Button variant="outline" className="rounded-full border-zinc-200 dark:border-zinc-800 font-bold text-[10px] uppercase tracking-widest px-6 h-12">
-                        Draft
+                    <Button variant="outline" onClick={() => handleSubmit(true)} disabled={loading} className="rounded-xl">
+                        <FileText className="w-4 h-4 mr-2 text-slate-500" />
+                        {t("sales.draft")}
                     </Button>
-                    <Button
-                        form="invoice-form"
-                        disabled={loading}
-                        className="rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-black text-[10px] uppercase tracking-widest px-8 shadow-xl shadow-indigo-500/20 border-0 h-12 transition-all hover:scale-[1.02] active:scale-95"
-                    >
-                        {loading ? <Receipt className="animate-spin mr-2" size={18} /> : <Save className="mr-2" size={18} />}
-                        Save Invoice
+                    <Button onClick={() => handleSubmit(false)} disabled={loading} className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none">
+                        <Save className="w-4 h-4 mr-2" />
+                        {t("sales.save_invoice")}
                     </Button>
                 </div>
             </div>
 
-            <form id="invoice-form" onSubmit={handleSubmit} className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+            <form className="grid grid-cols-1 xl:grid-cols-4 gap-6">
                 {/* Main Form Area */}
                 <div className="xl:col-span-3 space-y-6">
-                    {/* Top Section: Basic Info */}
-                    <Card className="border-0 bg-white dark:bg-zinc-900 shadow-2xl shadow-indigo-500/5 rounded-xl overflow-hidden">
+                    <Card className="border-0 shadow-2xl shadow-indigo-500/5 rounded-xl overflow-hidden">
                         <CardContent className="p-8">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Warehouse*</Label>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="p-1.5 rounded-md bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                                            <WarehouseIcon className="w-4 h-4" />
+                                        </div>
+                                        <Label className="text-sm font-semibold">{t("sales.warehouse")}</Label>
+                                    </div>
                                     <Select
                                         value={formData.warehouse_id}
-                                        onValueChange={(v) => setFormData(prev => ({ ...prev, warehouse_id: v }))}
+                                        onValueChange={(val) => setFormData({ ...formData, warehouse_id: val })}
                                     >
-                                        <SelectTrigger className="h-12 bg-zinc-50 dark:bg-zinc-800/50 border-zinc-100 dark:border-zinc-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 transition-all font-bold">
-                                            <SelectValue placeholder="Select Warehouse" />
+                                        <SelectTrigger className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 focus:ring-indigo-500 rounded-xl h-12">
+                                            <SelectValue placeholder={t("sales.select_warehouse")} />
                                         </SelectTrigger>
-                                        <SelectContent className="rounded-2xl border-zinc-100 dark:border-zinc-800 shadow-2xl">
+                                        <SelectContent className="rounded-xl">
                                             {warehouses.map(w => (
-                                                <SelectItem key={w.id} value={w.id.toString()} className="rounded-xl my-1">{w.name}</SelectItem>
+                                                <SelectItem key={w.id} value={w.id.toString()}>{w.name}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
 
                                 <div className="space-y-3">
-                                    <div className="flex items-center justify-between">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Customer Name*</Label>
-                                        {selectedCustomer && (
-                                            <span className="text-[10px] font-black text-red-500 uppercase tracking-tight">
-                                                (Previous Due: ${Number(selectedCustomer.previous_due || 0).toFixed(2)})
-                                            </span>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="p-1.5 rounded-md bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
+                                                <Users className="w-4 h-4" />
+                                            </div>
+                                            <Label className="text-sm font-semibold">{t("sales.customer_name")}</Label>
+                                        </div>
+                                        {selectedCustomer?.outstanding_balance > 0 && (
+                                            <Badge variant="outline" className="text-[10px] bg-red-50 text-red-600 border-red-100">
+                                                {t("sales.previous_due") || "Previous Due"}: {currentCompany?.currency} {selectedCustomer.outstanding_balance.toLocaleString()}
+                                            </Badge>
                                         )}
                                     </div>
                                     <div className="flex gap-2">
                                         <Select
                                             value={formData.customer_id}
-                                            onValueChange={(v) => setFormData(prev => ({ ...prev, customer_id: v }))}
+                                            onValueChange={(val) => setFormData({ ...formData, customer_id: val })}
                                         >
-                                            <SelectTrigger className="h-12 flex-1 bg-zinc-50 dark:bg-zinc-800/50 border-zinc-100 dark:border-zinc-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 transition-all font-bold">
-                                                <SelectValue placeholder="Select Customer" />
+                                            <SelectTrigger className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 focus:ring-indigo-500 rounded-xl h-12 flex-1">
+                                                <SelectValue placeholder={t("sales.select_customer")} />
                                             </SelectTrigger>
-                                            <SelectContent className="rounded-2xl border-zinc-100 dark:border-zinc-800 shadow-2xl">
+                                            <SelectContent className="rounded-xl">
                                                 {customers.map(c => (
-                                                    <SelectItem key={c.id} value={c.id.toString()} className="rounded-xl my-1">{c.name}</SelectItem>
+                                                    <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
-                                        <Button type="button" variant="outline" size="icon" className="h-12 w-12 rounded-2xl border-zinc-100 dark:border-zinc-800 shrink-0 hover:bg-indigo-50 dark:hover:bg-indigo-900/10">
+                                        <Button type="button" variant="outline" size="icon" className="h-12 w-12 rounded-xl border-slate-200 dark:border-slate-800">
                                             <UserPlus size={18} className="text-indigo-600" />
                                         </Button>
                                     </div>
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Sales Date*</Label>
-                                    <div className="relative">
-                                        <Input
-                                            type="date"
-                                            value={formData.sales_date}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, sales_date: e.target.value }))}
-                                            className="h-12 pl-12 bg-zinc-50 dark:bg-zinc-800/50 border-zinc-100 dark:border-zinc-800 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 transition-all font-bold"
-                                        />
-                                        <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="p-1.5 rounded-md bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
+                                            <Calendar className="w-4 h-4" />
+                                        </div>
+                                        <Label className="text-sm font-semibold">{t("sales.sales_date")}</Label>
                                     </div>
+                                    <Input
+                                        type="date"
+                                        value={formData.sales_date}
+                                        onChange={(e) => setFormData({ ...formData, sales_date: e.target.value })}
+                                        className="h-12 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-indigo-500 font-bold"
+                                    />
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
                     {/* Item Search & Table */}
-                    <Card className="border-0 bg-white dark:bg-zinc-900 shadow-2xl shadow-indigo-500/5 rounded-xl overflow-hidden">
+                    <Card className="border-0 shadow-2xl shadow-indigo-500/5 rounded-xl overflow-hidden">
                         <CardContent className="p-0">
                             <div className="p-8 pb-4">
                                 <div className="relative group">
                                     <Input
-                                        placeholder="Scan barcode or search items by name, code..."
+                                        placeholder={t("sales.item_search_placeholder")}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="h-14 pl-14 pr-14 bg-zinc-50 dark:bg-zinc-800 border-zinc-100 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-lg placeholder:text-zinc-400"
+                                        className="h-14 pl-14 pr-14 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-indigo-500/20 text-lg font-bold"
                                     />
-                                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" size={22} />
-                                    <QrCode className="absolute right-6 top-1/2 -translate-y-1/2 text-zinc-400 cursor-pointer hover:text-indigo-500 transition-colors" size={22} />
+                                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={22} />
+                                    <QrCode className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer hover:text-indigo-500 transition-colors" size={22} />
 
                                     {/* Search Results Dropdown */}
                                     {filteredProducts.length > 0 && (
-                                        <div className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.14)] z-50 p-2 overflow-hidden backdrop-blur-xl bg-opacity-95">
+                                        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 p-2 overflow-hidden">
                                             {filteredProducts.map(p => (
                                                 <div
                                                     key={p.id}
                                                     onClick={() => addItem(p)}
-                                                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-2xl transition-all group"
+                                                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all group"
                                                 >
                                                     <div className="flex items-center gap-4">
-                                                        <div className="h-10 w-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-xs text-zinc-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                                        <div className="h-10 w-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center font-bold text-indigo-600">
                                                             {p.name[0]}
                                                         </div>
                                                         <div>
-                                                            <div className="font-bold text-zinc-900 dark:text-zinc-100">{p.name}</div>
-                                                            <div className="text-[10px] text-zinc-500 font-medium tracking-wider uppercase">{p.item_code} | SKU: {p.sku || 'N/A'}</div>
+                                                            <div className="font-bold text-slate-900 dark:text-slate-100">{p.name}</div>
+                                                            <div className="text-[10px] text-slate-500 uppercase tracking-widest">{p.sku}</div>
                                                         </div>
                                                     </div>
                                                     <div className="text-right">
-                                                        <div className="font-black text-indigo-600">${p.sales_price}</div>
-                                                        <div className={cn(
-                                                            "text-[10px] font-bold uppercase tracking-widest",
-                                                            p.stock_quantity <= 0 ? "text-red-500" : "text-zinc-400"
-                                                        )}>
-                                                            {p.stock_quantity <= 0 ? "Out of Stock" : `Stock: ${p.stock_quantity}`}
-                                                        </div>
+                                                        <div className="font-black text-indigo-600">{currentCompany?.currency} {p.sales_price}</div>
+                                                        <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t("inventory.table_stock")}: {p.stock_quantity}</div>
                                                     </div>
                                                 </div>
                                             ))}
@@ -463,29 +453,29 @@ export default function NewSalePage() {
 
                             <div className="overflow-x-auto min-h-[300px]">
                                 <Table>
-                                    <TableHeader className="bg-zinc-50 dark:bg-zinc-900">
-                                        <TableRow className="border-b border-zinc-100 dark:border-zinc-800 hover:bg-transparent">
-                                            <TableHead className="pl-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Item Name</TableHead>
-                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-center">Qty</TableHead>
-                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Unit Price</TableHead>
-                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Discount</TableHead>
-                                            <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Tax</TableHead>
-                                            <TableHead className="pr-8 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-right">Total Amount</TableHead>
+                                    <TableHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800">
+                                        <TableRow className="hover:bg-transparent">
+                                            <TableHead className="pl-8 py-4 font-bold text-xs uppercase tracking-widest text-slate-500">{t("sales.table_item_name")}</TableHead>
+                                            <TableHead className="py-4 font-bold text-xs uppercase tracking-widest text-slate-500 text-center">{t("sales.table_qty")}</TableHead>
+                                            <TableHead className="py-4 font-bold text-xs uppercase tracking-widest text-slate-500 text-right">{t("sales.table_unit_price")}</TableHead>
+                                            <TableHead className="py-4 font-bold text-xs uppercase tracking-widest text-slate-500 text-right">{t("sales.table_discount")}</TableHead>
+                                            <TableHead className="py-4 font-bold text-xs uppercase tracking-widest text-slate-500 text-right">{t("sales.table_tax")}</TableHead>
+                                            <TableHead className="pr-8 py-4 font-bold text-xs uppercase tracking-widest text-slate-500 text-right">{t("sales.table_total")}</TableHead>
                                             <TableHead className="w-16"></TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {items.map((item, idx) => (
-                                            <TableRow key={idx} className="border-zinc-50 dark:border-zinc-800 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors group">
+                                            <TableRow key={idx} className="border-slate-100 dark:border-slate-800 hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-colors group">
                                                 <TableCell className="pl-8 py-6">
-                                                    <div className="font-bold text-zinc-900 dark:text-zinc-100">{item.name}</div>
+                                                    <div className="font-bold text-slate-900 dark:text-slate-100">{item.name}</div>
                                                 </TableCell>
                                                 <TableCell className="text-center">
                                                     <Input
                                                         type="number"
                                                         value={item.quantity}
                                                         onChange={(e) => updateItem(idx, 'quantity', Number(e.target.value))}
-                                                        className="h-10 w-20 mx-auto bg-transparent border-zinc-100 dark:border-zinc-800 rounded-xl text-center font-bold"
+                                                        className="h-10 w-20 mx-auto bg-transparent border-slate-200 dark:border-slate-800 rounded-xl text-center font-bold"
                                                     />
                                                 </TableCell>
                                                 <TableCell className="text-right">
@@ -493,25 +483,25 @@ export default function NewSalePage() {
                                                         type="number"
                                                         value={item.unit_price}
                                                         onChange={(e) => updateItem(idx, 'unit_price', Number(e.target.value))}
-                                                        className="h-10 w-28 ml-auto bg-transparent border-zinc-100 dark:border-zinc-800 rounded-xl text-right font-bold"
+                                                        className="h-10 w-28 ml-auto bg-transparent border-slate-200 dark:border-slate-800 rounded-xl text-right font-bold"
                                                     />
                                                 </TableCell>
-                                                <TableCell className="text-right">
-                                                    <div className="font-bold text-zinc-400">${item.discount_amount}</div>
+                                                <TableCell className="text-right font-medium text-slate-400">
+                                                    {currentCompany?.currency} {item.discount_amount}
                                                 </TableCell>
-                                                <TableCell className="text-right">
-                                                    <div className="font-bold text-zinc-400">${item.tax_amount}</div>
+                                                <TableCell className="text-right font-medium text-slate-400">
+                                                    {currentCompany?.currency} {item.tax_amount}
                                                 </TableCell>
                                                 <TableCell className="pr-8 text-right">
-                                                    <div className="font-black text-indigo-600">${Number(item.total_amount).toFixed(2)}</div>
+                                                    <div className="font-black text-indigo-600">{currentCompany?.currency} {Number(item.total_amount).toFixed(2)}</div>
                                                 </TableCell>
-                                                <TableCell className="pr-8">
+                                                <TableCell className="pr-8 text-right">
                                                     <Button
                                                         type="button"
                                                         variant="ghost"
                                                         size="icon"
                                                         onClick={() => removeItem(idx)}
-                                                        className="h-10 w-10 rounded-xl text-zinc-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 opacity-0 group-hover:opacity-100 transition-all"
+                                                        className="h-9 w-9 rounded-xl text-slate-300 hover:text-red-500 hover:bg-red-50"
                                                     >
                                                         <Trash2 size={16} />
                                                     </Button>
@@ -520,10 +510,10 @@ export default function NewSalePage() {
                                         ))}
                                         {items.length === 0 && (
                                             <TableRow>
-                                                <TableCell colSpan={7} className="h-40 text-center">
-                                                    <div className="flex flex-col items-center gap-3 text-zinc-400">
-                                                        <ShoppingCart size={32} className="opacity-20" />
-                                                        <span className="font-bold uppercase tracking-widest text-xs">Add items to your invoice to get started.</span>
+                                                <TableCell colSpan={7} className="h-60 text-center">
+                                                    <div className="flex flex-col items-center gap-3 text-slate-300 dark:text-slate-700">
+                                                        <ShoppingCart size={48} className="opacity-20" />
+                                                        <span className="font-bold uppercase tracking-widest text-xs">{t("sales.empty_items")}</span>
                                                     </div>
                                                 </TableCell>
                                             </TableRow>
@@ -534,297 +524,124 @@ export default function NewSalePage() {
                         </CardContent>
                     </Card>
 
-                    {/* Previous Payments Information */}
-                    <div className="space-y-3">
-                        <Label className="text-sm font-black text-zinc-500 uppercase tracking-widest pl-2">Previous Payments Information :</Label>
-                        <Card className="border-0 bg-white dark:bg-zinc-900 shadow-xl shadow-black/5 rounded-2xl overflow-hidden">
-                            <Table>
-                                <TableHeader className="bg-zinc-50 dark:bg-zinc-900">
-                                    <TableRow className="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800">
-                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white w-12 text-center uppercase tracking-widest">#</TableHead>
-                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Date</TableHead>
-                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Payment Type</TableHead>
-                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Payment Note</TableHead>
-                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white text-right uppercase tracking-widest">Payment</TableHead>
-                                        <TableHead className="py-4 font-black text-xs text-black dark:text-white text-center uppercase tracking-widest">Action</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {previousPayments.length > 0 ? (
-                                        previousPayments.map((p, idx) => (
-                                            <TableRow key={p.id}>
-                                                <TableCell className="text-center font-bold text-zinc-400">{idx + 1}</TableCell>
-                                                <TableCell className="font-medium text-zinc-600">{p.date}</TableCell>
-                                                <TableCell className="font-medium text-zinc-600">{p.payment_type}</TableCell>
-                                                <TableCell className="text-zinc-400">{p.note}</TableCell>
-                                                <TableCell className="text-right font-black text-indigo-600">${Number(p.amount).toFixed(2)}</TableCell>
-                                                <TableCell className="text-center">
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500">
-                                                        <Trash2 size={14} />
-                                                    </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    ) : (
-                                        <TableRow className="hover:bg-transparent border-0">
-                                            <TableCell colSpan={6} className="h-16 text-center text-sm font-black text-zinc-400 uppercase tracking-widest">
-                                                Payments Pending!!
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </Card>
-                    </div>
-
-                    {/* Terms and Conditions */}
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <Label className="text-sm font-bold text-zinc-700 dark:text-zinc-300">Invoice Terms and Conditions</Label>
-                            <div className="h-px flex-1 bg-red-500/20 mx-4" />
-                            <Minus size={16} className="text-red-500 cursor-pointer" />
-                        </div>
-                        <textarea
-                            className="w-full min-h-[140px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 font-mono text-sm text-zinc-600 dark:text-zinc-400 focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/20 transition-all outline-none resize-none shadow-inner"
-                            placeholder="Type your terms and conditions here..."
-                            value={formData.terms_and_conditions}
-                            onChange={(e) => setFormData(prev => ({ ...prev, terms_and_conditions: e.target.value }))}
-                        />
-                    </div>
-
-                    {/* Payment Section */}
-                    <div className="space-y-4">
-                        <div className="space-y-4">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Payment Status</Label>
-                            <div className="flex gap-4">
-                                <Button
-                                    type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, paid_amount: totals.grandTotal }))}
-                                    className={cn(
-                                        "flex-1 h-14 rounded-full font-black uppercase tracking-widest transition-all border-zinc-200 dark:border-zinc-800",
-                                        totals.paymentStatus === 'PAID'
-                                            ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25 border-0"
-                                            : "bg-white dark:bg-zinc-900 border text-zinc-400"
-                                    )}
-                                >
-                                    PAID
-                                </Button>
-                                <Button
-                                    type="button"
-                                    onClick={() => {
-                                        // Focus the paid amount field if partial is clicked
-                                        document.getElementById('paid-amount-input')?.focus();
-                                    }}
-                                    className={cn(
-                                        "flex-1 h-14 rounded-full font-black uppercase tracking-widest transition-all border-zinc-200 dark:border-zinc-800",
-                                        totals.paymentStatus === 'PARTIAL'
-                                            ? "bg-orange-500 text-white shadow-lg shadow-orange-500/25 border-0"
-                                            : "bg-white dark:bg-zinc-900 border text-zinc-400"
-                                    )}
-                                >
-                                    PARTIAL
-                                </Button>
-                                <Button
-                                    type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, paid_amount: 0 }))}
-                                    className={cn(
-                                        "flex-1 h-14 rounded-full font-black uppercase tracking-widest transition-all border-zinc-200 dark:border-zinc-800",
-                                        totals.paymentStatus === 'UNPAID'
-                                            ? "bg-zinc-800 text-white shadow-lg shadow-black/25 border-0"
-                                            : "bg-white dark:bg-zinc-900 border text-zinc-400"
-                                    )}
-                                >
-                                    UNPAID
-                                </Button>
-                            </div>
+                    {/* Terms & Notification Area */}
+                    <Card className="border-0 shadow-2xl shadow-indigo-500/5 rounded-xl p-8 space-y-6">
+                        <div className="space-y-3">
+                            <Label className="text-sm font-bold flex items-center gap-2">
+                                <FileText className="w-4 h-4 text-slate-400" />
+                                {t("sales.terms_title")}
+                            </Label>
+                            <Textarea
+                                placeholder={t("sales.terms_placeholder")}
+                                className="min-h-[120px] rounded-xl border-slate-200 dark:border-slate-800 p-4 focus:ring-indigo-500/20"
+                                value={formData.terms_and_conditions}
+                                onChange={(e) => setFormData({ ...formData, terms_and_conditions: e.target.value })}
+                            />
                         </div>
 
-                        <Label className="text-lg font-black text-indigo-600 pt-4 block">Payment :</Label>
-                        <div className="text-xs font-bold text-zinc-500 mb-2">Advance : 0.00</div>
-
-                        <div className="flex items-center gap-2 mb-4">
-                            <input type="checkbox" id="adjust-advance" className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500" />
-                            <label htmlFor="adjust-advance" className="text-xs font-bold text-zinc-600">Adjust Advance Payment</label>
-                        </div>
-
-                        <div className="bg-zinc-100 dark:bg-zinc-800/40 rounded-2xl p-8 grid grid-cols-1 md:grid-cols-3 gap-8 border border-zinc-200/50 dark:border-zinc-800">
-                            <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Amount</Label>
-                                <div className="relative">
-                                    <Input
-                                        id="paid-amount-input"
-                                        type="number"
-                                        value={formData.paid_amount}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, paid_amount: Number(e.target.value) }))}
-                                        className="h-12 text-right font-black text-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-indigo-500/20"
-                                    />
-                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-bold">$</div>
-                                </div>
+                        <div className="flex flex-wrap gap-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-900 px-4 py-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                                <Switch id="ws-notif" checked={sendWhatsapp} onCheckedChange={setSendWhatsapp} />
+                                <Label htmlFor="ws-notif" className="text-sm font-bold flex items-center gap-2 cursor-pointer">
+                                    <MessageSquare size={16} className="text-green-500" /> {t("sales.whatsapp_notif")}
+                                </Label>
                             </div>
-
-                            <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Payment Type</Label>
-                                <Select
-                                    value={formData.payment_type}
-                                    onValueChange={(v) => setFormData(prev => ({ ...prev, payment_type: v }))}
-                                >
-                                    <SelectTrigger className="h-12 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-xl font-bold">
-                                        <SelectValue placeholder="-Select-" />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-xl border-zinc-200 dark:border-zinc-800">
-                                        <SelectItem value="Cash">Cash</SelectItem>
-                                        <SelectItem value="Card">Card</SelectItem>
-                                        <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
-                                        <SelectItem value="Cheque">Cheque</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Account</Label>
-                                <Select
-                                    value={formData.account_id}
-                                    onValueChange={(v) => setFormData(prev => ({ ...prev, account_id: v }))}
-                                >
-                                    <SelectTrigger className="h-12 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-xl font-bold">
-                                        <SelectValue placeholder="Select Account" />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-xl border-zinc-200 dark:border-zinc-800">
-                                        {accounts.map(acc => (
-                                            <SelectItem key={acc.id} value={acc.id.toString()} className="rounded-lg">{acc.name}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="md:col-span-3 space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">Payment Note</Label>
-                                <textarea
-                                    className="w-full min-h-[80px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 font-medium focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500/20 transition-all outline-none resize-none"
-                                    placeholder="Write any payment related notes..."
-                                    value={formData.payment_note}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, payment_note: e.target.value }))}
-                                />
+                            <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-900 px-4 py-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                                <Switch id="email-notif" checked={sendEmail} onCheckedChange={setSendEmail} />
+                                <Label htmlFor="email-notif" className="text-sm font-bold flex items-center gap-2 cursor-pointer">
+                                    <Mail size={16} className="text-indigo-500" /> {t("sales.email_notif")}
+                                </Label>
                             </div>
                         </div>
-                    </div>
-
-                    <div className="space-y-3 py-4 border-t border-zinc-100 dark:border-zinc-800/30">
-                        {/* WhatsApp Notification Row */}
-                        <div className="flex items-center gap-4 flex-wrap">
-                            <div className="flex items-center gap-3">
-                                <input type="checkbox" id="send-msg" checked={sendWhatsapp} onChange={(e) => setSendWhatsapp(e.target.checked)} className="h-5 w-5 rounded border-green-500 cursor-pointer accent-green-500" />
-                                <label htmlFor="send-msg" className="text-sm font-bold text-zinc-600 dark:text-zinc-300 flex items-center gap-2 cursor-pointer">
-                                    <MessageCircle size={16} className="text-green-500" /> WhatsApp Notification
-                                </label>
-                            </div>
-                            {sendWhatsapp && !whatsappConfig && (<span className="text-[10px] font-bold text-amber-500 italic">(No active gateway)</span>)}
-                            {sendWhatsapp && whatsappConfig && !selectedCustomer?.mobile && (<span className="text-[10px] font-bold text-amber-500 italic">(No mobile number)</span>)}
-                            {sendWhatsapp && whatsappConfig && selectedCustomer?.mobile && (<span className="text-[10px] font-bold text-green-600 italic">→ {selectedCustomer.mobile}</span>)}
-                        </div>
-                        {/* Email Notification Row */}
-                        <div className="flex items-center gap-4 flex-wrap">
-                            <div className="flex items-center gap-3">
-                                <input type="checkbox" id="send-email" checked={sendEmail} onChange={(e) => setSendEmail(e.target.checked)} className="h-5 w-5 rounded border-indigo-500 cursor-pointer accent-indigo-500" />
-                                <label htmlFor="send-email" className="text-sm font-bold text-zinc-600 dark:text-zinc-300 flex items-center gap-2 cursor-pointer">
-                                    <Mail size={16} className="text-indigo-500" /> Email Notification
-                                </label>
-                            </div>
-                            {sendEmail && !emailConfig && (<span className="text-[10px] font-bold text-amber-500 italic">(No active email config)</span>)}
-                            {sendEmail && emailConfig && !selectedCustomer?.email && (<span className="text-[10px] font-bold text-amber-500 italic">(No email address)</span>)}
-                            {sendEmail && emailConfig && selectedCustomer?.email && (<span className="text-[10px] font-bold text-indigo-600 italic">→ {selectedCustomer.email}</span>)}
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-4 pt-4">
-                        <Button
-                            type="submit"
-                            disabled={loading}
-                            className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest h-14 shadow-xl shadow-emerald-500/20 border-0"
-                        >
-                            {loading ? <Receipt className="animate-spin mr-2" /> : <Save className="mr-2" />}
-                            Save
-                        </Button>
-                        <Button
-                            type="button"
-                            onClick={() => router.back()}
-                            className="flex-1 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-widest h-14 shadow-xl shadow-orange-500/20 border-0"
-                        >
-                            Close
-                        </Button>
-                    </div>
+                    </Card>
                 </div>
 
-                {/* Sidebar Sticky Area */}
+                {/* Sidebar Sticky Panel */}
                 <div className="space-y-6">
                     <Card className="border-0 bg-indigo-600 dark:bg-indigo-700 shadow-2xl shadow-indigo-500/20 rounded-xl overflow-hidden sticky top-24">
                         <CardContent className="p-8 space-y-8 text-white">
                             <div className="space-y-2">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-white/60">Grand Total</p>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-indigo-100/60">{t("sales.grand_total")}</p>
                                 <h3 className={cn(
-                                    "font-black tracking-tighter transition-all duration-300",
-                                    getDynamicFontSize(`$ ${Number(totals.grandTotal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 'grandTotal')
-                                )}>$ {Number(totals.grandTotal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
+                                    "font-black tracking-tighter transition-all",
+                                    getDynamicFontSize(`${currentCompany?.currency} ${Number(totals.grandTotal).toLocaleString()}`, 'grandTotal')
+                                )}>{currentCompany?.currency} {Number(totals.grandTotal).toLocaleString()}</h3>
                             </div>
 
                             <div className="space-y-6 pt-6 border-t border-white/10">
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-white/60">Discount on All</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-indigo-100/60">{t("sales.discount_on_all")}</Label>
                                     <div className="flex gap-2">
                                         <Input
                                             type="number"
-                                            value={formData.discount_on_all}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, discount_on_all: Number(e.target.value) }))}
                                             className="h-11 bg-white/10 border-white/10 rounded-xl focus:ring-white/20 text-white font-bold"
+                                            value={formData.discount_on_all}
+                                            onChange={(e) => setFormData({ ...formData, discount_on_all: parseFloat(e.target.value) || 0 })}
                                         />
                                         <Select
                                             value={formData.discount_type}
-                                            onValueChange={(v: any) => setFormData(prev => ({ ...prev, discount_type: v }))}
+                                            onValueChange={(val: any) => setFormData({ ...formData, discount_type: val })}
                                         >
-                                            <SelectTrigger className="h-11 w-24 bg-white/10 border-white/10 rounded-xl text-white font-bold">
+                                            <SelectTrigger className="h-11 w-20 bg-white/10 border-white/10 rounded-xl text-white font-bold">
                                                 <SelectValue />
                                             </SelectTrigger>
-                                            <SelectContent className="rounded-xl border-zinc-100 dark:border-zinc-800">
-                                                <SelectItem value="Percentage" className="rounded-lg">%</SelectItem>
-                                                <SelectItem value="Fixed" className="rounded-lg">$</SelectItem>
+                                            <SelectContent className="rounded-xl">
+                                                <SelectItem value="Percentage">%</SelectItem>
+                                                <SelectItem value="Fixed">{currentCompany?.currency}</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>
                                 </div>
 
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-white/60">Paid Amount</Label>
-                                    <Input
-                                        type="number"
-                                        value={formData.paid_amount}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, paid_amount: Number(e.target.value) }))}
-                                        className={cn(
-                                            "h-14 bg-white/20 border-white/20 rounded-2xl focus:ring-white/40 text-white font-black transition-all duration-300 px-4",
-                                            getDynamicFontSize(formData.paid_amount.toString(), 'paidAmount')
-                                        )}
-                                    />
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-indigo-100/60">{t("sales.paid_amount")}</Label>
+                                    <div className="relative">
+                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 font-bold">{currentCompany?.currency}</div>
+                                        <Input
+                                            type="number"
+                                            className="h-11 pl-12 bg-white/10 border-white/10 rounded-xl focus:ring-white/20 text-white font-bold text-right"
+                                            value={formData.paid_amount}
+                                            onChange={(e) => setFormData({ ...formData, paid_amount: parseFloat(e.target.value) || 0 })}
+                                        />
+                                    </div>
                                 </div>
 
-                                <div className="p-6 rounded-3xl bg-black/10 backdrop-blur-md space-y-4">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 italic">Balance Due</span>
-                                        <span className={cn(
-                                            "font-black px-4 py-1 rounded-full transition-all duration-300 whitespace-nowrap",
-                                            getDynamicFontSize(`$ ${Number(totals.balance).toFixed(2)}`, 'balanceDue'),
-                                            totals.balance > 0 ? "bg-red-500/20 text-red-200" : "bg-emerald-500/20 text-emerald-200"
-                                        )}>
-                                            $ {Number(totals.balance).toFixed(2)}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/30 italic">
-                                        <Receipt size={14} className="opacity-50" />
-                                        Invoicing for {currentCompany?.name}
-                                    </div>
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-indigo-100/60">{t("sales.balance_due")}</p>
+                                    <h4 className="font-black text-xl text-white">{currentCompany?.currency} {Number(totals.balance).toLocaleString()}</h4>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
+                    <Card className="border-0 shadow-xl rounded-xl p-8 space-y-4">
+                        <div className="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-widest">
+                            <span>{t("sales.table_qty")}</span>
+                            <span className="text-slate-900 dark:text-slate-100">{totals.quantity}</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-widest">
+                            <span>{t("common.subtotal")}</span>
+                            <span className="text-slate-900 dark:text-slate-100">{currentCompany?.currency} {Number(totals.subtotal).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-widest">
+                            <span>{t("sales.table_tax")}</span>
+                            <span className="text-slate-900 dark:text-slate-100 text-indigo-600">{currentCompany?.currency} {Number(totals.taxAmount).toLocaleString()}</span>
+                        </div>
+                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">{t("sales.total_payable") || "Total Payable"}</span>
+                            <span className="text-xl font-black text-indigo-600">{currentCompany?.currency} {Number(totals.grandTotal).toLocaleString()}</span>
+                        </div>
+                    </Card>
+
+                    <div className="grid grid-cols-2 gap-3">
+                        <Button onClick={() => handleSubmit(false)} disabled={loading} className="h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black uppercase tracking-widest shadow-xl shadow-indigo-500/20 border-0">
+                            <Save className="mr-2 w-5 h-5" />
+                            {t("sales.save")}
+                        </Button>
+                        <Button variant="outline" onClick={() => router.push('/sales')} className="h-14 rounded-xl font-black uppercase tracking-widest border-slate-200 dark:border-slate-800 text-slate-500">
+                            {t("sales.close")}
+                        </Button>
+                    </div>
                 </div>
             </form>
         </div>

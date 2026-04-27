@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
     Plus,
     Search,
-    MoreHorizontal,
     Edit2,
     Trash2,
     Building2,
@@ -46,8 +45,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/i18n/TranslationContext";
 
 export default function WarehousesPage() {
+    const { t } = useTranslation();
     const { currentCompany } = useAuthStore();
     const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
     const [loading, setLoading] = useState(true);
@@ -72,11 +73,11 @@ export default function WarehousesPage() {
             const data = await WarehouseService.getAll(currentCompany.id);
             setWarehouses(data);
         } catch (error) {
-            toast.error("Failed to fetch warehouses");
+            toast.error(t('inventory.load_warehouses_failed'));
         } finally {
             setLoading(false);
         }
-    }, [currentCompany]);
+    }, [currentCompany, t]);
 
     useEffect(() => {
         fetchWarehouses();
@@ -106,7 +107,7 @@ export default function WarehousesPage() {
     const handleSave = async () => {
         if (!currentCompany) return;
         if (!form.name.trim()) {
-            toast.error("Warehouse name is required");
+            toast.error(t('inventory.error_name_required'));
             return;
         }
 
@@ -114,15 +115,15 @@ export default function WarehousesPage() {
         try {
             if (editingWarehouse) {
                 await WarehouseService.update(editingWarehouse.id, form);
-                toast.success("Warehouse updated successfully");
+                toast.success(t('inventory.save_warehouse_success'));
             } else {
                 await WarehouseService.create({ ...form, company_id: currentCompany.id });
-                toast.success("Warehouse created successfully");
+                toast.success(t('inventory.save_warehouse_success'));
             }
             setDrawerOpen(false);
             fetchWarehouses();
         } catch (error) {
-            toast.error("Failed to save warehouse");
+            toast.error(t('inventory.save_warehouse_failed'));
         } finally {
             setSaving(false);
         }
@@ -131,10 +132,10 @@ export default function WarehousesPage() {
     const handleDelete = async (id: number) => {
         try {
             await WarehouseService.delete(id);
-            toast.success("Warehouse deleted successfully");
+            toast.success(t('inventory.delete_warehouse_success'));
             fetchWarehouses();
         } catch (error) {
-            toast.error("Failed to delete warehouse");
+            toast.error(t('inventory.delete_warehouse_failed'));
         }
     };
 
@@ -145,38 +146,38 @@ export default function WarehousesPage() {
     );
 
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-700">
+        <div className="p-2 md:p-4 w-full space-y-8 animate-in fade-in duration-700 mt-[5px]">
             {/* ── Header ── */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-gradient-to-br from-orange-400 via-red-500 to-pink-600 flex items-center justify-center text-white shadow-lg shadow-orange-500/20 transform rotate-3">
-                        <Building2 size={22} />
+                    <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-rose-500 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-rose-500/20 flex-shrink-0">
+                        <Building2 size={24} />
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-orange-500 via-red-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase leading-none mb-1">
-                            Warehouse List
+                        <h2 className="text-2xl font-extrabold bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 bg-clip-text text-transparent tracking-tight leading-tight uppercase pr-4 pt-[5px]">
+                            {t('inventory.warehouses_title')}
                         </h2>
-                        <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
-                            Manage your storage locations and inventory distribution.
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
+                            {t('inventory.warehouses_subtitle')}
                         </p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-orange-500 transition-colors" size={16} />
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <div className="relative w-full sm:w-80 group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
                         <Input
-                            placeholder="Find warehouse…"
+                            placeholder={t('inventory.find_warehouse')}
+                            className="pl-12 h-11 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all font-medium text-sm"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10 h-11 w-48 md:w-64 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-full shadow-sm focus:ring-2 focus:ring-orange-500 transition-all font-medium text-sm"
                         />
                     </div>
                     <Button
                         onClick={() => handleOpenDrawer()}
-                        className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-full px-6 h-11 font-bold transition-all hover:scale-[1.02] active:scale-95 border-0 shadow-lg"
+                        className="w-full sm:w-auto bg-gradient-to-r from-amber-500 via-indigo-600 to-pink-500 text-white rounded-full px-8 h-11 shadow-lg shadow-indigo-500/20 font-black uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95 border-0 whitespace-nowrap"
                     >
-                        <Plus size={18} className="mr-2" /> New Warehouse
+                        <Plus className="mr-2 h-5 w-5" /> {t('inventory.new_warehouse')}
                     </Button>
                 </div>
             </div>
@@ -187,25 +188,25 @@ export default function WarehousesPage() {
                     <Table>
                         <TableHeader className="bg-zinc-50 dark:bg-zinc-900/50">
                             <TableRow className="hover:bg-transparent border-b border-zinc-100 dark:border-zinc-800">
-                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Warehouse Name</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Mobile</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Email</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Details</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">Status</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-left w-[120px]">Action</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('inventory.table_warehouse_name')}</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('inventory.table_mobile')}</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('inventory.table_email')}</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('inventory.table_details')}</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest">{t('inventory.table_status')}</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs text-black dark:text-white uppercase tracking-widest text-left w-[120px]">{t('inventory.table_action')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="px-6 py-20 text-center">
+                                    <TableCell colSpan={6} className="px-6 py-20 text-center">
                                         <Loader2 className="h-8 w-8 animate-spin mx-auto text-orange-500" />
                                     </TableCell>
                                 </TableRow>
                             ) : filteredWarehouses.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={6} className="px-6 py-20 text-center text-zinc-400 font-medium">
-                                        No warehouses found.
+                                        {t('inventory.no_warehouses_found')}
                                     </TableCell>
                                 </TableRow>
                             ) : (
@@ -228,16 +229,16 @@ export default function WarehousesPage() {
                                         <TableCell className="px-6 py-4">
                                             <div className="space-y-1 py-2 px-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 min-w-[180px]">
                                                 <div className="flex justify-between items-center text-[10px] font-bold text-zinc-500">
-                                                    <span>Total Items:</span>
+                                                    <span>{t('inventory.total_items')}:</span>
                                                     <span className="text-zinc-900 dark:text-zinc-100">{warehouse.total_items ?? 0}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center text-[10px] font-bold text-zinc-500">
-                                                    <span>Available Quantity:</span>
+                                                    <span>{t('inventory.available_quantity')}:</span>
                                                     <span className="text-zinc-900 dark:text-zinc-100">{Number(warehouse.total_quantity ?? 0).toFixed(2)}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center text-[10px] font-bold text-zinc-500">
-                                                    <span>Worth:</span>
-                                                    <span className="text-zinc-900 dark:text-zinc-100">$ {Number(warehouse.total_worth ?? 0).toFixed(2)}</span>
+                                                    <span>{t('inventory.worth')}:</span>
+                                                    <span className="text-zinc-900 dark:text-zinc-100">{currentCompany?.currency || "$"} {Number(warehouse.total_worth ?? 0).toFixed(2)}</span>
                                                 </div>
                                             </div>
                                         </TableCell>
@@ -248,14 +249,14 @@ export default function WarehousesPage() {
                                                     ? "bg-emerald-500 text-white"
                                                     : "bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
                                             )}>
-                                                {warehouse.status}
+                                                {warehouse.status === "Active" ? t('inventory.active') : t('inventory.inactive')}
                                             </span>
                                         </TableCell>
                                         <TableCell className="px-6 py-4">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="default" className="bg-[#4192B3] hover:bg-[#367a96] text-white rounded-md h-9 px-4 flex items-center gap-2 font-bold text-xs uppercase border-0">
-                                                        Action <ChevronDown size={14} />
+                                                        {t('inventory.table_action')} <ChevronDown size={14} />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl p-2 min-w-[140px]">
@@ -263,23 +264,23 @@ export default function WarehousesPage() {
                                                         onClick={() => handleOpenDrawer(warehouse)}
                                                         className="rounded-lg h-10 gap-3 font-bold text-xs uppercase tracking-tighter cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
                                                     >
-                                                        <Edit2 size={14} className="text-orange-500" /> Edit Details
+                                                        <Edit2 size={14} className="text-orange-500" /> {t('inventory.edit_variant')}
                                                     </DropdownMenuItem>
                                                     <AlertDialog>
                                                         <AlertDialogTrigger asChild>
                                                             <div className="flex items-center gap-3 px-2 py-2 rounded-lg font-bold text-xs uppercase tracking-tighter cursor-pointer hover:bg-red-50 dark:hover:bg-red-950/20 text-red-500 transition-colors">
-                                                                <Trash2 size={14} /> Delete
+                                                                <Trash2 size={14} /> {t('inventory.delete')}
                                                             </div>
                                                         </AlertDialogTrigger>
                                                         <AlertDialogContent className="rounded-[2.5rem] border-0 shadow-2xl p-0 overflow-hidden">
                                                             <div className="bg-red-500 p-8 text-white">
                                                                 <div className="h-14 w-14 rounded-2xl bg-white/20 flex items-center justify-center mb-4"><Trash2 size={28} /></div>
-                                                                <AlertDialogTitle className="text-2xl font-bold tracking-tight uppercase leading-none">Delete Warehouse?</AlertDialogTitle>
-                                                                <AlertDialogDescription className="text-red-50 mt-2 font-medium">Permanently remove <span className="font-bold underline">{warehouse.name}</span>.</AlertDialogDescription>
+                                                                <AlertDialogTitle className="text-2xl font-bold tracking-tight uppercase leading-none">{t('inventory.delete_warehouse_confirm_title')}</AlertDialogTitle>
+                                                                <AlertDialogDescription className="text-red-50 mt-2 font-medium">{t('inventory.delete_warehouse_confirm_desc', { name: warehouse.name })}</AlertDialogDescription>
                                                             </div>
                                                             <AlertDialogFooter className="p-6 bg-white dark:bg-zinc-950 gap-3">
-                                                                <AlertDialogCancel className="rounded-full border-zinc-200 font-bold px-8 h-12">Cancel</AlertDialogCancel>
-                                                                <AlertDialogAction onClick={() => handleDelete(warehouse.id)} className="bg-red-600 hover:bg-red-700 text-white rounded-full font-bold px-10 h-12 border-0">Delete</AlertDialogAction>
+                                                                <AlertDialogCancel className="rounded-full border-zinc-200 font-bold px-8 h-12">{t('inventory.cancel')}</AlertDialogCancel>
+                                                                <AlertDialogAction onClick={() => handleDelete(warehouse.id)} className="bg-red-600 hover:bg-red-700 text-white rounded-full font-bold px-10 h-12 border-0">{t('inventory.confirm_delete')}</AlertDialogAction>
                                                             </AlertDialogFooter>
                                                         </AlertDialogContent>
                                                     </AlertDialog>
@@ -303,53 +304,53 @@ export default function WarehousesPage() {
                         <div className="p-8 space-y-8 flex-1">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-2xl font-black tracking-tighter uppercase leading-none bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent">
-                                    {editingWarehouse ? "Edit Warehouse" : "New Warehouse"}
+                                    {editingWarehouse ? t('inventory.edit_warehouse') : t('inventory.create_warehouse')}
                                 </h3>
                                 <button onClick={() => setDrawerOpen(false)} className="h-8 w-8 rounded-full hover:bg-zinc-100 flex items-center justify-center text-zinc-400"><X size={20} /></button>
                             </div>
 
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">Warehouse Name *</label>
+                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">{t('inventory.warehouse_name_label')} *</label>
                                     <div className="relative group">
                                         <Building className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-orange-500 transition-colors" size={18} />
                                         <Input
                                             value={form.name}
                                             onChange={(e) => setForm({ ...form, name: e.target.value })}
                                             className="pl-12 rounded-2xl h-12 bg-zinc-50 dark:bg-zinc-900 border-transparent focus:border-orange-500/50"
-                                            placeholder="e.g. MAIN STORAGE"
+                                            placeholder={t('inventory.warehouse_name_placeholder')}
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">Mobile</label>
+                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">{t('inventory.table_mobile')}</label>
                                     <div className="relative group">
                                         <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-orange-500 transition-colors" size={18} />
                                         <Input
                                             value={form.mobile}
                                             onChange={(e) => setForm({ ...form, mobile: e.target.value })}
                                             className="pl-12 rounded-2xl h-12 bg-zinc-50 dark:bg-zinc-900 border-transparent focus:border-orange-500/50"
-                                            placeholder="Contact number"
+                                            placeholder={t('inventory.table_mobile')}
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">Email</label>
+                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">{t('inventory.table_email')}</label>
                                     <div className="relative group">
                                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-orange-500 transition-colors" size={18} />
                                         <Input
                                             value={form.email}
                                             onChange={(e) => setForm({ ...form, email: e.target.value })}
                                             className="pl-12 rounded-2xl h-12 bg-zinc-50 dark:bg-zinc-900 border-transparent focus:border-orange-500/50"
-                                            placeholder="Email address"
+                                            placeholder={t('inventory.table_email')}
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">Status</label>
+                                    <label className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest leading-none">{t('inventory.table_status')}</label>
                                     <div className="grid grid-cols-2 gap-2">
                                         {(['Active', 'Inactive'] as const).map(s => (
                                             <button
@@ -362,7 +363,7 @@ export default function WarehousesPage() {
                                                         : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-500"
                                                 )}
                                             >
-                                                {s}
+                                                {s === "Active" ? t('inventory.active') : t('inventory.inactive')}
                                             </button>
                                         ))}
                                     </div>
@@ -377,7 +378,7 @@ export default function WarehousesPage() {
                                 className="w-full rounded-2xl h-14 font-black bg-gradient-to-r from-orange-400 via-red-500 to-orange-400 text-white border-0 shadow-xl shadow-red-500/25 uppercase tracking-tighter hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
                             >
                                 {saving ? <Loader2 className="animate-spin h-5 w-5" /> : <Check className="h-5 w-5" />}
-                                {editingWarehouse ? "Save Changes" : "Create Warehouse"}
+                                {editingWarehouse ? t('inventory.save_changes') : t('inventory.create_warehouse')}
                             </Button>
                         </div>
                     </div>

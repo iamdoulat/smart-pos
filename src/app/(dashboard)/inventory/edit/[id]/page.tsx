@@ -29,6 +29,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "@/i18n/TranslationContext";
 
 /* ─── Types ────────────────────────────────────────────────────────────── */
 const EMPTY_FORM = {
@@ -68,6 +69,7 @@ const EMPTY_FORM = {
    PAGE
    ═══════════════════════════════════════════════════════════════════════════ */
 export default function EditProductPage() {
+    const { t } = useTranslation();
     const { currentCompany } = useAuthStore();
     const router = useRouter();
     const params = useParams();
@@ -128,13 +130,13 @@ export default function EditProductPage() {
                     image: null,
                 });
             }).catch(() => {
-                toast.error("Failed to load product");
+                toast.error(t('inventory.load_failed'));
                 router.push("/inventory");
             }).finally(() => {
                 setLoading(false);
             });
         }
-    }, [productId]);
+    }, [productId, t, router]);
 
     const calculatePurchasePrice = (price: string, taxId: string, taxType: string) => {
         const p = parseFloat(price) || 0;
@@ -191,19 +193,17 @@ export default function EditProductPage() {
     };
 
     const handlePurchasePriceChange = (pp: string) => {
-        // When purchase price is manually entered, we assume the user is overriding the cost logic.
-        // We update the sales price based on the current margin.
         const sp = calculateSalesPrice(pp, form.profit_margin_percent);
         setForm({ ...form, purchase_price: pp, sales_price: sp });
     };
 
     const validate = () => {
         const e: Record<string, string> = {};
-        if (!form.name.trim()) e.name = "Item Name is required";
-        if (!form.item_code.trim()) e.item_code = "Item Code is required";
-        if (!form.category_id) e.category_id = "Category is required";
-        if (!form.purchase_price || isNaN(Number(form.purchase_price))) e.purchase_price = "Required";
-        if (!form.sales_price || isNaN(Number(form.sales_price))) e.sales_price = "Required";
+        if (!form.name.trim()) e.name = t('inventory.error_name_required');
+        if (!form.item_code.trim()) e.item_code = t('inventory.error_code_required');
+        if (!form.category_id) e.category_id = t('inventory.error_category_required');
+        if (!form.purchase_price || isNaN(Number(form.purchase_price))) e.purchase_price = t('inventory.required');
+        if (!form.sales_price || isNaN(Number(form.sales_price))) e.sales_price = t('inventory.required');
         setErrors(e);
         return Object.keys(e).length === 0;
     };
@@ -245,10 +245,10 @@ export default function EditProductPage() {
             }
 
             await ProductService.update(Number(productId), formData);
-            toast.success("Product updated successfully");
+            toast.success(t('inventory.product_updated_success'));
             router.push("/inventory");
         } catch {
-            toast.error("Failed to update product");
+            toast.error(t('inventory.product_updated_failed'));
         } finally {
             setSaving(false);
         }
@@ -262,14 +262,14 @@ export default function EditProductPage() {
                     <Package className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-purple-600 h-6 w-6" />
                 </div>
                 <p className="text-zinc-500 font-bold animate-pulse text-sm uppercase tracking-widest italic leading-none">
-                    Loading Product Details...
+                    {t('inventory.loading_product_details')}
                 </p>
             </div>
         );
     }
 
     return (
-        <div className="px-4 md:px-8 pb-4 md:pb-8 max-w-[1600px] mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="w-full p-4 md:p-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* ── Header ── */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -287,10 +287,10 @@ export default function EditProductPage() {
                         </div>
                         <div>
                             <h2 className="text-xl md:text-3xl font-black bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent tracking-tighter uppercase leading-none mb-1">
-                                Edit Product
+                                {t('inventory.edit_product_title')}
                             </h2>
                             <p className="text-[10px] md:text-sm text-zinc-500 dark:text-zinc-400 font-bold tracking-tight">
-                                Update the details of this catalog item.
+                                {t('inventory.edit_product_subtitle')}
                             </p>
                         </div>
                     </div>
@@ -305,41 +305,41 @@ export default function EditProductPage() {
                     <div className="space-y-6">
                         <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] flex items-center gap-3">
                             <span className="h-px w-8 bg-zinc-200 dark:bg-zinc-800" />
-                            General Information
+                            {t('inventory.section_general')}
                         </h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-                            <Field label="Item Code" required error={errors.item_code}>
+                            <Field label={t('inventory.item_code')} required error={errors.item_code}>
                                 <Input
                                     value={form.item_code}
                                     onChange={(e) => setForm({ ...form, item_code: e.target.value })}
                                     className="rounded-xl h-12 bg-zinc-50 border-transparent focus:border-purple-500/50"
                                 />
                             </Field>
-                            <Field label="Item Name" required error={errors.name}>
+                            <Field label={t('inventory.item_name')} required error={errors.name}>
                                 <Input
                                     value={form.name}
                                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                                     className="rounded-xl h-12 bg-zinc-50 border-transparent focus:border-purple-500/50"
                                 />
                             </Field>
-                            <Field label="Item Group" required>
+                            <Field label={t('inventory.item_group')} required>
                                 <Select value={form.item_group} onValueChange={(v) => setForm({ ...form, item_group: v })}>
                                     <SelectTrigger className="rounded-xl h-12 bg-zinc-50 border-transparent">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Single">Single</SelectItem>
-                                        <SelectItem value="Variants">Variants</SelectItem>
+                                        <SelectItem value="Single">{t('inventory.group_single')}</SelectItem>
+                                        <SelectItem value="Variants">{t('inventory.group_variants')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </Field>
 
-                            <Field label="Brand">
+                            <Field label={t('inventory.brand')}>
                                 <div className="flex gap-2">
                                     <Select value={form.brand_id} onValueChange={(v) => setForm({ ...form, brand_id: v })}>
                                         <SelectTrigger className="flex-1 rounded-xl h-12 bg-zinc-50 border-transparent">
-                                            <SelectValue placeholder="-Select-" />
+                                            <SelectValue placeholder={t('inventory.select_placeholder')} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {brands.map(b => <SelectItem key={b.id} value={b.id.toString()}>{b.name}</SelectItem>)}
@@ -352,11 +352,11 @@ export default function EditProductPage() {
                             </Field>
 
                             {form.item_group === "Variants" && (
-                                <Field label="Variant">
+                                <Field label={t('inventory.variant')}>
                                     <div className="flex gap-2 animate-in fade-in zoom-in duration-300">
                                         <Select value={form.variant_id} onValueChange={(v) => setForm({ ...form, variant_id: v })}>
                                             <SelectTrigger className="flex-1 rounded-xl h-12 bg-zinc-50 border-transparent">
-                                                <SelectValue placeholder="-Select-" />
+                                                <SelectValue placeholder={t('inventory.select_placeholder')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {variants.map(v => <SelectItem key={v.id} value={v.id.toString()}>{v.name}</SelectItem>)}
@@ -368,16 +368,16 @@ export default function EditProductPage() {
                                     </div>
                                 </Field>
                             )}
-                            <Field label="Unit" required>
+                            <Field label={t('inventory.unit')} required>
                                 <div className="flex gap-2">
                                     <Select value={form.unit} onValueChange={(v) => setForm({ ...form, unit: v })}>
                                         <SelectTrigger className="flex-1 rounded-xl h-12 bg-zinc-50 border-transparent">
-                                            <SelectValue placeholder="-Select-" />
+                                            <SelectValue placeholder={t('inventory.select_placeholder')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="Pcs">Pcs</SelectItem>
-                                            <SelectItem value="Kg">Kg</SelectItem>
-                                            <SelectItem value="Ltr">Ltr</SelectItem>
+                                            <SelectItem value="Pcs">{t('inventory.unit_pcs')}</SelectItem>
+                                            <SelectItem value="Kg">{t('inventory.unit_kg')}</SelectItem>
+                                            <SelectItem value="Ltr">{t('inventory.unit_ltr')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <Button variant="outline" size="icon" className="h-12 w-12 rounded-xl border-zinc-200">
@@ -385,7 +385,7 @@ export default function EditProductPage() {
                                     </Button>
                                 </div>
                             </Field>
-                            <Field label="SKU" hint="Optional">
+                            <Field label={t('inventory.sku')} hint="Optional">
                                 <Input
                                     value={form.sku}
                                     onChange={(e) => setForm({ ...form, sku: e.target.value })}
@@ -393,14 +393,14 @@ export default function EditProductPage() {
                                 />
                             </Field>
 
-                            <Field label="HSN">
+                            <Field label={t('inventory.hsn')}>
                                 <Input
                                     value={form.hsn}
                                     onChange={(e) => setForm({ ...form, hsn: e.target.value })}
                                     className="rounded-xl h-12 bg-zinc-50 border-transparent"
                                 />
                             </Field>
-                            <Field label="Alert Quantity">
+                            <Field label={t('inventory.alert_quantity')}>
                                 <Input
                                     type="number"
                                     value={form.alert_quantity}
@@ -408,7 +408,7 @@ export default function EditProductPage() {
                                     className="rounded-xl h-12 bg-zinc-50 border-transparent"
                                 />
                             </Field>
-                            <Field label="Seller Points">
+                            <Field label={t('inventory.seller_points')}>
                                 <Input
                                     type="number"
                                     value={form.seller_points}
@@ -417,7 +417,7 @@ export default function EditProductPage() {
                                 />
                             </Field>
 
-                            <Field label="Barcode">
+                            <Field label={t('inventory.barcode')}>
                                 <Input
                                     value={form.barcode}
                                     onChange={(e) => setForm({ ...form, barcode: e.target.value })}
@@ -425,11 +425,11 @@ export default function EditProductPage() {
                                 />
                             </Field>
                             <div className="md:col-span-1">
-                                <Field label="Category" required error={errors.category_id}>
+                                <Field label={t('inventory.category')} required error={errors.category_id}>
                                     <div className="flex gap-2">
                                         <Select value={form.category_id} onValueChange={(v) => setForm({ ...form, category_id: v })}>
                                             <SelectTrigger className="flex-1 rounded-xl h-12 bg-zinc-50 border-transparent">
-                                                <SelectValue placeholder="-Select-" />
+                                                <SelectValue placeholder={t('inventory.select_placeholder')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {categories.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}
@@ -442,7 +442,7 @@ export default function EditProductPage() {
                                 </Field>
                             </div>
                             <div className="md:col-span-1">
-                                <Field label="Select Image">
+                                <Field label={t('inventory.select_image')}>
                                     <input
                                         type="file"
                                         id="image-upload"
@@ -465,18 +465,18 @@ export default function EditProductPage() {
                                             "text-xs font-bold uppercase tracking-tighter truncate max-w-[200px]",
                                             form.image ? "text-emerald-600" : "text-zinc-500"
                                         )}>
-                                            {form.image ? form.image.name : "Choose File"}
+                                            {form.image ? form.image.name : t('inventory.choose_file')}
                                         </span>
                                         {form.image && <Check size={14} className="text-emerald-500 ml-auto" />}
                                     </div>
-                                    <p className="text-[10px] text-zinc-400 mt-1 font-bold">Max Width/Height: 1000px * 1000px & Size: 2MB</p>
+                                    <p className="text-[10px] text-zinc-400 mt-1 font-bold">{t('inventory.image_hint')}</p>
                                 </Field>
                             </div>
 
-                            <Field label="Warehouse">
+                            <Field label={t('inventory.warehouse')}>
                                 <Select value={form.warehouse_id} onValueChange={(v) => setForm({ ...form, warehouse_id: v })}>
                                     <SelectTrigger className="rounded-xl h-12 bg-zinc-50 border-transparent">
-                                        <SelectValue placeholder="-Select-" />
+                                        <SelectValue placeholder={t('inventory.select_placeholder')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {warehouses.map(w => (
@@ -486,7 +486,7 @@ export default function EditProductPage() {
                                 </Select>
                             </Field>
 
-                            <Field label="Stock">
+                            <Field label={t('inventory.stock')}>
                                 <Input
                                     type="number"
                                     value={form.stock_quantity}
@@ -496,7 +496,7 @@ export default function EditProductPage() {
                             </Field>
                         </div>
 
-                        <Field label="Description">
+                        <Field label={t('inventory.description')}>
                             <textarea
                                 rows={2}
                                 value={form.description}
@@ -512,22 +512,22 @@ export default function EditProductPage() {
                     <div className="space-y-6">
                         <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] flex items-center gap-3">
                             <span className="h-px w-8 bg-zinc-200 dark:bg-zinc-800" />
-                            Pricing & Discounts
+                            {t('inventory.section_pricing')}
                         </h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-                            <Field label="Discount Type">
+                            <Field label={t('inventory.discount_type')}>
                                 <Select value={form.discount_type} onValueChange={(v) => setForm({ ...form, discount_type: v })}>
                                     <SelectTrigger className="rounded-xl h-12 bg-zinc-50 border-transparent">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Percentage(%)">Percentage(%)</SelectItem>
-                                        <SelectItem value="Fixed">Fixed Amount</SelectItem>
+                                        <SelectItem value="Percentage(%)">{t('inventory.discount_percentage')}</SelectItem>
+                                        <SelectItem value="Fixed">{t('inventory.discount_fixed')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </Field>
-                            <Field label="Discount">
+                            <Field label={t('inventory.discount')}>
                                 <Input
                                     type="number"
                                     value={form.discount}
@@ -537,22 +537,22 @@ export default function EditProductPage() {
                             </Field>
                             <div className="hidden md:block" />
 
-                            <Field label="Price*" required error={errors.price_before_tax}>
+                            <Field label={t('inventory.price_label')} required error={errors.price_before_tax}>
                                 <Input
-                                    placeholder="Price of Item without Tax"
+                                    placeholder={t('inventory.price_placeholder')}
                                     value={form.price_before_tax}
                                     onChange={(e) => handlePriceChange(e.target.value)}
                                     className="rounded-xl h-12 bg-zinc-50 border-transparent"
                                 />
                             </Field>
-                            <Field label="Tax*">
+                            <Field label={t('inventory.tax_label')}>
                                 <div className="flex gap-2">
                                     <Select value={form.tax_id} onValueChange={(v) => handleTaxChange(v)}>
                                         <SelectTrigger className="flex-1 rounded-xl h-12 bg-zinc-50 border-transparent">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="NONE">NONE</SelectItem>
+                                            <SelectItem value="NONE">{t('inventory.tax_none')}</SelectItem>
                                             {taxes.map(t => (
                                                 <SelectItem key={t.id} value={t.id.toString()}>{t.name} ({t.rate}%)</SelectItem>
                                             ))}
@@ -563,27 +563,27 @@ export default function EditProductPage() {
                                     </Button>
                                 </div>
                             </Field>
-                            <Field label="Purchase Price*" required>
+                            <Field label={t('inventory.purchase_price_label')} required error={errors.purchase_price}>
                                 <Input
-                                    placeholder="Total Price with Tax Amount"
+                                    placeholder={t('inventory.purchase_price_placeholder')}
                                     value={form.purchase_price}
                                     onChange={(e) => handlePurchasePriceChange(e.target.value)}
                                     className="rounded-xl h-12 bg-zinc-100 border-transparent font-bold"
                                 />
                             </Field>
 
-                            <Field label="Tax Type*" required>
+                            <Field label={t('inventory.tax_type_label')} required>
                                 <Select value={form.tax_type} onValueChange={(v) => handleTaxTypeChange(v)}>
                                     <SelectTrigger className="rounded-xl h-12 bg-zinc-50 border-transparent">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Exclusive">Exclusive</SelectItem>
-                                        <SelectItem value="Inclusive">Inclusive</SelectItem>
+                                        <SelectItem value="Exclusive">{t('inventory.tax_exclusive')}</SelectItem>
+                                        <SelectItem value="Inclusive">{t('inventory.tax_inclusive')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </Field>
-                            <Field label="Profit Margin(%)" hint="Info icon here">
+                            <Field label={t('inventory.profit_margin_label')} hint="Info icon here">
                                 <div className="relative">
                                     <Input
                                         value={form.profit_margin_percent}
@@ -593,7 +593,7 @@ export default function EditProductPage() {
                                     <Info size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-rose-500" />
                                 </div>
                             </Field>
-                            <Field label="Sales Price*">
+                            <Field label={t('inventory.sales_price_label')} required error={errors.sales_price}>
                                 <Input
                                     value={form.sales_price}
                                     onChange={(e) => handleSalesPriceChange(e.target.value)}
@@ -601,10 +601,10 @@ export default function EditProductPage() {
                                 />
                             </Field>
 
-                            <Field label="MRP">
+                            <Field label={t('inventory.mrp_label')}>
                                 <div className="relative">
                                     <Input
-                                        placeholder="Maximum Retail Price"
+                                        placeholder={t('inventory.mrp_placeholder')}
                                         value={form.mrp}
                                         onChange={(e) => setForm({ ...form, mrp: e.target.value })}
                                         className="rounded-xl h-12 bg-zinc-50 border-transparent pr-10"
@@ -616,8 +616,6 @@ export default function EditProductPage() {
                     </div>
 
                     <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
-
-                    <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
                 </div>
 
                 {/* Footer */}
@@ -627,14 +625,14 @@ export default function EditProductPage() {
                         disabled={saving}
                         className="bg-gradient-to-r from-orange-500 via-purple-500 to-indigo-600 hover:scale-[1.02] active:scale-95 text-white rounded-xl px-12 h-12 font-black uppercase tracking-tighter min-w-[160px] shadow-lg shadow-purple-500/25 border-0 transition-all"
                     >
-                        {saving ? <Loader2 className="animate-spin h-5 w-5" /> : "Save"}
+                        {saving ? <Loader2 className="animate-spin h-5 w-5" /> : t('inventory.save')}
                     </Button>
                     <Button
                         variant="secondary"
                         onClick={() => router.back()}
                         className="bg-gradient-to-r from-rose-500 via-red-500 to-orange-600 hover:scale-[1.02] active:scale-95 text-white rounded-xl px-12 h-12 font-black uppercase tracking-tighter min-w-[160px] shadow-lg shadow-rose-500/25 border-0 transition-all"
                     >
-                        Close
+                        {t('inventory.close')}
                     </Button>
                 </div>
             </div>

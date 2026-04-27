@@ -148,3 +148,45 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* RTL Support for Arabic */
+html[dir="rtl"] {
+  direction: rtl;
+}
+
+html[dir="rtl"] .flex {
+  /* Flexbox auto-handles RTL direction */
+}
+
+html[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+html[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+html[dir="rtl"] .ml-auto {
+  margin-left: unset;
+  margin-right: auto;
+}
+
+html[dir="rtl"] .mr-auto {
+  margin-right: unset;
+  margin-left: auto;
+}
+
+html[dir="rtl"] .border-l {
+  border-left: none;
+  border-right: 1px solid;
+}
+
+html[dir="rtl"] .pl-4 {
+  padding-left: unset;
+  padding-right: 1rem;
+}
+
+html[dir="rtl"] .ml-7 {
+  margin-left: unset;
+  margin-right: 1.75rem;
+}

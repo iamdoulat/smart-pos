@@ -17,6 +17,7 @@ import {
     PlusSquare,
     ChevronLeft,
     ChevronRight,
+    Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -73,6 +74,43 @@ function CustomersContent() {
         }
     };
 
+    const handleExport = () => {
+        if (contacts.length === 0) {
+            toast.error(t('contacts.no_customers_to_export'));
+            return;
+        }
+
+        // CSV Header
+        const headers = ["ID", "Name", "Mobile", "Email", "Balance", "Address"];
+        
+        // CSV Rows
+        const rows = contacts.map(c => [
+            c.id,
+            `"${c.name.replace(/"/g, '""')}"`,
+            c.mobile || c.phone || "",
+            c.email || "",
+            c.opening_balance || 0,
+            `"${(c.address || "").replace(/"/g, '""')}"`
+        ]);
+
+        const csvContent = [
+            headers.join(","),
+            ...rows.map(r => r.join(","))
+        ].join("\n");
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `customers_export_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        toast.success(t('contacts.export_success'));
+    };
+
     const filteredContacts = contacts.filter(c =>
         c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         c.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -120,6 +158,12 @@ function CustomersContent() {
                         />
                     </div>
                     <Button
+                        onClick={handleExport}
+                        className="w-full sm:w-auto bg-gradient-to-r from-orange-400 to-indigo-600 text-white rounded-full px-8 h-12 shadow-xl shadow-indigo-500/20 font-black uppercase tracking-widest text-[10px] transition-all hover:scale-[1.02] active:scale-95 border-0 flex items-center gap-2"
+                    >
+                        <Download size={18} strokeWidth={3} /> {t('contacts.export_customers')}
+                    </Button>
+                    <Button
                         onClick={() => router.push('/contacts/customers/form')}
                         className="w-full sm:w-auto bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-full px-10 h-12 shadow-xl shadow-orange-500/20 font-black uppercase tracking-widest text-[10px] transition-all hover:scale-[1.02] active:scale-95 border-0"
                     >
@@ -157,7 +201,7 @@ function CustomersContent() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="font-bold text-zinc-900 dark:text-zinc-100 text-base">{contact.name}</span>
+                                            <span className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">{contact.name}</span>
                                         </td>
                                         <td className="px-6 py-4">
                                             {contact.mobile || contact.phone ? (

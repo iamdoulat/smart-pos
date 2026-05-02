@@ -69,9 +69,8 @@ function LoginContent() {
     const [resending, setResending] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem("auth_token");
-        if (user || token) {
-            window.location.href = "/dashboard";
+        if (user) {
+            router.push("/dashboard");
         }
     }, [user, router]);
 
